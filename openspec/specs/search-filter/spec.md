@@ -40,7 +40,7 @@ The system SHALL provide an accessible text search interface.
 - **AND** the full timeline SHALL be visible again
 
 #### Scenario: Close search interface
-- **WHEN** I press Escape or click outside the search box with the search interface open
+- **WHEN** I press Escape while the search input is focused
 - **THEN** the search interface SHALL close
 - **AND** any active search SHALL be cleared
 - **AND** focus SHALL return to the timeline

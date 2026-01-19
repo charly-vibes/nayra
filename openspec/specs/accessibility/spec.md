@@ -30,10 +30,11 @@ The system SHALL maintain a hidden accessible DOM synchronized with canvas rende
 - **AND** the label SHALL include temporal information (e.g., "World War II, 1939 to 1945")
 
 #### Scenario: Parallel DOM synchronization
-- **WHEN** visible events change due to viewport pan or zoom
-- **THEN** the parallel DOM SHALL be updated to match visible events
-- **AND** events that scroll out of view SHALL be removed from the DOM
-- **AND** newly visible events SHALL be added to the DOM
+- **WHEN** the viewport is changing during a pan or zoom interaction
+- **THEN** the parallel DOM SHALL be updated continuously or in near real-time
+- **AND** the currently focused event (if any) SHALL always be present in the parallel DOM
+- **AND** the update SHALL be debounced to prevent performance degradation, but not at the expense of accessibility
+- **AND** newly visible events SHALL be added to the DOM and old ones removed as they go out of view
 
 ### Requirement: Keyboard Navigation
 

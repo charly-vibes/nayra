@@ -3,9 +3,7 @@
 ## Purpose
 
 The data loading system efficiently fetches, validates, and persists event data from various sources. The system SHALL support static JSON files with compression, IndexedDB caching, external data sources like SPARQL endpoints, and progressive loading for large datasets while maintaining application responsiveness.
-
 ## Requirements
-
 ### Requirement: Static JSON Loading
 
 The system SHALL load event data from static JSON files efficiently.
@@ -128,7 +126,7 @@ The system SHALL use IndexedDB for client-side data persistence and caching.
 
 ### Requirement: External Data Sources (Future Consideration)
 
-The system MAY support loading data from external sources like SPARQL endpoints. The recommended approach for initial implementation is the pre-generated static file method.
+The system SHALL optionally support loading data from external sources like SPARQL endpoints. The recommended approach for initial implementation is the pre-generated static file method.
 
 #### Scenario: Wikidata SPARQL query
 - **WHEN** the application loads data from Wikidata with a SPARQL query defined
@@ -196,6 +194,27 @@ The system SHALL support exporting visible event data.
 - **THEN** visible events SHALL be serialized to JSON
 - **AND** the JSON SHALL be downloadable
 - **AND** the format SHALL match the input schema
+
+### Requirement: Out of Scope - Offline Support
+
+The system SHALL NOT implement Service Worker-based offline support in the initial version. This is explicitly out of scope.
+
+#### Scenario: No Service Worker registration
+- **WHEN** the application loads
+- **THEN** no Service Worker SHALL be registered
+- **AND** the application SHALL require network connectivity for initial data load
+
+#### Scenario: Cached data only via IndexedDB
+- **WHEN** data has been previously loaded and cached in IndexedDB
+- **THEN** the cached data SHALL be available on subsequent visits
+- **AND** this caching is independent of Service Worker functionality
+- **AND** cache invalidation SHALL follow standard IndexedDB patterns
+
+#### Scenario: Network failure handling
+- **WHEN** the network is unavailable and no cached data exists
+- **THEN** an error message SHALL be displayed
+- **AND** the user SHALL be informed that network connectivity is required
+- **AND** a retry option SHALL be offered when possible
 
 ## Technical Notes
 

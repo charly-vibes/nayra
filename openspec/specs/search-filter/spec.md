@@ -3,9 +3,7 @@
 ## Purpose
 
 The search and filtering system enables users to quickly locate specific events within large datasets. The system SHALL provide real-time text search, category-based filtering, boolean operators, result navigation, and search persistence through URL encoding while maintaining sub-100ms search performance on 10,000+ events.
-
 ## Requirements
-
 ### Requirement: Text Search Interface
 
 The system SHALL provide an accessible text search interface.
@@ -29,7 +27,7 @@ The system SHALL provide an accessible text search interface.
 
 #### Scenario: Real-time search filtering
 - **WHEN** I type in the open search interface
-- **THEN** the search results SHALL update after a short debounce period (e.g., 150-200ms)
+- **THEN** the search results SHALL update after a debounce period of 150ms
 - **AND** the filtering SHALL feel responsive without overwhelming the system on each keystroke
 - **AND** no lag SHALL be perceptible
 

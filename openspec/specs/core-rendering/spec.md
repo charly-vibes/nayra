@@ -3,9 +3,7 @@
 ## Purpose
 
 The core rendering system provides efficient HTML5 Canvas-based visualization capable of displaying 10,000+ events at 60 FPS using a hybrid layered architecture with dirty checking.
-
 ## Requirements
-
 ### Requirement: Canvas DPI Scaling
 
 The system SHALL initialize canvas elements with proper DPI scaling based on devicePixelRatio to ensure sharp rendering on high-DPI displays.
@@ -147,6 +145,29 @@ The system SHALL apply visual styling to events based on category, selection sta
 - **WHEN** the mouse is hovering over an event and the timeline is rendered
 - **THEN** the hovered event SHALL have a hover visual style
 - **AND** the cursor SHALL change to indicate interactivity
+
+### Requirement: Responsive Canvas Resize
+
+The system SHALL handle window and container resize events, re-initializing canvas dimensions and DPI scaling while preserving viewport state.
+
+#### Scenario: Window resize triggers canvas update
+- **WHEN** the browser window is resized
+- **THEN** the canvas buffer dimensions SHALL be recalculated based on new container size
+- **AND** DPI scaling SHALL be reapplied based on current devicePixelRatio
+- **AND** the viewport temporal range SHALL be preserved
+- **AND** a redraw SHALL be triggered
+
+#### Scenario: Container resize without window change
+- **WHEN** the timeline container is resized (e.g., sidebar toggle) without a window resize event
+- **THEN** a ResizeObserver SHALL detect the change
+- **AND** the canvas SHALL resize accordingly
+- **AND** performance SHALL not degrade during resize
+
+#### Scenario: Resize debouncing
+- **WHEN** rapid resize events occur (e.g., user dragging window edge)
+- **THEN** canvas reinitialization SHALL be debounced
+- **AND** the final resize SHALL be applied after events settle
+- **AND** intermediate states SHALL not cause visual glitches
 
 ## Technical Notes
 

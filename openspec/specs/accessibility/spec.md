@@ -3,9 +3,7 @@
 ## Purpose
 
 The accessibility system ensures the timeline is usable by all users regardless of ability. The system SHALL comply with WCAG 2.1 Level AA standards through parallel DOM structures for screen readers, comprehensive keyboard navigation, sufficient color contrast, and proper ARIA attributes.
-
 ## Requirements
-
 ### Requirement: Parallel DOM Structure
 
 The system SHALL maintain a hidden accessible DOM synchronized with canvas rendering.
@@ -216,6 +214,28 @@ The system SHALL pass WCAG 2.1 Level AA compliance testing.
 - **THEN** all content SHALL be accessible
 - **AND** navigation SHALL be coherent
 - **AND** announcements SHALL be helpful and accurate
+
+### Requirement: Skip Navigation Links
+
+The system SHALL provide skip links to allow keyboard users to bypass repetitive content and navigate directly to main timeline content.
+
+#### Scenario: Skip to timeline link
+- **WHEN** the page loads and I press Tab as a keyboard user
+- **THEN** the first focusable element SHALL be a "Skip to timeline" link
+- **AND** the link SHALL be visually hidden until focused
+- **AND** activating the link SHALL move focus to the timeline container
+
+#### Scenario: Skip link visibility on focus
+- **WHEN** the skip link receives keyboard focus
+- **THEN** the link SHALL become visible
+- **AND** the link SHALL have sufficient contrast (WCAG AA)
+- **AND** the link SHALL be positioned prominently (e.g., top-left)
+
+#### Scenario: Multiple skip links
+- **WHEN** the page has multiple regions (e.g., search, timeline, details panel)
+- **THEN** skip links MAY be provided for each major region
+- **AND** the order SHALL be logical
+- **AND** screen readers SHALL announce the link purposes clearly
 
 ## Technical Notes
 

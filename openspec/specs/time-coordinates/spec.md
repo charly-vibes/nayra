@@ -3,9 +3,7 @@
 ## Purpose
 
 The time coordinate system represents temporal positions using BigInt to support timescales from nanoseconds to billions of years, handling geological, astronomical, and cosmological events with precision.
-
 ## Requirements
-
 ### Requirement: BigInt Temporal Coordinates
 
 The system SHALL represent all temporal coordinates as BigInt offsets from a configurable zero point to support unlimited temporal range.
@@ -166,6 +164,28 @@ The system SHALL handle extreme temporal values without precision loss or overfl
 - **WHEN** storing the coordinate for an event with millisecond precision
 - **THEN** sub-second precision SHALL be preserved
 - **AND** the coordinate SHALL be accurate to milliseconds or better
+
+### Requirement: Duration Validation
+
+The system SHALL validate event durations and handle edge cases gracefully.
+
+#### Scenario: Zero duration events
+- **WHEN** an event has identical start and end times
+- **THEN** the duration SHALL be calculated as 0n (BigInt zero)
+- **AND** the event SHALL be treated as a point event
+- **AND** rendering SHALL use point event visual style
+
+#### Scenario: Negative duration rejection
+- **WHEN** an event is loaded with end time before start time (end < start)
+- **THEN** the event SHALL be rejected during validation
+- **AND** an error SHALL be logged indicating the invalid duration
+- **AND** other valid events SHALL still load successfully
+
+#### Scenario: Missing end time handling
+- **WHEN** an event has a start time but no end time
+- **THEN** the event SHALL be treated as a point event
+- **AND** duration SHALL default to 0n
+- **AND** no error SHALL be raised
 
 ## Technical Notes
 

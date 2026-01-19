@@ -111,6 +111,12 @@ The system SHALL support boolean operators and complex queries.
 - **THEN** events within that time range SHALL be highlighted
 - **AND** events outside the range SHALL be filtered
 
+#### Scenario: Invalid search syntax
+- **WHEN** I type an incomplete query like "War AND" in the advanced search interface
+- **THEN** an error message SHALL be displayed
+- **AND** the message SHALL indicate the syntax error
+- **AND** the search SHALL not execute
+
 ### Requirement: Category Filtering
 
 The system SHALL support filtering by event categories and tags.

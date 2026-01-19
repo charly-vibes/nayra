@@ -171,8 +171,8 @@ The system SHALL provide adequately sized touch targets.
 
 #### Scenario: Adequate touch target sizes
 - **WHEN** interactive elements are displayed on touch devices
-- **THEN** touch targets SHALL be at least 44x44 CSS pixels (WCAG AAA)
-- **AND** minimum 24x24 pixels (WCAG AA 2.2)
+- **THEN** touch targets SHALL be at least 24x24 CSS pixels
+- **AND** a target size of 44x44 CSS pixels SHALL be preferred
 - **AND** targets SHALL be spaced to avoid accidental activation
 
 #### Scenario: Pointer cancellation support

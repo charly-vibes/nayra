@@ -104,7 +104,8 @@ The system SHALL use IndexedDB for client-side data persistence and caching.
 #### Scenario: Check cache on startup
 - **WHEN** initialization occurs
 - **THEN** the application SHALL check if data exists in IndexedDB
-- **AND** if cached data exists and is valid, it SHALL be used
+- **AND** it SHALL verify if the cached data is stale (e.g., by checking a version number or ETag)
+- **AND** if cached data exists and is not stale, it SHALL be used
 - **AND** fetching from network SHALL be skipped
 
 #### Scenario: Store fetched data

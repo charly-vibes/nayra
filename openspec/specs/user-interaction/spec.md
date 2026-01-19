@@ -24,7 +24,7 @@ The system SHALL provide responsive mouse-based interaction with visual feedback
 - **AND** event details MAY be displayed in a panel
 
 #### Scenario: Multi-select with modifier
-- **WHEN** I Ctrl+Click on event B with event A already selected
+- **WHEN** I Ctrl+Click (or Cmd+Click on macOS) on event B with event A already selected
 - **THEN** both event A and event B SHALL be selected
 - **AND** the selection SHALL be visually indicated
 - **AND** I SHALL be able to select additional events
@@ -79,7 +79,7 @@ The system SHALL provide accurate, efficient hit detection for all interactive e
 - **WHEN** I click near an event edge with events having different shapes (points vs bars)
 - **THEN** the hit detection SHALL use geometric intersection
 - **AND** clicks just outside the event SHALL not trigger selection
-- **AND** precision SHALL be maintained
+- **AND** precision SHALL be maintained (i.e., based on geometry, not bounding box)
 
 ### Requirement: Keyboard Navigation
 
@@ -135,7 +135,7 @@ The system SHALL display contextual information through tooltips and detail pane
 #### Scenario: Detail panel closing
 - **WHEN** I click the close button or press Escape with an event detail panel displayed
 - **THEN** the detail panel SHALL close
-- **AND** the event SHALL remain selected or be deselected based on design
+- **AND** the event SHALL remain selected
 
 ### Requirement: Search Interface Integration
 
@@ -176,12 +176,12 @@ The system SHALL provide contextual actions through right-click menus.
 - **THEN** the viewport SHALL animate to focus on that event
 - **AND** the context menu SHALL close
 
-### Requirement: Drag and Drop
+### Requirement: Drag and Drop (Conditional)
 
-The system SHALL support event repositioning through drag and drop where applicable.
+The system SHALL support event repositioning through drag and drop when an explicit edit mode is enabled.
 
-#### Scenario: Event repositioning via drag
-- **WHEN** I drag a selected event horizontally on a timeline that supports editing
+#### Scenario: Event repositioning via drag in edit mode
+- **WHEN** I drag a selected event horizontally on a timeline that has editing enabled
 - **THEN** the event SHALL move in time
 - **AND** a preview SHALL show the new position
 - **AND** the change SHALL be applied on release

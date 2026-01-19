@@ -126,9 +126,9 @@ The system SHALL use IndexedDB for client-side data persistence and caching.
 - **AND** IndexedDB indices SHALL be used for efficient querying
 - **AND** the query SHALL be asynchronous (non-blocking)
 
-### Requirement: External Data Sources
+### Requirement: External Data Sources (Future Consideration)
 
-The system SHALL support loading data from external sources like SPARQL endpoints.
+The system MAY support loading data from external sources like SPARQL endpoints. The recommended approach for initial implementation is the pre-generated static file method.
 
 #### Scenario: Wikidata SPARQL query
 - **WHEN** the application loads data from Wikidata with a SPARQL query defined

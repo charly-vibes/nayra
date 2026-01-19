@@ -28,9 +28,9 @@ The system SHALL provide an accessible text search interface.
 - **AND** the search SHALL include description text
 
 #### Scenario: Real-time search filtering
-- **WHEN** I type each character in the open search interface
-- **THEN** the search results SHALL update immediately
-- **AND** the filtering SHALL feel instantaneous
+- **WHEN** I type in the open search interface
+- **THEN** the search results SHALL update after a short debounce period (e.g., 150-200ms)
+- **AND** the filtering SHALL feel responsive without overwhelming the system on each keystroke
 - **AND** no lag SHALL be perceptible
 
 #### Scenario: Clear search results
@@ -82,7 +82,7 @@ The system SHALL enable navigation through search results.
 - **AND** the timeline SHALL show all events (dimmed or unhighlighted)
 - **AND** the user SHALL be informed clearly
 
-### Requirement: Advanced Search Features
+### Requirement: Advanced Search Features (Future Consideration)
 
 The system SHALL support boolean operators and complex queries.
 
@@ -170,25 +170,27 @@ The system SHALL maintain fast search performance on large datasets.
 
 #### Scenario: Indexed search for very large datasets
 - **WHEN** performing searches on a timeline with 100,000+ events
-- **THEN** an inverted index or similar structure SHALL be used
+- **THEN** an inverted index or similar structure SHALL be used for fast lookups
+- **AND** this index MAY be pre-computed or built incrementally in a web worker to avoid blocking the main thread
 - **AND** searches SHALL remain fast (< 200ms)
 - **AND** IndexedDB or Web Worker MAY assist
 
 ### Requirement: Search Persistence
 
-The system SHALL persist search state through URL encoding.
+The system SHALL persist and restore search state via the central URL state serialization strategy.
 
 #### Scenario: Preserve search in URL
-- **WHEN** the URL is updated with a search active
-- **THEN** the search term SHALL be encoded in the hash
-- **AND** sharing the URL SHALL restore the search
-- **AND** the filtered view SHALL be reproducible
+- **WHEN** a search is performed or cleared
+- **THEN** the search state (query, filters) SHALL be sent to the central state manager
+- **AND** the state manager SHALL update the URL hash to include the search state (e.g., `q=...`)
+- **AND** sharing the URL SHALL allow restoring the search and its results
 
 #### Scenario: Restore search from URL
-- **WHEN** the timeline loads with a URL containing a search parameter
-- **THEN** the search SHALL be applied automatically
-- **AND** the results SHALL be displayed
-- **AND** the search input SHALL show the term
+- **WHEN** the application loads
+- **THEN** the state manager SHALL parse the URL hash for a search query parameter
+- **AND** if present, the search SHALL be applied automatically
+- **AND** the search input SHALL be populated with the restored query
+- **AND** the timeline SHALL display the corresponding filtered view
 
 ### Requirement: Search Accessibility
 

@@ -6,7 +6,15 @@ const store = createStore();
 
 initRenderer(canvas, store.dispatch);
 
-draw(store.getState());
-store.subscribe((state) => {
-  draw(state);
-});
+let lastRenderedRevision = -1;
+
+function loop() {
+  const state = store.getState();
+  if (state.revision !== lastRenderedRevision) {
+    draw(state);
+    lastRenderedRevision = state.revision;
+  }
+  requestAnimationFrame(loop);
+}
+
+requestAnimationFrame(loop);

@@ -8,8 +8,8 @@ let fps = 0;
 let frameCount = 0;
 let fpsUpdateTime = 0;
 
-const EVENT_HEIGHT = 20;
-const EVENT_COLORS = [
+export const EVENT_HEIGHT = 20;
+export const EVENT_COLORS = [
   '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4',
   '#ffeaa7', '#dfe6e9', '#fd79a8', '#a29bfe',
 ];
@@ -107,7 +107,7 @@ function drawEvent(event, state, axisY, canvasWidth) {
   ctx.strokeRect(x, y, eventWidth, EVENT_HEIGHT);
 }
 
-function hashCode(str) {
+export function hashCode(str) {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
@@ -115,6 +115,22 @@ function hashCode(str) {
     hash = hash & hash;
   }
   return Math.abs(hash);
+}
+
+export function getEventColor(eventId) {
+  const colorIndex = hashCode(eventId) % EVENT_COLORS.length;
+  return EVENT_COLORS[colorIndex];
+}
+
+export function cullEvents(events, viewportStart, viewportEnd) {
+  const visible = [];
+  for (const event of events) {
+    const duration = event.end !== undefined ? event.end - event.start : 0n;
+    if (isVisible(event.start, duration, viewportStart, viewportEnd)) {
+      visible.push(event);
+    }
+  }
+  return visible;
 }
 
 function updateFPS(now) {

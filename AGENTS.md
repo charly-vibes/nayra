@@ -30,6 +30,8 @@ nayra/
 ├── plans/           # Implementation plans (YYYY-MM-DD-description.md)
 ├── handoffs/        # Session handoff documents for context transfer
 ├── debates/         # Design debates and decision records
+├── openspec/        # OpenSpec specs and change proposals
+├── .beads/          # Beads issue database (git-tracked)
 ├── .agents/commands/  # Agent workflow commands
 ├── .claude/commands/  # Claude Code slash commands (symlinked)
 ├── src/             # Source code (vanilla JS modules)
@@ -79,9 +81,11 @@ Commands are available as slash commands in Claude Code:
     - If you can't tidy first, note it and proceed—but prefer tidying
     - A clean workspace is a productive workspace
 
-3.  **Spec-Driven Development (SDD)**: All new functionality begins with a specification. We use Gherkin (`.feature` files) to describe how a feature should behave from the user's perspective. These specs are human-readable, serve as living documentation, and form the foundation of our test suite.
+3.  **Spec-Driven Development (SDD)**: All new functionality begins with a specification. We use Gherkin (`.feature` files) to describe how a feature should behave from the user's perspective. These specs are human-readable, serve as living documentation, and form the foundation of our test suite. For larger changes, use OpenSpec (`openspec/`) to create formal change proposals.
 
-4.  **Test-Driven Development (TDD)**: The specs are implemented as automated tests *before* the feature code is written. The development cycle is "Red, Green, Refactor":
+4.  **Beads for Execution**: Use Beads (`bd`) as persistent agent memory and issue tracking. Plan with OpenSpec, execute with Beads. At session start, run `bd quickstart` to understand current work. File issues for discovered work with `bd create`. Query ready work with `bd ready --json`.
+
+5.  **Test-Driven Development (TDD)**: The specs are implemented as automated tests *before* the feature code is written. The development cycle is "Red, Green, Refactor":
     *   **Red**: Write a failing test that implements a single scenario from the spec.
     *   **Green**: Write the simplest possible production code to make the test pass.
     *   **Refactor**: Clean up the production and test code while keeping the test green.
@@ -102,6 +106,19 @@ Based on our architectural analysis (see `Vanilla JS Data Visualization Backend 
 
 All contributions to `nayra` must follow this process:
 
+### Session Startup
+
+At the start of each session, run `bd quickstart` to understand current work context and priorities.
+
+### Planning with OpenSpec + Beads
+
+1. **Plan with OpenSpec** → Create `proposal.md`, `tasks.md`, spec deltas for large features
+2. **Import into Beads** → Ask: *"File Beads epics and issues for all work in this proposal, with dependencies"*
+3. **Execute with Beads** → Query `bd ready --json` to find unblocked work
+4. **Archive with OpenSpec** → After deployment, archive the change and update specs
+
+### Implementation Cycle (TDD)
+
 1.  **Create/Update a Spec File**: In the `specs/` directory, create or modify a `.feature` file that describes the desired functionality. Use clear, user-centric Gherkin syntax.
     *   *Example*: `specs/01_canvas_rendering.feature`
 
@@ -114,6 +131,17 @@ All contributions to `nayra` must follow this process:
 5.  **Refactor**: With passing tests as a safety net, refactor the code for clarity, efficiency, and adherence to style guidelines. Re-run tests to ensure nothing was broken.
 
 6.  **Repeat**: Continue this cycle for all scenarios in the spec file. Once all scenarios for a feature are implemented, the feature is considered complete.
+
+### Beads During Development
+
+- **File discovered work**: When you find bugs or TODOs during implementation, run `bd create "title" -d "description"` to track them. **Always include a description** (`-d`) explaining the context and acceptance criteria.
+- **Update issues**: Use `bd update <id>` with flags (not `bd edit` which opens an editor). Examples:
+  - `bd update nayra-abc123 -d "new description"` - update description
+  - `bd update nayra-abc123 --title "new title"` - update title
+  - `bd update nayra-abc123 -s in_progress` - change status
+  - `bd update nayra-abc123 -p P1` - change priority
+- **Link dependencies**: Use `bd link` to connect related issues
+- **Update status**: Use `bd close` when work is complete
 
 This structured approach ensures that `nayra` is built on a solid foundation of clear specifications and comprehensive tests, making it robust and easy to maintain.
 
@@ -200,9 +228,9 @@ docs: add Canvas architecture reference to README
 
 **MANDATORY WORKFLOW:**
 
-1. **File issues for remaining work** - Create issues for anything that needs follow-up
+1. **File issues for remaining work** - Use `bd create` to track anything that needs follow-up
 2. **Run quality gates** (if code changed) - Tests, linters, builds
-3. **Update issue status** - Close finished work, update in-progress items
+3. **Update issue status** - Use `bd close` for finished work, update in-progress items
 4. **PUSH TO REMOTE** - This is MANDATORY:
    ```bash
    git pull --rebase

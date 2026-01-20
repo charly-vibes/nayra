@@ -134,7 +134,10 @@ At the start of each session, run `bd quickstart` to understand current work con
 
 ### Beads During Development
 
-- **File discovered work**: When you find bugs or TODOs during implementation, run `bd create "title" -d "description"` to track them. **Always include a description** (`-d`) explaining the context and acceptance criteria.
+- **File discovered work**: When you find bugs or TODOs during implementation, run `bd create "title" -d "description"` to track them. **Always include a description** (`-d`) explaining the context and acceptance criteria. **Every issue description MUST end with:**
+  ```
+  CRITICAL: Follow TDD and Tidy First.
+  ```
 - **Update issues**: Use `bd update <id>` with flags (not `bd edit` which opens an editor). Examples:
   - `bd update nayra-abc123 -d "new description"` - update description
   - `bd update nayra-abc123 --title "new title"` - update title

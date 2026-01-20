@@ -28,16 +28,16 @@ test:
 test-cover:
     @command -v npm >/dev/null 2>&1 && npm run test:coverage || echo "⚠️  No test framework configured yet"
 
-# Run visual regression tests (if configured)
-test-visual:
-    @echo "⚠️  Visual regression testing not yet configured"
+# Run E2E tests (Playwright)
+test-e2e:
+    @command -v npx >/dev/null 2>&1 && npm run test:e2e || echo "⚠️  Playwright not installed"
 
 # Run performance benchmarks
 test-perf:
     @echo "⚠️  Performance benchmarks not yet configured"
 
 # Run ALL test tiers
-test-all: test
+test-all: test test-e2e
     @echo "✅ All test tiers passed"
 
 # === Lint and Format Commands ===

@@ -6,11 +6,21 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed"
   },
   "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "jsdom": "^27.4.0",
     "vitest": "^3.0.0"
   },
-  "keywords": ["timeline", "visualization", "canvas", "bigint", "deep-time"],
+  "keywords": [
+    "timeline",
+    "visualization",
+    "canvas",
+    "bigint",
+    "deep-time"
+  ],
   "license": "MIT"
 }

@@ -1,4 +1,4 @@
-import { projectToScreen, isVisible } from '../core/time.js';
+import { projectToScreen, isVisible, YEAR, MILLION_YEARS, BILLION_YEARS } from '../core/time.js';
 
 let ctx = null;
 let canvas = null;
@@ -62,6 +62,9 @@ export function draw(state) {
   ctx.fillRect(0, 0, width, height);
 
   const axisY = height / 2;
+
+  drawGridAndLabels(state, width, height, axisY);
+
   ctx.strokeStyle = '#4a4a6a';
   ctx.lineWidth = 1;
   ctx.beginPath();
@@ -150,4 +153,123 @@ function drawFPS(canvasWidth) {
   ctx.fillStyle = fps >= 55 ? '#4ecdc4' : fps >= 30 ? '#ffeaa7' : '#ff6b6b';
   ctx.textAlign = 'left';
   ctx.fillText(text, 10, 20);
+}
+
+const TIME_INTERVALS = [
+  { value: 1n, label: 's', threshold: 60 },
+  { value: 60n, label: 'min', threshold: 3600 },
+  { value: 3600n, label: 'h', threshold: 86400 },
+  { value: 86400n, label: 'd', threshold: 86400 * 30 },
+  { value: YEAR, label: 'y', threshold: Number(YEAR) * 100 },
+  { value: YEAR * 100n, label: 'y', threshold: Number(YEAR) * 1000 },
+  { value: YEAR * 1000n, label: 'ky', threshold: Number(YEAR) * 1000000 },
+  { value: MILLION_YEARS, label: 'Ma', threshold: Number(MILLION_YEARS) * 1000 },
+  { value: BILLION_YEARS, label: 'Ga', threshold: Infinity },
+];
+
+export function getGridInterval(secondsPerPixel, targetPixelSpacing = 100) {
+  const targetSeconds = secondsPerPixel * targetPixelSpacing;
+
+  for (const interval of TIME_INTERVALS) {
+    if (targetSeconds < interval.threshold) {
+      const multipliers = [1n, 2n, 5n, 10n, 20n, 50n, 100n];
+      for (const mult of multipliers) {
+        const candidate = interval.value * mult;
+        const pixels = Number(candidate) / secondsPerPixel;
+        if (pixels >= targetPixelSpacing * 0.5 && pixels <= targetPixelSpacing * 2) {
+          return { interval: candidate, unit: interval.label, multiplier: mult };
+        }
+      }
+      return { interval: interval.value, unit: interval.label, multiplier: 1n };
+    }
+  }
+  return { interval: BILLION_YEARS, unit: 'Ga', multiplier: 1n };
+}
+
+export function formatTime(timeValue, unit, interval) {
+  if (unit === 'Ga') {
+    const gaWhole = timeValue / BILLION_YEARS;
+    const gaRemainder = timeValue % BILLION_YEARS;
+    const decimal = Number(gaRemainder * 10n / BILLION_YEARS);
+    const gaNum = Number(gaWhole) + decimal / 10;
+    if (gaNum < 0) {
+      return `${Math.abs(gaNum).toFixed(1)} Ga`;
+    }
+    return `+${gaNum.toFixed(1)} Ga`;
+  }
+
+  if (unit === 'Ma') {
+    const maWhole = timeValue / MILLION_YEARS;
+    const maNum = Number(maWhole);
+    if (maNum < 0) {
+      return `${Math.abs(maNum)} Ma`;
+    }
+    return `+${maNum} Ma`;
+  }
+
+  if (unit === 'ky') {
+    const kyWhole = timeValue / (YEAR * 1000n);
+    const kyNum = Number(kyWhole);
+    if (kyNum < 0) {
+      return `${Math.abs(kyNum)} kya`;
+    }
+    return `${kyNum} ky`;
+  }
+
+  const secondsFromEpoch = Number(timeValue);
+  if (!Number.isFinite(secondsFromEpoch) || Math.abs(secondsFromEpoch) > 8.64e15 / 1000) {
+    const years = timeValue / YEAR;
+    return `${Number(years)} y`;
+  }
+
+  const date = new Date(secondsFromEpoch * 1000);
+
+  if (unit === 'y') {
+    return `${date.getUTCFullYear()}`;
+  }
+
+  if (unit === 'd' || unit === 'h' || unit === 'min') {
+    const year = date.getUTCFullYear();
+    const month = date.getUTCMonth() + 1;
+    const day = date.getUTCDate();
+    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  }
+
+  return date.toISOString().substring(0, 19);
+}
+
+function drawGridAndLabels(state, width, height, axisY) {
+  const secondsPerPixel = state.scale.getSecondsPerPixel();
+  const { interval, unit } = getGridInterval(secondsPerPixel);
+  const viewportEnd = state.viewportStart + state.scale.pxToTime(width);
+
+  const firstGridTime = (state.viewportStart / interval) * interval;
+  const startGrid = firstGridTime < state.viewportStart ? firstGridTime + interval : firstGridTime;
+
+  ctx.strokeStyle = 'rgba(100, 100, 140, 0.3)';
+  ctx.lineWidth = 1;
+  ctx.font = '10px monospace';
+  ctx.fillStyle = '#8888aa';
+  ctx.textAlign = 'center';
+
+  let gridTime = startGrid;
+  let gridCount = 0;
+  const maxGridLines = 50;
+
+  while (gridTime <= viewportEnd && gridCount < maxGridLines) {
+    const x = projectToScreen(gridTime, state.viewportStart, state.scale);
+
+    if (x >= 0 && x <= width) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, height);
+      ctx.stroke();
+
+      const label = formatTime(gridTime, unit, interval);
+      ctx.fillText(label, x, axisY + 30);
+    }
+
+    gridTime = gridTime + interval;
+    gridCount++;
+  }
 }

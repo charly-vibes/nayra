@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/charly/nayra/event.schema.json",
+  "title": "Nayra Event",
+  "description": "Schema for timeline event data in Nayra",
+  "type": "object",
+  "required": ["id", "start", "label"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for the event"
+    },
+    "start": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Start time (supports multiple formats: ISO 8601, year only, BCE/BC, Ma, Ga)"
+    },
+    "label": {
+      "type": "string",
+      "description": "Short display title (recommended <100 characters)"
+    },
+    "end": {
+      "type": "string",
+      "description": "End time for span events; omit for point events"
+    },
+    "description": {
+      "type": "string",
+      "description": "Longer description, supports markdown"
+    },
+    "category": {
+      "type": "string",
+      "description": "Primary classification for coloring (e.g., 'war', 'science')"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Secondary classification for filtering"
+    },
+    "priority": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 4,
+      "default": 2,
+      "description": "Display priority 0-4 (0=critical, 4=background)"
+    },
+    "precision": {
+      "type": "string",
+      "enum": ["day", "month", "year", "decade", "century"],
+      "description": "Date precision for display formatting"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Link to more information"
+    },
+    "source": {
+      "type": "string",
+      "description": "Data provenance (e.g., 'wikidata:Q12345')"
+    },
+    "metadata": {
+      "type": "object",
+      "default": {},
+      "description": "Arbitrary key-value pairs for extensions"
+    }
+  },
+  "additionalProperties": false
+}

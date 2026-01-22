@@ -109,6 +109,128 @@ describe('TimeParser', () => {
 
       expect(result.success).toBe(true);
     });
+
+    it('parses BCE notation (44 BCE)', async () => {
+      const { parseTimeQuery } = await import('../../src/core/time-parser.js');
+
+      const result = parseTimeQuery('44 BCE');
+
+      expect(result.success).toBe(true);
+      expect(result.time).toBeLessThan(0n);
+    });
+
+    it('parses BC notation (44 BC)', async () => {
+      const { parseTimeQuery } = await import('../../src/core/time-parser.js');
+
+      const result = parseTimeQuery('44 BC');
+
+      expect(result.success).toBe(true);
+      expect(result.time).toBeLessThan(0n);
+    });
+
+    it('parses CE notation (1066 CE)', async () => {
+      const { parseTimeQuery } = await import('../../src/core/time-parser.js');
+
+      const result = parseTimeQuery('1066 CE');
+
+      expect(result.success).toBe(true);
+      // 1066 CE is before Unix epoch (1970), so negative timestamp is correct
+      // Should be around -28.5 billion seconds
+      expect(result.time).toBeLessThan(0n);
+      expect(result.time).toBeGreaterThan(-30_000_000_000n);
+    });
+
+    it('parses AD notation (1066 AD)', async () => {
+      const { parseTimeQuery } = await import('../../src/core/time-parser.js');
+
+      const result = parseTimeQuery('1066 AD');
+
+      expect(result.success).toBe(true);
+      // 1066 AD is before Unix epoch (1970), so negative timestamp is correct
+      expect(result.time).toBeLessThan(0n);
+      expect(result.time).toBeGreaterThan(-30_000_000_000n);
+    });
+
+    it('parses modern CE year (2000 CE)', async () => {
+      const { parseTimeQuery } = await import('../../src/core/time-parser.js');
+
+      const result = parseTimeQuery('2000 CE');
+
+      expect(result.success).toBe(true);
+      // 2000 CE is after Unix epoch, should be positive
+      expect(result.time).toBeGreaterThan(0n);
+    });
+
+    it('parses ISO datetime with timezone (2024-03-15T10:30:00Z)', async () => {
+      const { parseTimeQuery } = await import('../../src/core/time-parser.js');
+
+      const result = parseTimeQuery('2024-03-15T10:30:00Z');
+
+      expect(result.success).toBe(true);
+      const expected = BigInt(Math.floor(new Date('2024-03-15T10:30:00Z').getTime() / 1000));
+      expect(result.time).toBe(expected);
+    });
+
+    it('parses ISO datetime without timezone (treats as UTC)', async () => {
+      const { parseTimeQuery } = await import('../../src/core/time-parser.js');
+
+      const result = parseTimeQuery('2024-03-15T10:30:00');
+
+      expect(result.success).toBe(true);
+      const expected = BigInt(Math.floor(new Date('2024-03-15T10:30:00Z').getTime() / 1000));
+      expect(result.time).toBe(expected);
+    });
+
+    it('parses natural language "X billion years ago"', async () => {
+      const { parseTimeQuery } = await import('../../src/core/time-parser.js');
+
+      const result = parseTimeQuery('13.8 billion years ago');
+
+      expect(result.success).toBe(true);
+      expect(result.time).toBeLessThan(0n);
+      const expected = -13800000000n * YEAR;
+      const diff = result.time - expected;
+      expect(diff > -BILLION_YEARS && diff < BILLION_YEARS).toBe(true);
+    });
+
+    it('parses natural language "X million years ago"', async () => {
+      const { parseTimeQuery } = await import('../../src/core/time-parser.js');
+
+      const result = parseTimeQuery('65 million years ago');
+
+      expect(result.success).toBe(true);
+      expect(result.time).toBeLessThan(0n);
+      const expected = -65n * MILLION_YEARS;
+      const diff = result.time - expected;
+      expect(diff > -MILLION_YEARS && diff < MILLION_YEARS).toBe(true);
+    });
+
+    it('rejects year zero (historical convention)', async () => {
+      const { parseTimeQuery } = await import('../../src/core/time-parser.js');
+
+      const result = parseTimeQuery('0');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('Year zero');
+    });
+
+    it('rejects 0 BCE', async () => {
+      const { parseTimeQuery } = await import('../../src/core/time-parser.js');
+
+      const result = parseTimeQuery('0 BCE');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('Year zero');
+    });
+
+    it('rejects 0 CE', async () => {
+      const { parseTimeQuery } = await import('../../src/core/time-parser.js');
+
+      const result = parseTimeQuery('0 CE');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('Year zero');
+    });
   });
 
   describe('span precision', () => {

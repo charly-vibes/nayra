@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { transformJsonLd } from '../../src/data/jsonld-transformer.js';
+import { transformJsonLd, transformJsonLdWithReport } from '../../src/data/jsonld-transformer.js';
 
 describe('JSON-LD Transformer', () => {
   describe('transformJsonLd', () => {
@@ -246,6 +246,125 @@ describe('JSON-LD Transformer', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe('multi-type-1');
+    });
+  });
+
+  describe('transformJsonLdWithReport', () => {
+    it('returns valid events and empty errors for valid data', () => {
+      const jsonld = [{
+        '@type': 'Event',
+        '@id': 'event-1',
+        'name': 'Valid Event',
+        'startDate': '2020-01-01',
+      }];
+
+      const result = transformJsonLdWithReport(jsonld);
+
+      expect(result.valid).toHaveLength(1);
+      expect(result.errors).toEqual([]);
+      expect(result.summary).toBe('Transformed 1 of 1 events (0 skipped)');
+    });
+
+    it('reports missing id field', () => {
+      const jsonld = [{
+        '@type': 'Event',
+        'name': 'No ID Event',
+        'startDate': '2020-01-01',
+      }];
+
+      const result = transformJsonLdWithReport(jsonld);
+
+      expect(result.valid).toEqual([]);
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0].field).toBe('id');
+      expect(result.errors[0].code).toBe('MISSING_REQUIRED');
+    });
+
+    it('reports missing name field', () => {
+      const jsonld = [{
+        '@type': 'Event',
+        '@id': 'event-1',
+        'startDate': '2020-01-01',
+      }];
+
+      const result = transformJsonLdWithReport(jsonld);
+
+      expect(result.valid).toEqual([]);
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0].field).toBe('name');
+    });
+
+    it('reports missing startDate field', () => {
+      const jsonld = [{
+        '@type': 'Event',
+        '@id': 'event-1',
+        'name': 'No Date Event',
+      }];
+
+      const result = transformJsonLdWithReport(jsonld);
+
+      expect(result.valid).toEqual([]);
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0].field).toBe('startDate');
+    });
+
+    it('identifies event by id or index in error', () => {
+      const jsonld = [
+        {
+          '@type': 'Event',
+          '@id': 'known-id',
+          'startDate': '2020-01-01',
+        },
+        {
+          '@type': 'Event',
+          'name': 'No ID',
+          'startDate': '2020-01-01',
+        },
+      ];
+
+      const result = transformJsonLdWithReport(jsonld);
+
+      expect(result.errors[0].event).toBe('known-id');
+      expect(result.errors[1].event).toBe('index:1');
+    });
+
+    it('includes summary with counts', () => {
+      const jsonld = [
+        {
+          '@type': 'Event',
+          '@id': 'valid-1',
+          'name': 'Valid',
+          'startDate': '2020-01-01',
+        },
+        {
+          '@type': 'Event',
+          '@id': 'invalid-1',
+          'startDate': '2020-01-01',
+        },
+        {
+          '@type': 'Event',
+          '@id': 'valid-2',
+          'name': 'Also Valid',
+          'startDate': '2021-01-01',
+        },
+      ];
+
+      const result = transformJsonLdWithReport(jsonld);
+
+      expect(result.valid).toHaveLength(2);
+      expect(result.errors).toHaveLength(1);
+      expect(result.summary).toBe('Transformed 2 of 3 events (1 skipped)');
+    });
+
+    it('throws in strict mode on validation errors', () => {
+      const jsonld = [{
+        '@type': 'Event',
+        '@id': 'event-1',
+        'startDate': '2020-01-01',
+      }];
+
+      expect(() => transformJsonLdWithReport(jsonld, { strict: true }))
+        .toThrow('Missing required field: name');
     });
   });
 });

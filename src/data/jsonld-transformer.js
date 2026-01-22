@@ -10,6 +10,19 @@
  * - schema:url -> url
  */
 
+class TransformError {
+  constructor({ code, event, field, hint }) {
+    this.code = code;
+    this.event = event;
+    this.field = field;
+    this.hint = hint;
+  }
+
+  toString() {
+    return `Transform Error: ${this.code}\n  Event: ${this.event}\n  Field: ${this.field}\n  Hint: ${this.hint}`;
+  }
+}
+
 /**
  * Extract value from a JSON-LD property that may be a literal or an object with @value
  */
@@ -41,15 +54,48 @@ function extractId(node) {
 
 /**
  * Transform a single JSON-LD event to Nayra format
+ * @returns {{ event: object|null, error: TransformError|null }}
  */
-function transformEvent(node) {
+function transformEventWithError(node, index) {
   const id = extractId(node);
   const label = extractValue(node['name'] || node['schema:name']);
   const startDate = extractValue(node['startDate'] || node['schema:startDate']);
+  const eventId = id || `index:${index}`;
 
-  // Required fields
-  if (!id || !label || !startDate) {
-    return null;
+  if (!id) {
+    return {
+      event: null,
+      error: new TransformError({
+        code: 'MISSING_REQUIRED',
+        event: `index:${index}`,
+        field: 'id',
+        hint: 'Provide @id or schema:identifier',
+      }),
+    };
+  }
+
+  if (!label) {
+    return {
+      event: null,
+      error: new TransformError({
+        code: 'MISSING_REQUIRED',
+        event: eventId,
+        field: 'name',
+        hint: 'Provide schema:name',
+      }),
+    };
+  }
+
+  if (!startDate) {
+    return {
+      event: null,
+      error: new TransformError({
+        code: 'MISSING_REQUIRED',
+        event: eventId,
+        field: 'startDate',
+        hint: 'Provide schema:startDate',
+      }),
+    };
   }
 
   const event = {
@@ -58,7 +104,6 @@ function transformEvent(node) {
     start: startDate,
   };
 
-  // Optional fields
   const description = extractValue(node['description'] || node['schema:description']);
   if (description) {
     event.description = description;
@@ -74,6 +119,14 @@ function transformEvent(node) {
     event.url = url;
   }
 
+  return { event, error: null };
+}
+
+/**
+ * Transform a single JSON-LD event to Nayra format (legacy, silent)
+ */
+function transformEvent(node) {
+  const { event } = transformEventWithError(node, 0);
   return event;
 }
 
@@ -143,4 +196,65 @@ export function transformJsonLd(data) {
   }
 
   return events;
+}
+
+/**
+ * Collect event nodes from JSON-LD data structure
+ */
+function collectEventNodes(data) {
+  const nodes = [];
+
+  if (Array.isArray(data)) {
+    for (const node of data) {
+      if (isEventType(node)) {
+        nodes.push(node);
+      }
+    }
+  } else if (data['@graph'] && Array.isArray(data['@graph'])) {
+    for (const node of data['@graph']) {
+      if (isEventType(node)) {
+        nodes.push(node);
+      }
+    }
+  } else if (isEventType(data)) {
+    nodes.push(data);
+  }
+
+  return nodes;
+}
+
+/**
+ * Transform JSON-LD data with error reporting
+ *
+ * @param {object|array} data - JSON-LD data
+ * @param {object} options - Options
+ * @param {boolean} options.strict - If true, throws on first error
+ * @returns {{ valid: object[], errors: TransformError[], summary: string }}
+ */
+export function transformJsonLdWithReport(data, options = {}) {
+  const nodes = collectEventNodes(data);
+  const valid = [];
+  const errors = [];
+
+  for (let i = 0; i < nodes.length; i++) {
+    const { event, error } = transformEventWithError(nodes[i], i);
+
+    if (error) {
+      if (options.strict) {
+        throw new Error(`Missing required field: ${error.field}`);
+      }
+      errors.push(error);
+    } else {
+      valid.push(event);
+    }
+  }
+
+  const total = nodes.length;
+  const skipped = total - valid.length;
+
+  return {
+    valid,
+    errors,
+    summary: `Transformed ${valid.length} of ${total} events (${skipped} skipped)`,
+  };
 }

@@ -30,9 +30,20 @@ describe('HelpMenu', () => {
 
       expect(helpMenu.element.className).toBe('help-menu-overlay');
     });
+
+    it('has tab navigation buttons', async () => {
+      const { createHelpMenu } = await import('../../src/ui/help.js');
+
+      const helpMenu = createHelpMenu(container);
+      const tabs = helpMenu.element.querySelectorAll('.help-tab');
+
+      expect(tabs.length).toBe(2);
+      expect(tabs[0].textContent).toBe('Shortcuts');
+      expect(tabs[1].textContent).toBe('Timescales');
+    });
   });
 
-  describe('content', () => {
+  describe('shortcuts content', () => {
     it('displays keyboard shortcuts', async () => {
       const { createHelpMenu } = await import('../../src/ui/help.js');
 
@@ -55,6 +66,105 @@ describe('HelpMenu', () => {
       const content = helpMenu.element.textContent;
       expect(content).toMatch(/pan|drag/i);
       expect(content).toMatch(/zoom|scroll/i);
+    });
+  });
+
+  describe('timescales content', () => {
+    it('displays search formats when on timescales tab', async () => {
+      const { createHelpMenu } = await import('../../src/ui/help.js');
+
+      const helpMenu = createHelpMenu(container);
+      helpMenu.show();
+      helpMenu.switchTab('timescales');
+
+      const content = helpMenu.element.textContent;
+      expect(content).toContain('Search Formats');
+      expect(content).toContain('big bang');
+      expect(content).toContain('Ga');
+      expect(content).toContain('Ma');
+    });
+
+    it('displays unit explanations', async () => {
+      const { createHelpMenu } = await import('../../src/ui/help.js');
+
+      const helpMenu = createHelpMenu(container);
+      helpMenu.show();
+      helpMenu.switchTab('timescales');
+
+      const content = helpMenu.element.textContent;
+      expect(content).toContain('Display Units');
+      expect(content).toContain('Gigayears');
+      expect(content).toContain('Megayears');
+      expect(content).toContain('Kiloyears');
+    });
+  });
+
+  describe('tab navigation', () => {
+    it('starts on shortcuts tab by default', async () => {
+      const { createHelpMenu } = await import('../../src/ui/help.js');
+
+      const helpMenu = createHelpMenu(container);
+
+      expect(helpMenu.getActiveTab()).toBe('shortcuts');
+    });
+
+    it('switchTab changes the active tab', async () => {
+      const { createHelpMenu } = await import('../../src/ui/help.js');
+
+      const helpMenu = createHelpMenu(container);
+      helpMenu.switchTab('timescales');
+
+      expect(helpMenu.getActiveTab()).toBe('timescales');
+    });
+
+    it('arrow right switches to next tab', async () => {
+      const { createHelpMenu } = await import('../../src/ui/help.js');
+
+      const helpMenu = createHelpMenu(container);
+      helpMenu.show();
+
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+
+      expect(helpMenu.getActiveTab()).toBe('timescales');
+    });
+
+    it('arrow left switches to previous tab', async () => {
+      const { createHelpMenu } = await import('../../src/ui/help.js');
+
+      const helpMenu = createHelpMenu(container);
+      helpMenu.show();
+      helpMenu.switchTab('timescales');
+
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
+
+      expect(helpMenu.getActiveTab()).toBe('shortcuts');
+    });
+
+    it('arrow keys wrap around tabs', async () => {
+      const { createHelpMenu } = await import('../../src/ui/help.js');
+
+      const helpMenu = createHelpMenu(container);
+      helpMenu.show();
+
+      // From shortcuts, arrow left should go to timescales (wrap)
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
+      expect(helpMenu.getActiveTab()).toBe('timescales');
+
+      // From timescales, arrow right should go to shortcuts (wrap)
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+      expect(helpMenu.getActiveTab()).toBe('shortcuts');
+    });
+
+    it('clicking tab button switches tabs', async () => {
+      const { createHelpMenu } = await import('../../src/ui/help.js');
+
+      const helpMenu = createHelpMenu(container);
+      helpMenu.show();
+
+      const timescalesTab = helpMenu.element.querySelector('[data-tab="timescales"]');
+      timescalesTab.click();
+
+      expect(helpMenu.getActiveTab()).toBe('timescales');
     });
   });
 

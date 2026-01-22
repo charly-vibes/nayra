@@ -11,6 +11,7 @@ export const KEYBOARD_SHORTCUTS = {
   Home: 'jumpToToday',
   h: 'jumpToToday',
   '/': 'openSearch',
+  '?': 'toggleHelp',
 };
 
 export function jumpToToday(canvasWidth, scale = DEFAULT_SCALE) {
@@ -87,6 +88,9 @@ export function initInput(canvas, store, callbacks = {}) {
     } else if (action === 'openSearch' && callbacks.onOpenSearch) {
       e.preventDefault();
       callbacks.onOpenSearch();
+    } else if (action === 'toggleHelp' && callbacks.onToggleHelp) {
+      e.preventDefault();
+      callbacks.onToggleHelp();
     }
   }
 

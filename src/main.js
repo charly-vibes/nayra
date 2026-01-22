@@ -3,6 +3,7 @@ import { init as initRenderer, draw } from './rendering/renderer.js';
 import { initInput } from './interaction/input.js';
 import { generateSampleEvents } from './data/samples.js';
 import { createSearchBar } from './ui/searchbar.js';
+import { createHelpMenu } from './ui/help.js';
 import { parseTimeQuery } from './core/time-parser.js';
 import { RationalScale } from './core/scale.js';
 import { YEAR } from './core/time.js';
@@ -27,10 +28,19 @@ const searchBar = createSearchBar(document.body, (query) => {
   }
 });
 
+const helpMenu = createHelpMenu(document.body);
+
 initInput(canvas, store, {
   onOpenSearch: () => {
     if (!searchBar.isVisible()) {
       searchBar.show();
+    }
+  },
+  onToggleHelp: () => {
+    if (helpMenu.isVisible()) {
+      helpMenu.hide();
+    } else {
+      helpMenu.show();
     }
   },
 });

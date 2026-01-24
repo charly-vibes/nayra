@@ -79,6 +79,68 @@ Nayra follows a rigorous Spec-Driven Development (SDD) and Test-Driven Developme
 
 See [AGENTS.md](AGENTS.md) for complete development guidelines.
 
+## Data Format
+
+Nayra accepts event data as JSON. See the [full data schema spec](openspec/specs/data-schema/spec.md) for complete details.
+
+### Event Structure
+
+```json
+{
+  "id": "apollo-11",
+  "start": "1969-07-16",
+  "end": "1969-07-24",
+  "label": "Apollo 11 Mission",
+  "description": "First crewed Moon landing",
+  "category": "space",
+  "tags": ["nasa", "moon"],
+  "priority": 0
+}
+```
+
+**Required:** `id`, `start`, `label`  
+**Optional:** `end`, `description`, `category`, `tags`, `priority` (0-4), `precision`, `url`, `source`, `metadata`
+
+### Time Formats
+
+| Format | Example | Use Case |
+|--------|---------|----------|
+| ISO 8601 | `2024-03-15` | Modern dates |
+| Year | `1969`, `-44` | Historical (negative = BCE) |
+| BCE/CE | `44 BCE`, `1066 CE` | Human-readable ancient dates |
+| Geological | `65 Ma`, `4.5 Ga` | Million/billion years ago |
+
+### Dataset Structure
+
+**Simple (array):**
+```json
+[
+  { "id": "1", "start": "1969-07-20", "label": "Moon Landing" }
+]
+```
+
+**Extended (with metadata):**
+```json
+{
+  "name": "Space Exploration",
+  "events": [
+    { "id": "1", "start": "1969-07-20", "label": "Moon Landing" }
+  ]
+}
+```
+
+### Wikidata Integration
+
+Transform SPARQL query results using the built-in Wikidata transformer:
+
+```javascript
+import { transformWikidataResults } from './src/data/wikidata-transformer.js';
+
+const events = transformWikidataResults(sparqlResults);
+```
+
+See `examples/` for sample data files and SPARQL queries.
+
 ## Project Structure
 
 ```

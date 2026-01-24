@@ -1,7 +1,9 @@
 import { RationalScale } from '../core/scale.js';
 import { YEAR } from '../core/time.js';
+import { findEventAtPoint } from './hit-detection.js';
 
 const MIN_SECONDS_PER_PIXEL = 0.001;
+const CLICK_THRESHOLD = 3;
 const MAX_SECONDS_PER_PIXEL = 1e15;
 const ZOOM_FACTOR = 1.15;
 
@@ -24,36 +26,106 @@ export function jumpToToday(canvasWidth, scale = DEFAULT_SCALE) {
 export function initInput(canvas, store, callbacks = {}) {
   let isDragging = false;
   let lastX = 0;
+  let dragStartX = 0;
+  let dragStartY = 0;
 
   function onMouseDown(e) {
     if (e.button !== 0) return;
-    isDragging = true;
+    isDragging = false;
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
     lastX = e.clientX;
-    canvas.style.cursor = 'grabbing';
   }
 
   function onMouseMove(e) {
-    if (!isDragging) return;
-    const dx = e.clientX - lastX;
-    if (dx === 0) return;
-    
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
     const state = store.getState();
-    const timeDelta = state.scale.pxToTime(-dx);
-    store.dispatch({ type: 'PAN', offset: timeDelta });
-    lastX = e.clientX;
+
+    if (!isDragging && e.buttons !== 1) {
+      const event = findEventAtPoint(
+        x,
+        y,
+        state.events,
+        state.viewportStart,
+        state.scale,
+        rect.height
+      );
+      const eventId = event ? event.id : null;
+      if (eventId !== state.hoveredEventId) {
+        store.dispatch({ type: 'SET_HOVER', eventId });
+      }
+      canvas.style.cursor = event ? 'pointer' : 'grab';
+    }
+
+    if (e.buttons === 1) {
+      const dx = e.clientX - dragStartX;
+      const dy = e.clientY - dragStartY;
+      if (Math.abs(dx) > CLICK_THRESHOLD || Math.abs(dy) > CLICK_THRESHOLD) {
+        isDragging = true;
+        canvas.style.cursor = 'grabbing';
+      }
+      if (isDragging) {
+        const delta = e.clientX - lastX;
+        if (delta !== 0) {
+          store.dispatch({ type: 'PAN', offset: state.scale.pxToTime(-delta) });
+          lastX = e.clientX;
+        }
+      }
+    }
   }
 
-  function onMouseUp() {
-    if (!isDragging) return;
+  function onMouseUp(e) {
+    if (!isDragging) {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const state = store.getState();
+      const event = findEventAtPoint(
+        x,
+        y,
+        state.events,
+        state.viewportStart,
+        state.scale,
+        rect.height
+      );
+
+      if (event) {
+        if (e.ctrlKey || e.metaKey) {
+          store.dispatch({ type: 'TOGGLE_EVENT_SELECTION', eventId: event.id });
+        } else {
+          store.dispatch({ type: 'SELECT_EVENT', eventId: event.id });
+        }
+      } else {
+        store.dispatch({ type: 'CLEAR_SELECTION' });
+      }
+    }
     isDragging = false;
-    canvas.style.cursor = 'grab';
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const state = store.getState();
+    const event = findEventAtPoint(
+      x,
+      y,
+      state.events,
+      state.viewportStart,
+      state.scale,
+      rect.height
+    );
+    canvas.style.cursor = event ? 'pointer' : 'grab';
   }
 
   function onMouseLeave() {
     if (isDragging) {
       isDragging = false;
-      canvas.style.cursor = 'grab';
     }
+    const state = store.getState();
+    if (state.hoveredEventId !== null) {
+      store.dispatch({ type: 'SET_HOVER', eventId: null });
+    }
+    canvas.style.cursor = 'grab';
   }
 
   function onWheel(e) {

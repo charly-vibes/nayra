@@ -182,6 +182,68 @@ describe('Schema Validator', () => {
       });
     });
 
+    describe('end before start validation', () => {
+      it('rejects event where end is before start', () => {
+        const events = [{ id: '1', start: '2024-06-15', end: '2024-06-10', label: 'Invalid' }];
+        const result = validate(events);
+
+        expect(result.valid).toEqual([]);
+        expect(result.errors).toHaveLength(1);
+        expect(result.errors[0].code).toBe('INVALID_END_BEFORE_START');
+        expect(result.errors[0].event).toBe('1');
+        expect(result.errors[0].field).toBe('end');
+      });
+
+      it('accepts event where end equals start (zero-duration)', () => {
+        const events = [{ id: '1', start: '2024-06-15', end: '2024-06-15', label: 'Same Day' }];
+        const result = validate(events);
+
+        expect(result.valid).toHaveLength(1);
+        expect(result.errors).toEqual([]);
+      });
+
+      it('accepts event where end is after start', () => {
+        const events = [{ id: '1', start: '2024-06-10', end: '2024-06-15', label: 'Valid Span' }];
+        const result = validate(events);
+
+        expect(result.valid).toHaveLength(1);
+        expect(result.errors).toEqual([]);
+      });
+
+      it('accepts BCE span event (336 BCE to 323 BCE)', () => {
+        const events = [{ id: 'alexander', start: '336 BCE', end: '323 BCE', label: 'Reign of Alexander' }];
+        const result = validate(events);
+
+        expect(result.valid).toHaveLength(1);
+        expect(result.errors).toEqual([]);
+      });
+
+      it('accepts negative year span event (-1194 to -1184)', () => {
+        const events = [{ id: 'troy', start: '-1194', end: '-1184', label: 'Trojan War' }];
+        const result = validate(events);
+
+        expect(result.valid).toHaveLength(1);
+        expect(result.errors).toEqual([]);
+      });
+
+      it('accepts geological Ma span event (538 Ma to 485 Ma)', () => {
+        const events = [{ id: 'cambrian', start: '538 Ma', end: '485 Ma', label: 'Cambrian Period' }];
+        const result = validate(events);
+
+        expect(result.valid).toHaveLength(1);
+        expect(result.errors).toEqual([]);
+      });
+
+      it('rejects CE event where end is actually before start', () => {
+        const events = [{ id: '1', start: '2024', end: '2020', label: 'Invalid' }];
+        const result = validate(events);
+
+        expect(result.valid).toEqual([]);
+        expect(result.errors).toHaveLength(1);
+        expect(result.errors[0].code).toBe('INVALID_END_BEFORE_START');
+      });
+    });
+
     describe('partial import with warnings', () => {
       it('imports valid events and skips invalid ones', () => {
         const events = [

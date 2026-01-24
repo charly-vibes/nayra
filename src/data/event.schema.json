@@ -12,17 +12,14 @@
       "description": "Unique identifier for the event"
     },
     "start": {
-      "type": "string",
-      "minLength": 1,
-      "description": "Start time (supports multiple formats: ISO 8601, year only, BCE/BC, Ma, Ga)"
+      "$ref": "#/$defs/timeString"
     },
     "label": {
       "type": "string",
       "description": "Short display title (recommended <100 characters)"
     },
     "end": {
-      "type": "string",
-      "description": "End time for span events; omit for point events"
+      "$ref": "#/$defs/timeString"
     },
     "description": {
       "type": "string",
@@ -49,7 +46,7 @@
     },
     "precision": {
       "type": "string",
-      "enum": ["day", "month", "year", "decade", "century"],
+      "enum": ["day", "month", "year", "decade", "century", "million_years", "billion_years"],
       "description": "Date precision for display formatting"
     },
     "url": {
@@ -67,5 +64,13 @@
       "description": "Arbitrary key-value pairs for extensions"
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$defs": {
+    "timeString": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Time value in supported formats: ISO 8601, year only, BCE/BC, CE/AD, Ma/Ga",
+      "examples": ["2024-03-15", "1969", "-44", "44 BCE", "1066 CE", "65 Ma", "4.5 Ga"]
+    }
+  }
 }

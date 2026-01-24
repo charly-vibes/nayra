@@ -1,4 +1,6 @@
-const VALID_PRECISIONS = ['day', 'month', 'year', 'decade', 'century'];
+import { parseTimeQuery } from '../core/time-parser.js';
+
+const VALID_PRECISIONS = ['day', 'month', 'year', 'decade', 'century', 'million_years', 'billion_years'];
 
 class ValidationError {
   constructor({ code, event, field, value, expected, hint, occurrences }) {
@@ -92,6 +94,24 @@ function validateEvent(event, index, seenIds) {
         expected: `one of: ${VALID_PRECISIONS.join(', ')}`,
         hint: 'Use a valid precision value',
       }));
+    }
+  }
+
+  if (event.start !== undefined && event.end !== undefined) {
+    const startParsed = parseTimeQuery(event.start);
+    const endParsed = parseTimeQuery(event.end);
+
+    if (startParsed.success && endParsed.success) {
+      if (endParsed.time < startParsed.time) {
+        errors.push(new ValidationError({
+          code: 'INVALID_END_BEFORE_START',
+          event: eventId,
+          field: 'end',
+          value: event.end,
+          expected: 'end date >= start date',
+          hint: 'End date must not be earlier than start date',
+        }));
+      }
     }
   }
 

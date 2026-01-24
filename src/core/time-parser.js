@@ -23,7 +23,7 @@ const NAMED_EVENTS = {
   'earth': { time: -4_500_000_000n * YEAR, span: BILLION_YEARS },
 };
 
-const SUPPORTED_FORMATS = [
+export const SUPPORTED_FORMATS = [
   'ISO 8601 (2024-03-15T10:30:00Z)',
   'ISO date (2024-03-15)',
   'Year only (1969, -44)',

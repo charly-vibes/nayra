@@ -7,6 +7,8 @@ import {
   formatTime,
   EVENT_HEIGHT,
   EVENT_COLORS,
+  getEventFillColor,
+  getEventStrokeStyle,
 } from '../../src/rendering/renderer.js';
 import { YEAR, MILLION_YEARS, BILLION_YEARS } from '../../src/core/time.js';
 
@@ -223,6 +225,45 @@ describe('Renderer', () => {
       const result = formatTime(time, 'Ga', BILLION_YEARS);
       expect(result).not.toContain('NaN');
       expect(result).toMatch(/13.*Ga/);
+    });
+  });
+
+  describe('getEventFillColor', () => {
+    it('returns base color when not hovered or selected', () => {
+      const result = getEventFillColor('event-1', false, false);
+      expect(result).toBe(getEventColor('event-1'));
+    });
+
+    it('returns lightened color when hovered', () => {
+      const baseColor = getEventColor('event-1');
+      const result = getEventFillColor('event-1', true, false);
+      expect(result).not.toBe(baseColor);
+      expect(result).toMatch(/^#[0-9a-f]{6}$/i);
+    });
+
+    it('returns lightened color when hovered and selected', () => {
+      const baseColor = getEventColor('event-1');
+      const result = getEventFillColor('event-1', true, true);
+      expect(result).not.toBe(baseColor);
+    });
+
+    it('returns base color when selected but not hovered', () => {
+      const result = getEventFillColor('event-1', false, true);
+      expect(result).toBe(getEventColor('event-1'));
+    });
+  });
+
+  describe('getEventStrokeStyle', () => {
+    it('returns default subtle border when not selected', () => {
+      const result = getEventStrokeStyle(false);
+      expect(result.color).toBe('rgba(255, 255, 255, 0.3)');
+      expect(result.lineWidth).toBe(1);
+    });
+
+    it('returns accent border when selected', () => {
+      const result = getEventStrokeStyle(true);
+      expect(result.color).toBe('#ffcc00');
+      expect(result.lineWidth).toBe(2);
     });
   });
 });

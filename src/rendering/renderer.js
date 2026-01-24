@@ -1,4 +1,5 @@
 import { projectToScreen, isVisible, YEAR, MILLION_YEARS, BILLION_YEARS } from '../core/time.js';
+import { lightenColor } from './colors.js';
 
 let ctx = null;
 let canvas = null;
@@ -98,16 +99,23 @@ function drawEvent(event, state, axisY, canvasWidth) {
 
   if (x > canvasWidth || x + eventWidth < 0) return;
 
-  const colorIndex = hashCode(event.id) % EVENT_COLORS.length;
-  const color = EVENT_COLORS[colorIndex];
+  const isHovered = state.hoveredEventId === event.id;
+  const isSelected = state.selectedEventIds && state.selectedEventIds.has(event.id);
+
+  const fillColor = getEventFillColor(event.id, isHovered, isSelected);
+  const strokeStyle = getEventStrokeStyle(isSelected);
 
   const y = axisY - EVENT_HEIGHT / 2;
-  ctx.fillStyle = color;
+  ctx.fillStyle = fillColor;
   ctx.fillRect(x, y, eventWidth, EVENT_HEIGHT);
 
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(x, y, eventWidth, EVENT_HEIGHT);
+  ctx.strokeStyle = strokeStyle.color;
+  ctx.lineWidth = strokeStyle.lineWidth;
+  if (isSelected) {
+    ctx.strokeRect(x - 1, y - 1, eventWidth + 2, EVENT_HEIGHT + 2);
+  } else {
+    ctx.strokeRect(x, y, eventWidth, EVENT_HEIGHT);
+  }
 }
 
 export function hashCode(str) {
@@ -123,6 +131,21 @@ export function hashCode(str) {
 export function getEventColor(eventId) {
   const colorIndex = hashCode(eventId) % EVENT_COLORS.length;
   return EVENT_COLORS[colorIndex];
+}
+
+export function getEventFillColor(eventId, isHovered, isSelected) {
+  const baseColor = getEventColor(eventId);
+  if (isHovered) {
+    return lightenColor(baseColor, 0.2);
+  }
+  return baseColor;
+}
+
+export function getEventStrokeStyle(isSelected) {
+  if (isSelected) {
+    return { color: '#ffcc00', lineWidth: 2 };
+  }
+  return { color: 'rgba(255, 255, 255, 0.3)', lineWidth: 1 };
 }
 
 export function cullEvents(events, viewportStart, viewportEnd) {

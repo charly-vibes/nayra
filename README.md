@@ -56,6 +56,25 @@ just setup
 just dev
 ```
 
+### Loading Data
+
+Nayra supports multiple ways to load timeline data:
+
+**URL Parameter** (default method):
+```
+http://localhost:5173/?example=earth-history
+```
+
+Available built-in examples:
+- `space-exploration` (default) - Key milestones from Sputnik to JWST
+- `earth-history` - Major geological and biological events across billions of years
+- `ancient-civilizations` - Rise and fall of great civilizations
+- `wikidata-wars` - Historical conflicts from Wikidata SPARQL queries
+
+**Local Files**: Drag a JSON file onto the canvas (coming soon)
+
+**File Picker**: Use the Examples tab in the help menu (coming soon)
+
 ### Development Commands
 
 ```bash
@@ -147,9 +166,12 @@ See `examples/` for sample data files and SPARQL queries.
 nayra/
 ├── src/                    # Source code (ES6 modules)
 │   ├── core/              # Core engine (Canvas, state, time)
+│   ├── data/              # Data loading, validation, transformation
 │   ├── rendering/         # Rendering pipeline
 │   ├── interaction/       # Input handling
+│   ├── ui/                # UI components (search, help menu)
 │   └── utils/             # Utilities (BigInt time, spatial index)
+├── examples/              # Built-in example datasets (JSON)
 ├── test/                  # Test files
 ├── specs/                 # Gherkin feature specifications
 ├── research/              # Research documents (YYYY-MM-DD-topic.md)

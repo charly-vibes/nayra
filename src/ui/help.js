@@ -1,6 +1,7 @@
 const TABS = [
   { id: 'shortcuts', label: 'Shortcuts' },
   { id: 'timescales', label: 'Timescales' },
+  { id: 'data', label: 'Loading Data' },
 ];
 
 const SHORTCUTS_CONTENT = `
@@ -130,6 +131,56 @@ const TIMESCALES_CONTENT = `
   </p>
 `;
 
+const DATA_CONTENT = `
+  <h2 style="margin: 0 0 20px 0; color: #ffffff; font-size: 20px; font-weight: 600;">
+    Loading Data
+  </h2>
+
+  <h3 style="margin: 0 0 12px 0; color: #c0c0d0; font-size: 16px; font-weight: 500;">
+    URL Parameter
+  </h3>
+  <p style="margin: 0 0 12px 0; color: #a0a0b0; font-size: 14px; line-height: 1.6;">
+    Load a built-in example by adding <code style="background: #1a1a2e; padding: 2px 6px; border-radius: 3px;">?example=name</code> to the URL:
+  </p>
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 20px;">
+    <tbody>
+      <tr style="border-bottom: 1px solid #3a3a4e;">
+        <td style="padding: 6px 12px 6px 0; font-family: monospace; color: #00d9ff;">space-exploration</td>
+        <td style="padding: 6px 0; color: #a0a0b0;">Sputnik to JWST (default)</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #3a3a4e;">
+        <td style="padding: 6px 12px 6px 0; font-family: monospace; color: #00d9ff;">earth-history</td>
+        <td style="padding: 6px 0; color: #a0a0b0;">Big Bang to humans</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #3a3a4e;">
+        <td style="padding: 6px 12px 6px 0; font-family: monospace; color: #00d9ff;">ancient-civilizations</td>
+        <td style="padding: 6px 0; color: #a0a0b0;">Great empires throughout history</td>
+      </tr>
+      <tr>
+        <td style="padding: 6px 12px 6px 0; font-family: monospace; color: #00d9ff;">wikidata-wars</td>
+        <td style="padding: 6px 0; color: #a0a0b0;">Historical conflicts from Wikidata</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin: 0 0 12px 0; color: #c0c0d0; font-size: 16px; font-weight: 500;">
+    Custom Data
+  </h3>
+  <p style="margin: 0 0 12px 0; color: #a0a0b0; font-size: 14px; line-height: 1.6;">
+    Create a JSON file with an array of events:
+  </p>
+  <pre style="background: #1a1a2e; padding: 12px; border-radius: 6px; font-size: 12px; overflow-x: auto; margin: 0 0 20px 0; border: 1px solid #3a3a4e;"><code style="color: #e0e0e0;">[{
+  "id": "apollo-11",
+  "label": "Moon Landing",
+  "start": "1969-07-20",
+  "end": "1969-07-24"
+}]</code></pre>
+
+  <p style="margin: 0; color: #6a6a8a; font-size: 13px; line-height: 1.6;">
+    See the <a href="https://github.com/charly-vibes/nayra#data-format" target="_blank" style="color: #00d9ff; text-decoration: none;">README</a> for full schema documentation including geological timescales (Ma, Ga) and Wikidata integration.
+  </p>
+`;
+
 export function createHelpMenu(container) {
   let activeTab = 'shortcuts';
 
@@ -190,7 +241,7 @@ export function createHelpMenu(container) {
       font-weight: 500;
       cursor: pointer;
       transition: color 0.15s, background 0.15s;
-      border-radius: ${index === 0 ? '12px 0 0 0' : '0 12px 0 0'};
+      border-radius: ${index === 0 ? '12px 0 0 0' : index === TABS.length - 1 ? '0 12px 0 0' : '0'};
     `;
 
     button.addEventListener('click', () => switchTab(tab.id));
@@ -229,6 +280,8 @@ export function createHelpMenu(container) {
       panel.innerHTML = SHORTCUTS_CONTENT;
     } else if (tab.id === 'timescales') {
       panel.innerHTML = TIMESCALES_CONTENT;
+    } else if (tab.id === 'data') {
+      panel.innerHTML = DATA_CONTENT;
     }
 
     panelContainer.appendChild(panel);

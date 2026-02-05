@@ -37,9 +37,10 @@ describe('HelpMenu', () => {
       const helpMenu = createHelpMenu(container);
       const tabs = helpMenu.element.querySelectorAll('.help-tab');
 
-      expect(tabs.length).toBe(2);
+      expect(tabs.length).toBe(3);
       expect(tabs[0].textContent).toBe('Shortcuts');
       expect(tabs[1].textContent).toBe('Timescales');
+      expect(tabs[2].textContent).toBe('Loading Data');
     });
   });
 
@@ -146,11 +147,11 @@ describe('HelpMenu', () => {
       const helpMenu = createHelpMenu(container);
       helpMenu.show();
 
-      // From shortcuts, arrow left should go to timescales (wrap)
+      // From shortcuts, arrow left should go to data (wrap to last)
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
-      expect(helpMenu.getActiveTab()).toBe('timescales');
+      expect(helpMenu.getActiveTab()).toBe('data');
 
-      // From timescales, arrow right should go to shortcuts (wrap)
+      // From data, arrow right should go to shortcuts (wrap to first)
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
       expect(helpMenu.getActiveTab()).toBe('shortcuts');
     });

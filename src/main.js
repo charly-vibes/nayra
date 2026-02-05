@@ -6,6 +6,8 @@ import { loadExample, loadFromFile } from './data/loader.js';
 import { DEFAULT_EXAMPLE } from './data/examples.js';
 import { createSearchBar } from './ui/searchbar.js';
 import { createHelpMenu } from './ui/help.js';
+import { createTooltip } from './ui/tooltip.js';
+import { createEventPanel } from './ui/event-panel.js';
 import { parseTimeQuery } from './core/time-parser.js';
 import { RationalScale } from './core/scale.js';
 
@@ -46,6 +48,66 @@ async function handleExampleLoad(exampleOrFile) {
 
 const helpMenu = createHelpMenu(document.body, { onLoad: handleExampleLoad });
 
+const tooltip = createTooltip(document.body);
+const eventPanel = createEventPanel(document.body, {
+  onClose: () => {
+    // Panel closed, but keep selection
+  },
+});
+
+let mouseX = 0;
+let mouseY = 0;
+let hoverTimeout = null;
+let lastHoveredEventId = null;
+
+function handleHoverChange(hoveredEventId) {
+  if (hoveredEventId !== lastHoveredEventId) {
+    lastHoveredEventId = hoveredEventId;
+    
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      hoverTimeout = null;
+    }
+    
+    if (hoveredEventId === null) {
+      tooltip.hide();
+    } else {
+      hoverTimeout = setTimeout(() => {
+        const state = store.getState();
+        const event = state.events.find(e => e.id === hoveredEventId);
+        if (event && state.hoveredEventId === hoveredEventId) {
+          tooltip.update(event, mouseX, mouseY);
+          tooltip.show();
+        }
+      }, 500);
+    }
+  }
+}
+
+function handleSelectionChange(selectedEventIds) {
+  if (selectedEventIds.length > 0) {
+    const state = store.getState();
+    const selectedEvents = state.events.filter(e => selectedEventIds.includes(e.id));
+    if (selectedEvents.length > 0) {
+      eventPanel.update(selectedEvents);
+      eventPanel.show();
+    }
+  }
+}
+
+let lastSelectedIds = [];
+
+store.subscribe((state) => {
+  handleHoverChange(state.hoveredEventId);
+  
+  const currentIds = state.selectedEventIds.join(',');
+  const prevIds = lastSelectedIds.join(',');
+  if (currentIds !== prevIds && state.selectedEventIds.length > 0) {
+    handleSelectionChange(state.selectedEventIds);
+  }
+  lastSelectedIds = [...state.selectedEventIds];
+});
+
 initInput(canvas, store, {
   onOpenSearch: () => {
     if (!searchBar.isVisible()) {
@@ -57,6 +119,17 @@ initInput(canvas, store, {
       helpMenu.hide();
     } else {
       helpMenu.show();
+    }
+  },
+  onMousePosition: (x, y) => {
+    mouseX = x;
+    mouseY = y;
+    if (tooltip.isVisible()) {
+      const state = store.getState();
+      const event = state.events.find(e => e.id === state.hoveredEventId);
+      if (event) {
+        tooltip.update(event, x, y);
+      }
     }
   },
 });

@@ -57,6 +57,10 @@ export function initInput(canvas, store, callbacks = {}) {
         store.dispatch({ type: 'SET_HOVER', eventId });
       }
       canvas.style.cursor = event ? 'pointer' : 'grab';
+      
+      if (callbacks.onMousePosition) {
+        callbacks.onMousePosition(e.clientX, e.clientY);
+      }
     }
 
     if (e.buttons === 1) {

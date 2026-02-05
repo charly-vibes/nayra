@@ -85,9 +85,9 @@ function handleHoverChange(hoveredEventId) {
 }
 
 function handleSelectionChange(selectedEventIds) {
-  if (selectedEventIds.length > 0) {
+  if (selectedEventIds.size > 0) {
     const state = store.getState();
-    const selectedEvents = state.events.filter(e => selectedEventIds.includes(e.id));
+    const selectedEvents = state.events.filter(e => selectedEventIds.has(e.id));
     if (selectedEvents.length > 0) {
       eventPanel.update(selectedEvents);
       eventPanel.show();
@@ -95,17 +95,17 @@ function handleSelectionChange(selectedEventIds) {
   }
 }
 
-let lastSelectedIds = [];
+let lastSelectedIds = new Set();
 
 store.subscribe((state) => {
   handleHoverChange(state.hoveredEventId);
   
-  const currentIds = state.selectedEventIds.join(',');
-  const prevIds = lastSelectedIds.join(',');
-  if (currentIds !== prevIds && state.selectedEventIds.length > 0) {
+  const currentIds = [...state.selectedEventIds].sort().join(',');
+  const prevIds = [...lastSelectedIds].sort().join(',');
+  if (currentIds !== prevIds && state.selectedEventIds.size > 0) {
     handleSelectionChange(state.selectedEventIds);
   }
-  lastSelectedIds = [...state.selectedEventIds];
+  lastSelectedIds = new Set(state.selectedEventIds);
 });
 
 initInput(canvas, store, {

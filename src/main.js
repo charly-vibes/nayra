@@ -2,11 +2,12 @@ import { createStore } from './core/store.js';
 import { init as initRenderer, draw } from './rendering/renderer.js';
 import { initInput } from './interaction/input.js';
 import { generateSampleEvents } from './data/samples.js';
+import { loadExample } from './data/loader.js';
+import { DEFAULT_EXAMPLE } from './data/examples.js';
 import { createSearchBar } from './ui/searchbar.js';
 import { createHelpMenu } from './ui/help.js';
 import { parseTimeQuery } from './core/time-parser.js';
 import { RationalScale } from './core/scale.js';
-import { YEAR } from './core/time.js';
 
 const canvas = document.getElementById('timeline-canvas');
 const store = createStore();
@@ -17,11 +18,9 @@ const searchBar = createSearchBar(document.body, (query) => {
   const result = parseTimeQuery(query);
   if (result.success) {
     const state = store.getState();
-    // Calculate scale so span takes ~80% of viewport width
     const targetWidth = state.canvasWidth * 0.8;
     const secondsPerPixel = Number(result.span) / targetWidth;
     const newScale = RationalScale.fromSecondsPerPixel(secondsPerPixel);
-    // Center the target time
     const halfWidthTime = newScale.pxToTime(state.canvasWidth / 2);
     const viewportStart = result.time - halfWidthTime;
     store.dispatch({ type: 'SET_VIEWPORT', viewportStart, scale: newScale });
@@ -45,8 +44,26 @@ initInput(canvas, store, {
   },
 });
 
-const events = generateSampleEvents();
-store.dispatch({ type: 'SET_EVENTS', events });
+async function init() {
+  const params = new URLSearchParams(window.location.search);
+  const exampleName = params.get('example') || DEFAULT_EXAMPLE;
+
+  const result = await loadExample(exampleName);
+
+  if (result.errors.length > 0) {
+    console.warn(result.summary, result.errors);
+  }
+
+  if (result.events.length > 0) {
+    store.dispatch({ type: 'SET_EVENTS', events: result.events });
+  } else {
+    console.warn('Loader failed, using generated samples');
+    const fallback = generateSampleEvents();
+    store.dispatch({ type: 'SET_EVENTS', events: fallback });
+  }
+}
+
+init();
 
 let lastRenderedRevision = -1;
 

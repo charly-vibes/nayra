@@ -37,10 +37,11 @@ describe('HelpMenu', () => {
       const helpMenu = createHelpMenu(container);
       const tabs = helpMenu.element.querySelectorAll('.help-tab');
 
-      expect(tabs.length).toBe(3);
+      expect(tabs.length).toBe(4);
       expect(tabs[0].textContent).toBe('Shortcuts');
       expect(tabs[1].textContent).toBe('Timescales');
       expect(tabs[2].textContent).toBe('Loading Data');
+      expect(tabs[3].textContent).toBe('Examples');
     });
   });
 
@@ -147,11 +148,11 @@ describe('HelpMenu', () => {
       const helpMenu = createHelpMenu(container);
       helpMenu.show();
 
-      // From shortcuts, arrow left should go to data (wrap to last)
+      // From shortcuts, arrow left should go to examples (wrap to last)
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
-      expect(helpMenu.getActiveTab()).toBe('data');
+      expect(helpMenu.getActiveTab()).toBe('examples');
 
-      // From data, arrow right should go to shortcuts (wrap to first)
+      // From examples, arrow right should go to shortcuts (wrap to first)
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
       expect(helpMenu.getActiveTab()).toBe('shortcuts');
     });
@@ -250,6 +251,95 @@ describe('HelpMenu', () => {
       content.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
       expect(helpMenu.element.style.display).not.toBe('none');
+    });
+  });
+
+  describe('examples tab', () => {
+    it('displays all available examples', async () => {
+      const { createHelpMenu } = await import('../../src/ui/help.js');
+      const { EXAMPLES } = await import('../../src/data/examples.js');
+
+      const helpMenu = createHelpMenu(container);
+      helpMenu.show();
+      helpMenu.switchTab('examples');
+
+      const content = helpMenu.element.textContent;
+      for (const example of EXAMPLES) {
+        expect(content).toContain(example.label);
+        expect(content).toContain(example.desc);
+      }
+    });
+
+    it('has clickable example items with data-example attribute', async () => {
+      const { createHelpMenu } = await import('../../src/ui/help.js');
+      const { EXAMPLES } = await import('../../src/data/examples.js');
+
+      const helpMenu = createHelpMenu(container);
+      helpMenu.show();
+      helpMenu.switchTab('examples');
+
+      const exampleItems = helpMenu.element.querySelectorAll('[data-example]');
+      expect(exampleItems.length).toBe(EXAMPLES.length);
+
+      EXAMPLES.forEach((ex, i) => {
+        expect(exampleItems[i].dataset.example).toBe(ex.id);
+      });
+    });
+
+    it('clicking example calls onLoad callback with example name', async () => {
+      const { createHelpMenu } = await import('../../src/ui/help.js');
+      const onLoad = vi.fn();
+
+      const helpMenu = createHelpMenu(container, { onLoad });
+      helpMenu.show();
+      helpMenu.switchTab('examples');
+
+      const firstExample = helpMenu.element.querySelector('[data-example]');
+      firstExample.click();
+
+      expect(onLoad).toHaveBeenCalledWith('space-exploration');
+    });
+
+    it('clicking example hides the menu', async () => {
+      const { createHelpMenu } = await import('../../src/ui/help.js');
+      const onLoad = vi.fn();
+
+      const helpMenu = createHelpMenu(container, { onLoad });
+      helpMenu.show();
+      helpMenu.switchTab('examples');
+
+      const firstExample = helpMenu.element.querySelector('[data-example]');
+      firstExample.click();
+
+      expect(helpMenu.isVisible()).toBe(false);
+    });
+
+    it('has a file picker button', async () => {
+      const { createHelpMenu } = await import('../../src/ui/help.js');
+
+      const helpMenu = createHelpMenu(container);
+      helpMenu.show();
+      helpMenu.switchTab('examples');
+
+      const filePickerBtn = helpMenu.element.querySelector('[data-file-picker]');
+      expect(filePickerBtn).not.toBeNull();
+      expect(filePickerBtn.textContent).toContain('Load from file');
+    });
+
+    it('file picker button triggers file input', async () => {
+      const { createHelpMenu } = await import('../../src/ui/help.js');
+
+      const helpMenu = createHelpMenu(container);
+      helpMenu.show();
+      helpMenu.switchTab('examples');
+
+      const clickSpy = vi.fn();
+      vi.spyOn(HTMLInputElement.prototype, 'click').mockImplementation(clickSpy);
+
+      const filePickerBtn = helpMenu.element.querySelector('[data-file-picker]');
+      filePickerBtn.click();
+
+      expect(clickSpy).toHaveBeenCalled();
     });
   });
 

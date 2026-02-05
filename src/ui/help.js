@@ -1,7 +1,10 @@
+import { EXAMPLES } from '../data/examples.js';
+
 const TABS = [
   { id: 'shortcuts', label: 'Shortcuts' },
   { id: 'timescales', label: 'Timescales' },
   { id: 'data', label: 'Loading Data' },
+  { id: 'examples', label: 'Examples' },
 ];
 
 const SHORTCUTS_CONTENT = `
@@ -181,7 +184,45 @@ const DATA_CONTENT = `
   </p>
 `;
 
-export function createHelpMenu(container) {
+function buildExamplesContent() {
+  const exampleItems = EXAMPLES.map(
+    (ex) => `
+    <li data-example="${ex.id}" style="
+      padding: 12px 16px;
+      border-bottom: 1px solid #3a3a4e;
+      cursor: pointer;
+      transition: background 0.15s;
+    ">
+      <div style="color: #ffffff; font-weight: 500; margin-bottom: 4px;">${ex.label}</div>
+      <div style="color: #8a8aaa; font-size: 13px;">${ex.desc}</div>
+    </li>
+  `
+  ).join('');
+
+  return `
+    <h2 style="margin: 0 0 20px 0; color: #ffffff; font-size: 20px; font-weight: 600;">
+      Load Example Dataset
+    </h2>
+    <ul style="list-style: none; margin: 0; padding: 0; border: 1px solid #3a3a4e; border-radius: 6px;">
+      ${exampleItems}
+    </ul>
+    <button data-file-picker style="
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px 16px;
+      background: #1a1a2e;
+      border: 1px solid #4a4a6a;
+      border-radius: 6px;
+      color: #00d9ff;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    ">Load from file...</button>
+  `;
+}
+
+export function createHelpMenu(container, options = {}) {
+  const { onLoad } = options;
   let activeTab = 'shortcuts';
 
   const element = document.createElement('div');
@@ -282,11 +323,55 @@ export function createHelpMenu(container) {
       panel.innerHTML = TIMESCALES_CONTENT;
     } else if (tab.id === 'data') {
       panel.innerHTML = DATA_CONTENT;
+    } else if (tab.id === 'examples') {
+      panel.innerHTML = buildExamplesContent();
+      setupExamplesPanel(panel);
     }
 
     panelContainer.appendChild(panel);
     panels[tab.id] = panel;
   });
+
+  function setupExamplesPanel(panel) {
+    panel.querySelectorAll('[data-example]').forEach((li) => {
+      li.addEventListener('mouseenter', () => {
+        li.style.background = '#3a3a4e';
+      });
+      li.addEventListener('mouseleave', () => {
+        li.style.background = 'transparent';
+      });
+      li.addEventListener('click', () => {
+        if (onLoad) {
+          onLoad(li.dataset.example);
+        }
+        hide();
+      });
+    });
+
+    const filePickerBtn = panel.querySelector('[data-file-picker]');
+    if (filePickerBtn) {
+      filePickerBtn.addEventListener('mouseenter', () => {
+        filePickerBtn.style.background = '#2a2a3e';
+        filePickerBtn.style.borderColor = '#00d9ff';
+      });
+      filePickerBtn.addEventListener('mouseleave', () => {
+        filePickerBtn.style.background = '#1a1a2e';
+        filePickerBtn.style.borderColor = '#4a4a6a';
+      });
+      filePickerBtn.addEventListener('click', () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = () => {
+          if (input.files[0] && onLoad) {
+            onLoad(input.files[0]);
+          }
+          hide();
+        };
+        input.click();
+      });
+    }
+  }
 
   // Footer
   const footer = document.createElement('p');

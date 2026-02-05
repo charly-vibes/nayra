@@ -2,7 +2,7 @@ import { createStore } from './core/store.js';
 import { init as initRenderer, draw } from './rendering/renderer.js';
 import { initInput } from './interaction/input.js';
 import { generateSampleEvents } from './data/samples.js';
-import { loadExample } from './data/loader.js';
+import { loadExample, loadFromFile } from './data/loader.js';
 import { DEFAULT_EXAMPLE } from './data/examples.js';
 import { createSearchBar } from './ui/searchbar.js';
 import { createHelpMenu } from './ui/help.js';
@@ -27,7 +27,24 @@ const searchBar = createSearchBar(document.body, (query) => {
   }
 });
 
-const helpMenu = createHelpMenu(document.body);
+async function handleExampleLoad(exampleOrFile) {
+  let result;
+  if (typeof exampleOrFile === 'string') {
+    result = await loadExample(exampleOrFile);
+  } else {
+    result = await loadFromFile(exampleOrFile);
+  }
+
+  if (result.errors.length > 0) {
+    console.warn(result.summary, result.errors);
+  }
+
+  if (result.events.length > 0) {
+    store.dispatch({ type: 'SET_EVENTS', events: result.events });
+  }
+}
+
+const helpMenu = createHelpMenu(document.body, { onLoad: handleExampleLoad });
 
 initInput(canvas, store, {
   onOpenSearch: () => {

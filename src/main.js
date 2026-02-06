@@ -8,6 +8,7 @@ import { createSearchBar } from './ui/searchbar.js';
 import { createHelpMenu } from './ui/help.js';
 import { createTooltip } from './ui/tooltip.js';
 import { createEventPanel } from './ui/event-panel.js';
+import { createDropzone } from './ui/dropzone.js';
 import { parseTimeQuery } from './core/time-parser.js';
 import { RationalScale } from './core/scale.js';
 
@@ -47,6 +48,8 @@ async function handleExampleLoad(exampleOrFile) {
 }
 
 const helpMenu = createHelpMenu(document.body, { onLoad: handleExampleLoad });
+
+const dropzone = createDropzone(canvas.parentElement, { onLoad: handleExampleLoad });
 
 const tooltip = createTooltip(document.body);
 const eventPanel = createEventPanel(document.body, {

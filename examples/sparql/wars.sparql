@@ -1,0 +1,19 @@
+# Fetch major wars with start/end dates from Wikidata
+# Run at: https://query.wikidata.org/
+#
+# Output fields match Nayra's Wikidata transformer:
+# - item → id (Q-number)
+# - itemLabel → label
+# - itemDescription → description
+# - startTime → start
+# - endTime → end
+
+SELECT ?item ?itemLabel ?itemDescription ?startTime ?endTime WHERE {
+  ?item wdt:P31 wd:Q198.           # instance of: war
+  ?item wdt:P580 ?startTime.       # start time
+  OPTIONAL { ?item wdt:P582 ?endTime. }  # end time (optional)
+  
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY ?startTime
+LIMIT 100

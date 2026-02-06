@@ -1,0 +1,79 @@
+[
+  {
+    "id": "sputnik-1",
+    "start": "1957-10-04",
+    "label": "Sputnik 1 Launch",
+    "description": "First artificial satellite launched into Earth orbit by the Soviet Union",
+    "category": "space",
+    "tags": ["soviet", "satellite"],
+    "precision": "day"
+  },
+  {
+    "id": "apollo-11",
+    "start": "1969-07-16",
+    "end": "1969-07-24",
+    "label": "Apollo 11 Mission",
+    "description": "First crewed Moon landing. Neil Armstrong and Buzz Aldrin walked on the lunar surface.",
+    "category": "space",
+    "tags": ["nasa", "moon", "crewed"],
+    "precision": "day",
+    "url": "https://www.nasa.gov/mission_pages/apollo/apollo-11.html"
+  },
+  {
+    "id": "voyager-1",
+    "start": "1977-09-05",
+    "label": "Voyager 1 Launch",
+    "description": "Space probe launched to study the outer Solar System and interstellar space",
+    "category": "space",
+    "tags": ["nasa", "probe", "interstellar"],
+    "precision": "day"
+  },
+  {
+    "id": "challenger-disaster",
+    "start": "1986-01-28",
+    "label": "Challenger Disaster",
+    "description": "Space Shuttle Challenger broke apart 73 seconds after launch",
+    "category": "space",
+    "tags": ["nasa", "shuttle", "disaster"],
+    "priority": 1,
+    "precision": "day"
+  },
+  {
+    "id": "hubble-launch",
+    "start": "1990-04-24",
+    "label": "Hubble Space Telescope Launch",
+    "description": "Space telescope launched into low Earth orbit",
+    "category": "science",
+    "tags": ["nasa", "telescope", "astronomy"],
+    "precision": "day"
+  },
+  {
+    "id": "iss-first-crew",
+    "start": "2000-11-02",
+    "end": "2001-03-21",
+    "label": "ISS Expedition 1",
+    "description": "First long-duration crew aboard the International Space Station",
+    "category": "space",
+    "tags": ["iss", "crewed", "international"],
+    "precision": "day"
+  },
+  {
+    "id": "spacex-crew-dragon",
+    "start": "2020-05-30",
+    "label": "SpaceX Crew Dragon Demo-2",
+    "description": "First crewed orbital spaceflight launched by a private company",
+    "category": "space",
+    "tags": ["spacex", "crewed", "commercial"],
+    "precision": "day"
+  },
+  {
+    "id": "jwst-launch",
+    "start": "2021-12-25",
+    "label": "James Webb Space Telescope Launch",
+    "description": "Most powerful space telescope ever built, launched to observe the early universe",
+    "category": "science",
+    "tags": ["nasa", "telescope", "infrared"],
+    "precision": "day",
+    "url": "https://webb.nasa.gov/"
+  }
+]

@@ -1,0 +1,74 @@
+[
+  {
+    "id": "great-pyramid",
+    "start": "2560 BCE",
+    "label": "Great Pyramid of Giza Completed",
+    "description": "Construction of the Great Pyramid completed during reign of Pharaoh Khufu",
+    "category": "architecture",
+    "tags": ["egypt", "pyramid"],
+    "precision": "decade"
+  },
+  {
+    "id": "hammurabi-code",
+    "start": "1754 BCE",
+    "label": "Code of Hammurabi",
+    "description": "One of the oldest deciphered writings of significant length in the world",
+    "category": "law",
+    "tags": ["babylon", "mesopotamia"],
+    "precision": "year"
+  },
+  {
+    "id": "trojan-war",
+    "start": "1194 BCE",
+    "label": "Trojan War Begins",
+    "description": "Legendary war between Greeks and Trojans (~1194-1184 BCE), as told in Homer's Iliad",
+    "category": "war",
+    "tags": ["greece", "troy", "legendary"],
+    "precision": "decade"
+  },
+  {
+    "id": "rome-founded",
+    "start": "753 BCE",
+    "label": "Traditional Founding of Rome",
+    "description": "Legendary founding of Rome by Romulus and Remus",
+    "category": "politics",
+    "tags": ["rome", "legendary"],
+    "precision": "year"
+  },
+  {
+    "id": "first-olympics",
+    "start": "776 BCE",
+    "label": "First Olympic Games",
+    "description": "Traditional date of the first Olympic Games held at Olympia, Greece",
+    "category": "culture",
+    "tags": ["greece", "sports"],
+    "precision": "year"
+  },
+  {
+    "id": "alexander-empire",
+    "start": "336 BCE",
+    "label": "Alexander the Great Becomes King",
+    "description": "Macedonian king who created one of the largest empires in ancient history (336-323 BCE)",
+    "category": "politics",
+    "tags": ["macedonia", "greece", "conquest"],
+    "precision": "year"
+  },
+  {
+    "id": "julius-caesar-assassination",
+    "start": "44 BCE",
+    "label": "Assassination of Julius Caesar",
+    "description": "Roman dictator Julius Caesar was stabbed to death by senators on the Ides of March",
+    "category": "politics",
+    "tags": ["rome", "assassination"],
+    "precision": "day"
+  },
+  {
+    "id": "cleopatra-death",
+    "start": "30 BCE",
+    "label": "Death of Cleopatra",
+    "description": "Last active ruler of the Ptolemaic Kingdom of Egypt died, ending Egyptian independence",
+    "category": "politics",
+    "tags": ["egypt", "rome"],
+    "precision": "year"
+  }
+]

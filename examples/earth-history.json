@@ -1,0 +1,98 @@
+[
+  {
+    "id": "big-bang",
+    "start": "13.8 Ga",
+    "label": "Big Bang",
+    "description": "Origin of the universe from an initial singularity",
+    "category": "cosmology",
+    "tags": ["universe", "origin"],
+    "precision": "century",
+    "priority": 0
+  },
+  {
+    "id": "milky-way-formation",
+    "start": "13.6 Ga",
+    "label": "Milky Way Galaxy Formation",
+    "description": "Our galaxy began forming from primordial gas clouds",
+    "category": "cosmology",
+    "tags": ["galaxy", "formation"],
+    "precision": "century"
+  },
+  {
+    "id": "earth-formation",
+    "start": "4.5 Ga",
+    "label": "Earth Formation",
+    "description": "Earth formed from the solar nebula through accretion",
+    "category": "geology",
+    "tags": ["earth", "formation"],
+    "precision": "century",
+    "priority": 0
+  },
+  {
+    "id": "first-life",
+    "start": "3.8 Ga",
+    "label": "First Life on Earth",
+    "description": "Earliest evidence of microbial life in the fossil record",
+    "category": "biology",
+    "tags": ["life", "origin", "microbes"],
+    "precision": "century"
+  },
+  {
+    "id": "great-oxidation",
+    "start": "2.4 Ga",
+    "label": "Great Oxidation Event",
+    "description": "Cyanobacteria began producing oxygen, dramatically changing Earth's atmosphere",
+    "category": "geology",
+    "tags": ["atmosphere", "oxygen"],
+    "precision": "century"
+  },
+  {
+    "id": "cambrian-explosion",
+    "start": "538 Ma",
+    "label": "Cambrian Explosion",
+    "description": "Rapid diversification of animal life (~538-485 Ma) with the appearance of most major phyla",
+    "category": "biology",
+    "tags": ["evolution", "animals"],
+    "precision": "century",
+    "priority": 1
+  },
+  {
+    "id": "permian-extinction",
+    "start": "252 Ma",
+    "label": "Permian-Triassic Extinction",
+    "description": "The Great Dying: largest mass extinction, eliminating ~96% of marine species",
+    "category": "extinction",
+    "tags": ["mass-extinction", "permian"],
+    "precision": "century",
+    "priority": 1
+  },
+  {
+    "id": "dinosaurs-reign",
+    "start": "233 Ma",
+    "end": "66 Ma",
+    "label": "Age of Dinosaurs",
+    "description": "Dinosaurs dominated terrestrial ecosystems during the Mesozoic Era",
+    "category": "biology",
+    "tags": ["dinosaurs", "mesozoic"],
+    "precision": "century"
+  },
+  {
+    "id": "kt-extinction",
+    "start": "66 Ma",
+    "label": "Cretaceous-Paleogene Extinction",
+    "description": "Asteroid impact ended the reign of non-avian dinosaurs",
+    "category": "extinction",
+    "tags": ["mass-extinction", "asteroid", "dinosaurs"],
+    "precision": "century",
+    "priority": 1
+  },
+  {
+    "id": "homo-sapiens",
+    "start": "300000",
+    "label": "Emergence of Homo sapiens",
+    "description": "Anatomically modern humans appeared in Africa",
+    "category": "biology",
+    "tags": ["human", "evolution"],
+    "precision": "century"
+  }
+]

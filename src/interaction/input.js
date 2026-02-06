@@ -29,15 +29,20 @@ export function initInput(canvas, store, callbacks = {}) {
   let dragStartX = 0;
   let dragStartY = 0;
 
-  function onMouseDown(e) {
+  function onPointerDown(e) {
     if (e.button !== 0) return;
     isDragging = false;
     dragStartX = e.clientX;
     dragStartY = e.clientY;
     lastX = e.clientX;
+    try {
+      canvas.setPointerCapture(e.pointerId);
+    } catch {
+      // InvalidStateError can occur if element is not in DOM
+    }
   }
 
-  function onMouseMove(e) {
+  function onPointerMove(e) {
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -80,7 +85,7 @@ export function initInput(canvas, store, callbacks = {}) {
     }
   }
 
-  function onMouseUp(e) {
+  function onPointerUp(e) {
     if (!isDragging) {
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -121,10 +126,19 @@ export function initInput(canvas, store, callbacks = {}) {
     canvas.style.cursor = event ? 'pointer' : 'grab';
   }
 
-  function onMouseLeave() {
+  function onPointerLeave() {
     if (isDragging) {
       isDragging = false;
     }
+    const state = store.getState();
+    if (state.hoveredEventId !== null) {
+      store.dispatch({ type: 'SET_HOVER', eventId: null });
+    }
+    canvas.style.cursor = 'grab';
+  }
+
+  function onPointerCancel() {
+    isDragging = false;
     const state = store.getState();
     if (state.hoveredEventId !== null) {
       store.dispatch({ type: 'SET_HOVER', eventId: null });
@@ -170,20 +184,23 @@ export function initInput(canvas, store, callbacks = {}) {
     }
   }
 
-  canvas.addEventListener('mousedown', onMouseDown);
-  canvas.addEventListener('mousemove', onMouseMove);
-  canvas.addEventListener('mouseup', onMouseUp);
-  canvas.addEventListener('mouseleave', onMouseLeave);
+  canvas.addEventListener('pointerdown', onPointerDown);
+  canvas.addEventListener('pointermove', onPointerMove);
+  canvas.addEventListener('pointerup', onPointerUp);
+  canvas.addEventListener('pointerleave', onPointerLeave);
+  canvas.addEventListener('pointercancel', onPointerCancel);
   canvas.addEventListener('wheel', onWheel, { passive: false });
   document.addEventListener('keydown', onKeyDown);
 
   canvas.style.cursor = 'grab';
+  canvas.style.touchAction = 'none';
 
   return function destroy() {
-    canvas.removeEventListener('mousedown', onMouseDown);
-    canvas.removeEventListener('mousemove', onMouseMove);
-    canvas.removeEventListener('mouseup', onMouseUp);
-    canvas.removeEventListener('mouseleave', onMouseLeave);
+    canvas.removeEventListener('pointerdown', onPointerDown);
+    canvas.removeEventListener('pointermove', onPointerMove);
+    canvas.removeEventListener('pointerup', onPointerUp);
+    canvas.removeEventListener('pointerleave', onPointerLeave);
+    canvas.removeEventListener('pointercancel', onPointerCancel);
     canvas.removeEventListener('wheel', onWheel);
     document.removeEventListener('keydown', onKeyDown);
   };

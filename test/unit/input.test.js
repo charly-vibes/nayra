@@ -22,6 +22,8 @@ function createMockCanvas() {
       width: 800,
       height: 400,
     })),
+    setPointerCapture: vi.fn(),
+    releasePointerCapture: vi.fn(),
     style: { cursor: '' },
     _listeners: listeners,
     dispatchEvent(type, eventInit) {
@@ -31,10 +33,12 @@ function createMockCanvas() {
   };
 }
 
-function createMockEvent(x, y, options = {}) {
+function createMockPointerEvent(x, y, options = {}) {
   return {
     clientX: x,
     clientY: y,
+    pointerId: options.pointerId ?? 1,
+    pointerType: options.pointerType ?? 'mouse',
     button: options.button ?? 0,
     buttons: options.buttons ?? 0,
     ctrlKey: options.ctrlKey ?? false,
@@ -132,29 +136,28 @@ describe('Input', () => {
       delete globalThis.document;
     });
 
-    it('click on event dispatches SELECT_EVENT', () => {
-      const state = store.getState();
+    it('tap on event dispatches SELECT_EVENT', () => {
       const eventX = 100;
       const eventY = 200;
 
-      canvas.dispatchEvent('mousedown', createMockEvent(eventX, eventY, { buttons: 1 }));
-      canvas.dispatchEvent('mouseup', createMockEvent(eventX, eventY));
+      canvas.dispatchEvent('pointerdown', createMockPointerEvent(eventX, eventY, { buttons: 1 }));
+      canvas.dispatchEvent('pointerup', createMockPointerEvent(eventX, eventY));
 
       const newState = store.getState();
       expect(newState.selectedEventIds.has('evt-1')).toBe(true);
       expect(newState.selectedEventIds.size).toBe(1);
     });
 
-    it('Ctrl+click dispatches TOGGLE_EVENT_SELECTION', () => {
+    it('Ctrl+tap dispatches TOGGLE_EVENT_SELECTION', () => {
       store.dispatch({ type: 'SELECT_EVENT', eventId: 'evt-1' });
 
       const eventX = 200;
       const eventY = 200;
 
-      canvas.dispatchEvent('mousedown', createMockEvent(eventX, eventY, { buttons: 1 }));
+      canvas.dispatchEvent('pointerdown', createMockPointerEvent(eventX, eventY, { buttons: 1 }));
       canvas.dispatchEvent(
-        'mouseup',
-        createMockEvent(eventX, eventY, { ctrlKey: true })
+        'pointerup',
+        createMockPointerEvent(eventX, eventY, { ctrlKey: true })
       );
 
       const newState = store.getState();
@@ -163,48 +166,58 @@ describe('Input', () => {
       expect(newState.selectedEventIds.size).toBe(2);
     });
 
-    it('click on background dispatches CLEAR_SELECTION', () => {
+    it('tap on background dispatches CLEAR_SELECTION', () => {
       store.dispatch({ type: 'SELECT_EVENT', eventId: 'evt-1' });
       expect(store.getState().selectedEventIds.size).toBe(1);
 
       const bgX = 500;
       const bgY = 200;
 
-      canvas.dispatchEvent('mousedown', createMockEvent(bgX, bgY, { buttons: 1 }));
-      canvas.dispatchEvent('mouseup', createMockEvent(bgX, bgY));
+      canvas.dispatchEvent('pointerdown', createMockPointerEvent(bgX, bgY, { buttons: 1 }));
+      canvas.dispatchEvent('pointerup', createMockPointerEvent(bgX, bgY));
 
       const newState = store.getState();
       expect(newState.selectedEventIds.size).toBe(0);
     });
 
-    it('mousemove over event dispatches SET_HOVER', () => {
+    it('pointermove over event dispatches SET_HOVER', () => {
       const eventX = 100;
       const eventY = 200;
 
-      canvas.dispatchEvent('mousemove', createMockEvent(eventX, eventY));
+      canvas.dispatchEvent('pointermove', createMockPointerEvent(eventX, eventY));
 
       const newState = store.getState();
       expect(newState.hoveredEventId).toBe('evt-1');
     });
 
-    it('mousemove off event dispatches SET_HOVER with null', () => {
+    it('pointermove off event dispatches SET_HOVER with null', () => {
       store.dispatch({ type: 'SET_HOVER', eventId: 'evt-1' });
       expect(store.getState().hoveredEventId).toBe('evt-1');
 
       const bgX = 500;
       const bgY = 200;
 
-      canvas.dispatchEvent('mousemove', createMockEvent(bgX, bgY));
+      canvas.dispatchEvent('pointermove', createMockPointerEvent(bgX, bgY));
 
       const newState = store.getState();
       expect(newState.hoveredEventId).toBe(null);
     });
 
-    it('mouseleave clears hover state', () => {
+    it('pointerleave clears hover state', () => {
       store.dispatch({ type: 'SET_HOVER', eventId: 'evt-1' });
       expect(store.getState().hoveredEventId).toBe('evt-1');
 
-      canvas.dispatchEvent('mouseleave', createMockEvent(0, 0));
+      canvas.dispatchEvent('pointerleave', createMockPointerEvent(0, 0));
+
+      const newState = store.getState();
+      expect(newState.hoveredEventId).toBe(null);
+    });
+
+    it('pointercancel clears hover and drag state', () => {
+      store.dispatch({ type: 'SET_HOVER', eventId: 'evt-1' });
+      canvas.dispatchEvent('pointerdown', createMockPointerEvent(100, 200, { buttons: 1 }));
+
+      canvas.dispatchEvent('pointercancel', createMockPointerEvent(0, 0));
 
       const newState = store.getState();
       expect(newState.hoveredEventId).toBe(null);
@@ -214,9 +227,9 @@ describe('Input', () => {
       const startX = 100;
       const startY = 200;
 
-      canvas.dispatchEvent('mousedown', createMockEvent(startX, startY, { buttons: 1 }));
-      canvas.dispatchEvent('mousemove', createMockEvent(startX + 50, startY, { buttons: 1 }));
-      canvas.dispatchEvent('mouseup', createMockEvent(startX + 50, startY));
+      canvas.dispatchEvent('pointerdown', createMockPointerEvent(startX, startY, { buttons: 1 }));
+      canvas.dispatchEvent('pointermove', createMockPointerEvent(startX + 50, startY, { buttons: 1 }));
+      canvas.dispatchEvent('pointerup', createMockPointerEvent(startX + 50, startY));
 
       const newState = store.getState();
       expect(newState.selectedEventIds.size).toBe(0);
@@ -226,7 +239,7 @@ describe('Input', () => {
       const eventX = 100;
       const eventY = 200;
 
-      canvas.dispatchEvent('mousemove', createMockEvent(eventX, eventY));
+      canvas.dispatchEvent('pointermove', createMockPointerEvent(eventX, eventY));
 
       expect(canvas.style.cursor).toBe('pointer');
     });
@@ -236,9 +249,19 @@ describe('Input', () => {
       const bgX = 500;
       const bgY = 200;
 
-      canvas.dispatchEvent('mousemove', createMockEvent(bgX, bgY));
+      canvas.dispatchEvent('pointermove', createMockPointerEvent(bgX, bgY));
 
       expect(canvas.style.cursor).toBe('grab');
+    });
+
+    it('calls setPointerCapture on pointerdown', () => {
+      canvas.dispatchEvent('pointerdown', createMockPointerEvent(100, 200, { pointerId: 42, buttons: 1 }));
+
+      expect(canvas.setPointerCapture).toHaveBeenCalledWith(42);
+    });
+
+    it('sets touch-action to none for gesture support', () => {
+      expect(canvas.style.touchAction).toBe('none');
     });
   });
 });

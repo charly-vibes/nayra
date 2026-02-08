@@ -11,7 +11,7 @@ export class GestureRecognizer {
 
   addPointer(pointerId, x, y, timestamp) {
     if (this._pointers.size >= MAX_POINTERS) {
-      return;
+      return false;
     }
     this._pointers.set(pointerId, {
       x,
@@ -20,6 +20,7 @@ export class GestureRecognizer {
       initialX: x,
       initialY: y,
     });
+    return true;
   }
 
   updatePointer(pointerId, x, y, timestamp) {
@@ -28,18 +29,34 @@ export class GestureRecognizer {
       pointer.x = x;
       pointer.y = y;
       pointer.timestamp = timestamp;
+      return true;
     }
+    return false;
   }
 
   removePointer(pointerId) {
     this._pointers.delete(pointerId);
   }
 
+  hasPointer(pointerId) {
+    return this._pointers.has(pointerId);
+  }
+
   getPointer(pointerId) {
     return this._pointers.get(pointerId);
   }
 
+  getAnyPointer() {
+    const iterator = this._pointers.values();
+    const result = iterator.next();
+    return result.done ? null : result.value;
+  }
+
   clear() {
+    this._pointers.clear();
+  }
+
+  reset() {
     this._pointers.clear();
   }
 

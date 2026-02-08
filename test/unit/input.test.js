@@ -263,5 +263,45 @@ describe('Input', () => {
     it('sets touch-action to none for gesture support', () => {
       expect(canvas.style.touchAction).toBe('none');
     });
+
+    it('pinch-to-zoom changes scale via two pointers', () => {
+      const initialState = store.getState();
+      const initialSpp = initialState.scale.getSecondsPerPixel();
+
+      canvas.dispatchEvent('pointerdown', createMockPointerEvent(100, 200, {
+        pointerId: 1, buttons: 1, pointerType: 'touch',
+      }));
+      canvas.dispatchEvent('pointerdown', createMockPointerEvent(200, 200, {
+        pointerId: 2, buttons: 1, pointerType: 'touch',
+      }));
+
+      canvas.dispatchEvent('pointermove', createMockPointerEvent(50, 200, {
+        pointerId: 1, buttons: 1, pointerType: 'touch',
+      }));
+      canvas.dispatchEvent('pointermove', createMockPointerEvent(250, 200, {
+        pointerId: 2, buttons: 1, pointerType: 'touch',
+      }));
+
+      const newState = store.getState();
+      const newSpp = newState.scale.getSecondsPerPixel();
+      expect(newSpp).toBeLessThan(initialSpp);
+    });
+
+    it('pinch-to-zoom does not trigger selection', () => {
+      canvas.dispatchEvent('pointerdown', createMockPointerEvent(100, 200, {
+        pointerId: 1, buttons: 1, pointerType: 'touch',
+      }));
+      canvas.dispatchEvent('pointerdown', createMockPointerEvent(200, 200, {
+        pointerId: 2, buttons: 1, pointerType: 'touch',
+      }));
+      canvas.dispatchEvent('pointerup', createMockPointerEvent(200, 200, {
+        pointerId: 2, pointerType: 'touch',
+      }));
+      canvas.dispatchEvent('pointerup', createMockPointerEvent(100, 200, {
+        pointerId: 1, pointerType: 'touch',
+      }));
+
+      expect(store.getState().selectedEventIds.size).toBe(0);
+    });
   });
 });

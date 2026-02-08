@@ -42,4 +42,16 @@ export class GestureRecognizer {
   clear() {
     this._pointers.clear();
   }
+
+  getPinchState() {
+    if (this._pointers.size < 2) return null;
+    const [a, b] = [...this._pointers.values()];
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    return {
+      distance: Math.sqrt(dx * dx + dy * dy),
+      midpointX: (a.x + b.x) / 2,
+      midpointY: (a.y + b.y) / 2,
+    };
+  }
 }

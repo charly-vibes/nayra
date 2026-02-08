@@ -1,6 +1,7 @@
 import { RationalScale } from '../core/scale.js';
 import { YEAR } from '../core/time.js';
 import { findEventAtPoint } from './hit-detection.js';
+import { GestureRecognizer } from './gestures.js';
 
 const MIN_SECONDS_PER_PIXEL = 0.001;
 const CLICK_THRESHOLD = 3;
@@ -28,21 +29,58 @@ export function initInput(canvas, store, callbacks = {}) {
   let lastX = 0;
   let dragStartX = 0;
   let dragStartY = 0;
+  const gestures = new GestureRecognizer();
+  let pinchStartDistance = null;
+  let pinchStartSpp = null;
+  let wasPinchGesture = false;
 
   function onPointerDown(e) {
     if (e.button !== 0) return;
-    isDragging = false;
-    dragStartX = e.clientX;
-    dragStartY = e.clientY;
-    lastX = e.clientX;
     try {
       canvas.setPointerCapture(e.pointerId);
     } catch {
       // InvalidStateError can occur if element is not in DOM
     }
+
+    gestures.addPointer(e.pointerId, e.clientX, e.clientY, e.timeStamp);
+
+    if (gestures.pointerCount === 2) {
+      isDragging = false;
+      wasPinchGesture = true;
+      const pinch = gestures.getPinchState();
+      pinchStartDistance = pinch.distance;
+      pinchStartSpp = store.getState().scale.getSecondsPerPixel();
+      return;
+    }
+
+    isDragging = false;
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    lastX = e.clientX;
   }
 
   function onPointerMove(e) {
+    gestures.updatePointer(e.pointerId, e.clientX, e.clientY, e.timeStamp);
+
+    if (gestures.pointerCount === 2 && pinchStartDistance !== null) {
+      const pinch = gestures.getPinchState();
+      const ratio = pinch.distance / pinchStartDistance;
+      if (ratio === 0) return;
+
+      let newSpp = pinchStartSpp / ratio;
+      newSpp = Math.max(MIN_SECONDS_PER_PIXEL, Math.min(MAX_SECONDS_PER_PIXEL, newSpp));
+
+      const rect = canvas.getBoundingClientRect();
+      const midX = pinch.midpointX - rect.left;
+      const state = store.getState();
+      const anchor = state.viewportStart + state.scale.pxToTime(midX);
+      const newScale = RationalScale.fromSecondsPerPixel(newSpp);
+      const newStart = anchor - newScale.pxToTime(midX);
+
+      store.dispatch({ type: 'SET_VIEWPORT', viewportStart: newStart, scale: newScale });
+      return;
+    }
+
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -68,7 +106,7 @@ export function initInput(canvas, store, callbacks = {}) {
       }
     }
 
-    if (e.buttons === 1) {
+    if (e.buttons === 1 && gestures.pointerCount === 1) {
       const dx = e.clientX - dragStartX;
       const dy = e.clientY - dragStartY;
       if (Math.abs(dx) > CLICK_THRESHOLD || Math.abs(dy) > CLICK_THRESHOLD) {
@@ -86,6 +124,29 @@ export function initInput(canvas, store, callbacks = {}) {
   }
 
   function onPointerUp(e) {
+    const wasPinching = gestures.pointerCount === 2;
+    gestures.removePointer(e.pointerId);
+
+    if (wasPinching) {
+      pinchStartDistance = null;
+      pinchStartSpp = null;
+      if (gestures.pointerCount === 1) {
+        const remaining = [...gestures._pointers.values()][0];
+        lastX = remaining.x;
+        dragStartX = remaining.x;
+        dragStartY = remaining.y;
+        isDragging = false;
+      }
+      return;
+    }
+
+    if (wasPinchGesture) {
+      wasPinchGesture = false;
+      isDragging = false;
+      canvas.style.cursor = 'grab';
+      return;
+    }
+
     if (!isDragging) {
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -137,7 +198,12 @@ export function initInput(canvas, store, callbacks = {}) {
     canvas.style.cursor = 'grab';
   }
 
-  function onPointerCancel() {
+  function onPointerCancel(e) {
+    gestures.removePointer(e.pointerId);
+    if (gestures.pointerCount < 2) {
+      pinchStartDistance = null;
+      pinchStartSpp = null;
+    }
     isDragging = false;
     const state = store.getState();
     if (state.hoveredEventId !== null) {

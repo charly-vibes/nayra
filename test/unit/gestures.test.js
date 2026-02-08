@@ -87,4 +87,38 @@ describe('GestureRecognizer', () => {
       expect(recognizer.pointerCount).toBe(0);
     });
   });
+
+  describe('getPinchState', () => {
+    it('returns null with fewer than 2 pointers', () => {
+      const recognizer = new GestureRecognizer();
+      expect(recognizer.getPinchState()).toBeNull();
+
+      recognizer.addPointer(1, 100, 200, 1000);
+      expect(recognizer.getPinchState()).toBeNull();
+    });
+
+    it('returns distance and midpoint for two pointers', () => {
+      const recognizer = new GestureRecognizer();
+      recognizer.addPointer(1, 100, 0, 1000);
+      recognizer.addPointer(2, 200, 0, 1000);
+
+      const pinch = recognizer.getPinchState();
+      expect(pinch.distance).toBe(100);
+      expect(pinch.midpointX).toBe(150);
+      expect(pinch.midpointY).toBe(0);
+    });
+
+    it('updates as pointers move', () => {
+      const recognizer = new GestureRecognizer();
+      recognizer.addPointer(1, 100, 0, 1000);
+      recognizer.addPointer(2, 200, 0, 1000);
+
+      recognizer.updatePointer(1, 50, 0, 1100);
+      recognizer.updatePointer(2, 250, 0, 1100);
+
+      const pinch = recognizer.getPinchState();
+      expect(pinch.distance).toBe(200);
+      expect(pinch.midpointX).toBe(150);
+    });
+  });
 });

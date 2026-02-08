@@ -6,6 +6,7 @@ import { loadExample, loadFromFile } from './data/loader.js';
 import { DEFAULT_EXAMPLE } from './data/examples.js';
 import { createSearchBar } from './ui/searchbar.js';
 import { createHelpMenu } from './ui/help.js';
+import { createHelpButton } from './ui/help-button.js';
 import { createTooltip } from './ui/tooltip.js';
 import { createEventPanel } from './ui/event-panel.js';
 import { createDropzone } from './ui/dropzone.js';
@@ -48,6 +49,16 @@ async function handleExampleLoad(exampleOrFile) {
 }
 
 const helpMenu = createHelpMenu(document.body, { onLoad: handleExampleLoad });
+
+function toggleHelp() {
+  if (helpMenu.isVisible()) {
+    helpMenu.hide();
+  } else {
+    helpMenu.show();
+  }
+}
+
+const helpButton = createHelpButton(document.body, { onToggleHelp: toggleHelp });
 
 const dropzone = createDropzone(canvas.parentElement, { onLoad: handleExampleLoad });
 
@@ -117,13 +128,7 @@ initInput(canvas, store, {
       searchBar.show();
     }
   },
-  onToggleHelp: () => {
-    if (helpMenu.isVisible()) {
-      helpMenu.hide();
-    } else {
-      helpMenu.show();
-    }
-  },
+  onToggleHelp: toggleHelp,
   onMousePosition: (x, y) => {
     mouseX = x;
     mouseY = y;

@@ -23,19 +23,24 @@ export function createHelpButton(container, { onToggleHelp }) {
 
   button.addEventListener('click', onToggleHelp);
 
-  button.addEventListener('pointerdown', (e) => {
+  const handlePointerDown = (e) => {
     e.stopPropagation();
     button.style.transform = 'scale(0.92)';
-  });
+  };
 
-  button.addEventListener('pointerup', () => {
+  const handlePointerUp = () => {
     button.style.transform = 'scale(1)';
-  });
+  };
+
+  button.addEventListener('pointerdown', handlePointerDown);
+  button.addEventListener('pointerup', handlePointerUp);
 
   container.appendChild(button);
 
   function destroy() {
     button.removeEventListener('click', onToggleHelp);
+    button.removeEventListener('pointerdown', handlePointerDown);
+    button.removeEventListener('pointerup', handlePointerUp);
     container.removeChild(button);
   }
 

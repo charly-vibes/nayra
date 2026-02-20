@@ -121,7 +121,8 @@ const dropzone = createDropzone(canvas.parentElement, { onLoad: handleExampleLoa
 const tooltip = createTooltip(document.body);
 const eventPanel = createEventPanel(document.body, {
   onClose: () => {
-    // Panel closed, but keep selection
+    // Clear selection when panel is closed
+    store.dispatch({ type: 'CLEAR_SELECTION' });
   },
 });
 
@@ -169,11 +170,15 @@ let lastSelectedIds = new Set();
 
 store.subscribe((state) => {
   handleHoverChange(state.hoveredEventId);
-  
+
   const currentIds = [...state.selectedEventIds].sort().join(',');
   const prevIds = [...lastSelectedIds].sort().join(',');
-  if (currentIds !== prevIds && state.selectedEventIds.size > 0) {
-    handleSelectionChange(state.selectedEventIds);
+  if (currentIds !== prevIds) {
+    if (state.selectedEventIds.size > 0) {
+      handleSelectionChange(state.selectedEventIds);
+    } else {
+      eventPanel.hide();
+    }
   }
   lastSelectedIds = new Set(state.selectedEventIds);
 });

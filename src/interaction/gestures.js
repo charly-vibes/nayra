@@ -3,6 +3,7 @@ const MAX_POINTERS = 2;
 export class GestureRecognizer {
   constructor() {
     this._pointers = new Map();
+    this._pinchInitialDistance = null;
   }
 
   get pointerCount() {
@@ -20,6 +21,16 @@ export class GestureRecognizer {
       initialX: x,
       initialY: y,
     });
+
+    if (this._pointers.size === 2) {
+      const pinch = this.getPinchState();
+      if (pinch && pinch.distance > 0) {
+        this._pinchInitialDistance = pinch.distance;
+      } else {
+        this._pinchInitialDistance = null;
+      }
+    }
+
     return true;
   }
 
@@ -36,6 +47,9 @@ export class GestureRecognizer {
 
   removePointer(pointerId) {
     this._pointers.delete(pointerId);
+    if (this._pointers.size < 2) {
+      this._pinchInitialDistance = null;
+    }
   }
 
   hasPointer(pointerId) {
@@ -54,10 +68,12 @@ export class GestureRecognizer {
 
   clear() {
     this._pointers.clear();
+    this._pinchInitialDistance = null;
   }
 
   reset() {
     this._pointers.clear();
+    this._pinchInitialDistance = null;
   }
 
   getPinchState() {
@@ -69,6 +85,20 @@ export class GestureRecognizer {
       distance: Math.sqrt(dx * dx + dy * dy),
       midpointX: (a.x + b.x) / 2,
       midpointY: (a.y + b.y) / 2,
+    };
+  }
+
+  getPinchZoom() {
+    if (this._pointers.size < 2) return null;
+    if (this._pinchInitialDistance === null || this._pinchInitialDistance === 0) return null;
+
+    const current = this.getPinchState();
+    if (!current || current.distance === 0) return null;
+
+    return {
+      factor: current.distance / this._pinchInitialDistance,
+      midpointX: current.midpointX,
+      midpointY: current.midpointY,
     };
   }
 }

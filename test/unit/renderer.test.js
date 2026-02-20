@@ -255,15 +255,39 @@ describe('Renderer', () => {
 
   describe('getEventStrokeStyle', () => {
     it('returns default subtle border when not selected', () => {
-      const result = getEventStrokeStyle(false);
+      const result = getEventStrokeStyle(false, false);
       expect(result.color).toBe('rgba(255, 255, 255, 0.3)');
       expect(result.lineWidth).toBe(1);
     });
 
     it('returns accent border when selected', () => {
-      const result = getEventStrokeStyle(true);
+      const result = getEventStrokeStyle(true, false);
       expect(result.color).toBe('#ffcc00');
       expect(result.lineWidth).toBe(2);
+    });
+
+    it('returns blue focus indicator when focused', () => {
+      const result = getEventStrokeStyle(false, true);
+      expect(result.color).toBe('#2563eb');
+      expect(result.lineWidth).toBe(2);
+    });
+
+    it('focus takes priority over selection', () => {
+      const result = getEventStrokeStyle(true, true);
+      expect(result.color).toBe('#2563eb');
+      expect(result.lineWidth).toBe(2);
+    });
+
+    it('focus indicator has 2px width for WCAG compliance', () => {
+      const result = getEventStrokeStyle(false, true);
+      expect(result.lineWidth).toBe(2);
+    });
+
+    it('focus indicator uses high-contrast blue color', () => {
+      const result = getEventStrokeStyle(false, true);
+      // Blue color (#2563eb) should have good contrast against typical backgrounds
+      expect(result.color).toMatch(/^#[0-9a-f]{6}$/i);
+      expect(result.color).toBe('#2563eb');
     });
   });
 });

@@ -394,9 +394,10 @@ function drawEvent(event, state, axisY, canvasWidth, lod) {
 
   const isHovered = state.hoveredEventId === event.id;
   const isSelected = state.selectedEventIds && state.selectedEventIds.has(event.id);
+  const isFocused = state.focusedEventId === event.id;
 
   const fillColor = getEventFillColor(event.id, isHovered, isSelected);
-  const strokeStyle = getEventStrokeStyle(isSelected);
+  const strokeStyle = getEventStrokeStyle(isSelected, isFocused);
 
   // Use lane-based positioning
   const lane = laneAssignments.get(event.id) || 0;
@@ -466,7 +467,12 @@ export function getEventFillColor(eventId, isHovered, isSelected) {
   return baseColor;
 }
 
-export function getEventStrokeStyle(isSelected) {
+export function getEventStrokeStyle(isSelected, isFocused) {
+  // Focus takes priority over selection for visual clarity
+  if (isFocused) {
+    // WCAG 2.1 AA compliant focus indicator (blue with high contrast)
+    return { color: '#2563eb', lineWidth: 2 };
+  }
   if (isSelected) {
     return { color: '#ffcc00', lineWidth: 2 };
   }

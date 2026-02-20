@@ -18,6 +18,13 @@ export default defineConfig({
           setupFiles: ['test/integration/setup.js'],
         },
       },
+      {
+        test: {
+          name: 'performance',
+          include: ['test/performance/**/*.test.js'],
+          environment: 'node',
+        },
+      },
     ],
   },
 });

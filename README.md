@@ -75,6 +75,28 @@ Available built-in examples:
 
 **File Picker**: Use the Examples tab in the help menu (coming soon)
 
+### Interaction & Navigation
+
+Nayra supports both mouse/keyboard and touch input for navigation:
+
+#### Mouse & Keyboard
+- **Pan**: Click and drag to move through time
+- **Zoom**: Scroll to zoom in/out at cursor position
+- **Select**: Click on event to select, Ctrl+click to multi-select
+- **Jump to Today**: Press `Home` or `h`
+- **Search**: Press `/`
+- **Help Menu**: Press `?`
+
+#### Touch Gestures
+- **Pan**: Touch and drag to move through time
+- **Pinch-to-Zoom**: Use two fingers to zoom in/out
+- **Double-Tap**: Quickly tap twice to zoom in at that location
+- **Tap**: Tap on event to select it
+- **Long Press**: Press and hold for context actions (500ms threshold)
+- **Momentum Scrolling**: Flick to pan with inertia
+
+All touch gestures are implemented using the Pointer Events API for unified handling of mouse, touch, and pen input.
+
 ### Development Commands
 
 ```bash

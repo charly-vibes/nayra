@@ -43,11 +43,23 @@ const SHORTCUTS_CONTENT = `
   </table>
 
   <h2 style="margin: 24px 0 16px 0; color: #ffffff; font-size: 20px; font-weight: 600;">
-    Navigation
+    Mouse & Keyboard Navigation
   </h2>
   <ul style="margin: 0; padding: 0 0 0 20px; line-height: 1.8;">
     <li><strong>Pan:</strong> Click and drag to move through time</li>
     <li><strong>Zoom:</strong> Scroll to zoom in/out at cursor position</li>
+    <li><strong>Select:</strong> Click on event to select, Ctrl+click to multi-select</li>
+  </ul>
+
+  <h2 style="margin: 24px 0 16px 0; color: #ffffff; font-size: 20px; font-weight: 600;">
+    Touch Gestures
+  </h2>
+  <ul style="margin: 0; padding: 0 0 0 20px; line-height: 1.8;">
+    <li><strong>Pan:</strong> Touch and drag to move through time</li>
+    <li><strong>Pinch-to-Zoom:</strong> Use two fingers to zoom in/out</li>
+    <li><strong>Double-Tap:</strong> Quickly tap twice to zoom in</li>
+    <li><strong>Tap:</strong> Tap on event to select it</li>
+    <li><strong>Long Press:</strong> Press and hold for context menu (if enabled)</li>
   </ul>
 `;
 

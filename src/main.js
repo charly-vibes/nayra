@@ -1,12 +1,13 @@
 import { createStore } from './core/store.js';
 import { init as initRenderer, draw } from './rendering/renderer.js';
-import { initInput } from './interaction/input.js';
+import { initInput, fitToContent, resetZoom } from './interaction/input.js';
 import { generateSampleEvents } from './data/samples.js';
 import { loadExample, loadFromFile } from './data/loader.js';
 import { DEFAULT_EXAMPLE } from './data/examples.js';
 import { createSearchBar } from './ui/searchbar.js';
 import { createHelpMenu } from './ui/help.js';
 import { createHelpButton } from './ui/help-button.js';
+import { createZoomControls } from './ui/zoom-controls.js';
 import { createTooltip } from './ui/tooltip.js';
 import { createEventPanel } from './ui/event-panel.js';
 import { createDropzone } from './ui/dropzone.js';
@@ -59,6 +60,56 @@ function toggleHelp() {
 }
 
 const helpButton = createHelpButton(document.body, { onToggleHelp: toggleHelp });
+
+// Zoom control handlers
+function handleZoomIn() {
+  const state = store.getState();
+  const rect = canvas.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const mouseX = centerX - rect.left;
+  const anchor = state.viewportStart + state.scale.pxToTime(mouseX);
+  const factor = 1.15; // ZOOM_FACTOR from input.js
+  const currentSpp = state.scale.getSecondsPerPixel();
+  let newSpp = currentSpp / factor;
+  newSpp = Math.max(0.001, Math.min(1e15, newSpp)); // MIN/MAX_SECONDS_PER_PIXEL
+  const newScale = RationalScale.fromSecondsPerPixel(newSpp);
+  const newStart = anchor - newScale.pxToTime(mouseX);
+  store.dispatch({ type: 'SET_VIEWPORT', viewportStart: newStart, scale: newScale });
+}
+
+function handleZoomOut() {
+  const state = store.getState();
+  const rect = canvas.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const mouseX = centerX - rect.left;
+  const anchor = state.viewportStart + state.scale.pxToTime(mouseX);
+  const factor = 1 / 1.15; // 1/ZOOM_FACTOR from input.js
+  const currentSpp = state.scale.getSecondsPerPixel();
+  let newSpp = currentSpp / factor;
+  newSpp = Math.max(0.001, Math.min(1e15, newSpp)); // MIN/MAX_SECONDS_PER_PIXEL
+  const newScale = RationalScale.fromSecondsPerPixel(newSpp);
+  const newStart = anchor - newScale.pxToTime(mouseX);
+  store.dispatch({ type: 'SET_VIEWPORT', viewportStart: newStart, scale: newScale });
+}
+
+function handleFitToContent() {
+  const state = store.getState();
+  const { viewportStart, scale } = fitToContent(state.events, state.canvasWidth);
+  store.dispatch({ type: 'SET_VIEWPORT', viewportStart, scale });
+}
+
+function handleResetZoom() {
+  const state = store.getState();
+  const { viewportStart, scale } = resetZoom(state.canvasWidth);
+  store.dispatch({ type: 'SET_VIEWPORT', viewportStart, scale });
+}
+
+const zoomControls = createZoomControls(document.body, {
+  onZoomIn: handleZoomIn,
+  onZoomOut: handleZoomOut,
+  onFitToContent: handleFitToContent,
+  onResetZoom: handleResetZoom,
+});
 
 const dropzone = createDropzone(canvas.parentElement, { onLoad: handleExampleLoad });
 

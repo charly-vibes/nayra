@@ -38,6 +38,17 @@
       /* Optional: Add a subtle focus indicator */
       box-shadow: inset 0 0 0 2px rgba(0, 217, 255, 0.3);
     }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
   </style>
 </head>
 <body>
@@ -45,6 +56,8 @@
     <div id="timeline-container">
       <canvas id="timeline-canvas" tabindex="0" aria-label="Timeline visualization"></canvas>
     </div>
+    <!-- ARIA live region for screen reader announcements -->
+    <div id="aria-live" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
   </div>
   <script type="module" src="src/main.js"></script>
 </body>

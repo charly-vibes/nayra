@@ -1,6 +1,7 @@
 import { createStore } from './core/store.js';
 import { init as initRenderer, draw } from './rendering/renderer.js';
 import { initInput, fitToContent, resetZoom } from './interaction/input.js';
+import { createFocusManager } from './interaction/focus-manager.js';
 import { generateSampleEvents } from './data/samples.js';
 import { loadExample, loadFromFile } from './data/loader.js';
 import { DEFAULT_EXAMPLE } from './data/examples.js';
@@ -16,6 +17,10 @@ import { RationalScale } from './core/scale.js';
 
 const canvas = document.getElementById('timeline-canvas');
 const store = createStore();
+
+// Create focus manager for keyboard navigation
+const ariaLiveElement = document.getElementById('aria-live');
+const focusManager = createFocusManager(store, ariaLiveElement);
 
 initRenderer(canvas, store.dispatch);
 
@@ -191,7 +196,7 @@ initInput(canvas, store, {
       }
     }
   },
-});
+}, focusManager);
 
 async function init() {
   const params = new URLSearchParams(window.location.search);

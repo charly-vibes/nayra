@@ -210,6 +210,9 @@ async function init() {
     const fallback = generateSampleEvents();
     store.dispatch({ type: 'SET_EVENTS', events: fallback });
   }
+
+  // Focus canvas for keyboard navigation
+  canvas.focus();
 }
 
 init();

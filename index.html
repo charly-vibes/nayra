@@ -32,13 +32,18 @@
       display: block;
       width: 100%;
       height: 100%;
+      outline: none; /* Remove default focus outline, we handle focus visually in the canvas */
+    }
+    #timeline-canvas:focus {
+      /* Optional: Add a subtle focus indicator */
+      box-shadow: inset 0 0 0 2px rgba(0, 217, 255, 0.3);
     }
   </style>
 </head>
 <body>
   <div id="app">
     <div id="timeline-container">
-      <canvas id="timeline-canvas"></canvas>
+      <canvas id="timeline-canvas" tabindex="0" aria-label="Timeline visualization"></canvas>
     </div>
   </div>
   <script type="module" src="src/main.js"></script>

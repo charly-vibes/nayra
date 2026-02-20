@@ -203,6 +203,11 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
     if (e.button !== 0) return;
     if (hasActiveTouch && e.pointerType === 'mouse') return;
     cancelMomentum();
+
+    // Ensure canvas has focus for keyboard navigation
+    if (canvas !== document.activeElement && typeof canvas.focus === 'function') {
+      canvas.focus();
+    }
     try {
       canvas.setPointerCapture(e.pointerId);
     } catch {

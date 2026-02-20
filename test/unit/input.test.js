@@ -528,6 +528,24 @@ describe('Input', () => {
       expect(newViewport).not.toBe(initialViewport);
     });
 
+    it('Tab navigation auto-pans when focused event is off-screen', () => {
+      // Set up: make event-3 off-screen
+      const state = store.getState();
+      store.dispatch({ type: 'SET_VIEWPORT', viewportStart: 0n, scale: state.scale });
+      const initialViewport = store.getState().viewportStart;
+
+      // Mock focusNext to focus event-3 (which is at start: 500n, way off-screen)
+      mockFocusManager.focusNext = vi.fn(() => {
+        store.dispatch({ type: 'SET_FOCUS', eventId: 'event-3' });
+      });
+
+      triggerKeyDown('Tab');
+
+      // Auto-pan should have triggered
+      const newViewport = store.getState().viewportStart;
+      expect(newViewport).not.toBe(initialViewport);
+    });
+
     it('Enter key selects focused event', () => {
       mockFocusManager.getFocus = vi.fn(() => 'event-2');
 

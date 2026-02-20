@@ -2,6 +2,7 @@ import { RationalScale } from '../core/scale.js';
 import { YEAR } from '../core/time.js';
 import { findEventAtPoint } from './hit-detection.js';
 import { GestureRecognizer } from './gestures.js';
+import { initAutoPan } from '../viewport/pan.js';
 
 const MIN_SECONDS_PER_PIXEL = 0.001;
 const CLICK_THRESHOLD = 3;
@@ -530,6 +531,9 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
   canvas.style.cursor = 'grab';
   canvas.style.touchAction = 'none';
 
+  // Initialize auto-pan for keyboard navigation
+  const unsubscribeAutoPan = focusManager ? initAutoPan(store) : null;
+
   return function destroy() {
     canvas.removeEventListener('pointerdown', onPointerDown);
     canvas.removeEventListener('pointermove', onPointerMove);
@@ -540,6 +544,7 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
     document.removeEventListener('keydown', onKeyDown);
     window.removeEventListener('resize', resetGestures);
     window.removeEventListener('orientationchange', resetGestures);
+    if (unsubscribeAutoPan) unsubscribeAutoPan();
     resetGestures();
   };
 }

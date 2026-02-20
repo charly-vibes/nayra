@@ -14,6 +14,12 @@ import {
   LOD_MACRO,
 } from './lod.js';
 import { clusterEvents, isPointInCluster } from '../layout/event-clustering.js';
+import {
+  calculateLayout as calculateLayoutWorker,
+  initWorker,
+  terminateWorker,
+  getWorkerThreshold,
+} from '../layout/layout-worker-manager.js';
 
 let ctx = null;
 let canvas = null;
@@ -30,6 +36,8 @@ let spatialHash = new SpatialHash();
 let layoutRevision = -1; // Track when layout needs recalculation
 let currentLOD = LOD_MICRO; // Current level of detail
 let clusters = []; // Current event clusters (for macro zoom)
+let pendingLayoutRevision = -1; // Track pending async layout calculation
+let isLayoutPending = false; // Flag to prevent duplicate layout requests
 
 export const EVENT_HEIGHT = 20;
 export const EVENT_COLORS = [
@@ -50,6 +58,9 @@ export function init(canvasElement, dispatch) {
   });
   resizeObserver.observe(canvas);
 
+  // Initialize Web Worker for layout offloading
+  initWorker();
+
   return { ctx, canvas };
 }
 
@@ -58,6 +69,10 @@ export function destroy() {
     resizeObserver.disconnect();
     resizeObserver = null;
   }
+
+  // Terminate Web Worker
+  terminateWorker();
+
   ctx = null;
   canvas = null;
   // Clear layout state
@@ -67,6 +82,8 @@ export function destroy() {
   layoutRevision = -1;
   currentLOD = LOD_MICRO;
   clusters = [];
+  pendingLayoutRevision = -1;
+  isLayoutPending = false;
 }
 
 /**
@@ -113,6 +130,9 @@ function setupDPI() {
 /**
  * Calculate lane assignments for all events
  * Only recalculates if state has changed (based on revision)
+ *
+ * For large datasets (>= 10,000 events), offloads calculation to Web Worker.
+ * For small datasets, uses synchronous calculation on main thread.
  */
 function calculateLayout(state, axisY, viewportStart, scale, width) {
   // Only recalculate if state has changed
@@ -120,14 +140,73 @@ function calculateLayout(state, axisY, viewportStart, scale, width) {
     return;
   }
 
-  layoutRevision = state.revision;
+  const targetRevision = state.revision;
+  const eventCount = state.events.length;
+  const threshold = getWorkerThreshold();
 
-  // Assign lanes using greedy interval coloring
-  const result = assignLanes(state.events);
-  laneAssignments = result.layouts;
-  laneCount = result.laneCount;
+  // For small datasets, use synchronous calculation
+  if (eventCount < threshold) {
+    layoutRevision = targetRevision;
 
-  // Rebuild spatial hash with new positions
+    // Assign lanes using greedy interval coloring (synchronous)
+    const result = assignLanes(state.events);
+    laneAssignments = result.layouts;
+    laneCount = result.laneCount;
+
+    rebuildSpatialHash(state.events, axisY, viewportStart, scale);
+    return;
+  }
+
+  // For large datasets, use Web Worker (async)
+  // Prevent duplicate requests for the same revision
+  if (isLayoutPending && pendingLayoutRevision === targetRevision) {
+    return; // Already calculating this revision
+  }
+
+  isLayoutPending = true;
+  pendingLayoutRevision = targetRevision;
+
+  // Kick off async calculation
+  calculateLayoutWorker(state.events, {
+    start: viewportStart,
+    end: viewportStart + scale.pxToTime(width),
+  }, scale.getSecondsPerPixel())
+    .then((result) => {
+      // Only apply result if it's still relevant (revision hasn't changed)
+      if (pendingLayoutRevision === targetRevision && layoutRevision !== targetRevision) {
+        layoutRevision = targetRevision;
+        laneAssignments = result.layouts;
+        laneCount = result.laneCount;
+
+        rebuildSpatialHash(state.events, axisY, viewportStart, scale);
+
+        // Trigger a redraw to show updated layout
+        if (canvas) {
+          requestAnimationFrame(() => draw(state));
+        }
+      }
+      isLayoutPending = false;
+    })
+    .catch((error) => {
+      console.error('Layout calculation failed:', error);
+      isLayoutPending = false;
+
+      // Fallback to synchronous calculation
+      if (layoutRevision !== targetRevision) {
+        layoutRevision = targetRevision;
+        const result = assignLanes(state.events);
+        laneAssignments = result.layouts;
+        laneCount = result.laneCount;
+        rebuildSpatialHash(state.events, axisY, viewportStart, scale);
+      }
+    });
+}
+
+/**
+ * Rebuild spatial hash with current lane assignments
+ * Extracted to reduce duplication between sync and async paths
+ */
+function rebuildSpatialHash(events, axisY, viewportStart, scale) {
   const getBounds = (event) => {
     const x = projectToScreen(event.start, viewportStart, scale);
 
@@ -154,7 +233,7 @@ function calculateLayout(state, axisY, viewportStart, scale, width) {
     return { x: hitX, y, width: displayWidth, height: EVENT_HEIGHT };
   };
 
-  spatialHash.rebuild(state.events, getBounds);
+  spatialHash.rebuild(events, getBounds);
 }
 
 export function draw(state) {

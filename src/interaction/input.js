@@ -469,6 +469,16 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
       return;
     }
 
+    // Handle Enter/Space to activate (select) focused event
+    if ((e.key === 'Enter' || e.key === ' ') && focusManager) {
+      e.preventDefault();
+      const focusedEventId = focusManager.getFocus();
+      if (focusedEventId) {
+        store.dispatch({ type: 'SELECT_EVENT', eventId: focusedEventId });
+      }
+      return;
+    }
+
     const action = KEYBOARD_SHORTCUTS[e.key];
     if (action === 'jumpToToday') {
       const state = store.getState();

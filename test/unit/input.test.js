@@ -527,5 +527,59 @@ describe('Input', () => {
       // Viewport should have changed to show last event
       expect(newViewport).not.toBe(initialViewport);
     });
+
+    it('Enter key selects focused event', () => {
+      mockFocusManager.getFocus = vi.fn(() => 'event-2');
+
+      triggerKeyDown('Enter');
+
+      const state = store.getState();
+      expect(state.selectedEventIds.has('event-2')).toBe(true);
+    });
+
+    it('Space key selects focused event', () => {
+      mockFocusManager.getFocus = vi.fn(() => 'event-2');
+
+      triggerKeyDown(' ');
+
+      const state = store.getState();
+      expect(state.selectedEventIds.has('event-2')).toBe(true);
+    });
+
+    it('Enter does nothing when no event focused', () => {
+      mockFocusManager.getFocus = vi.fn(() => null);
+      store.dispatch({ type: 'SELECT_EVENT', eventId: 'event-1' });
+
+      triggerKeyDown('Enter');
+
+      const state = store.getState();
+      // Selection should remain unchanged
+      expect(state.selectedEventIds.has('event-1')).toBe(true);
+      expect(state.selectedEventIds.has('event-2')).toBe(false);
+    });
+
+    it('Space does nothing when no event focused', () => {
+      mockFocusManager.getFocus = vi.fn(() => null);
+      store.dispatch({ type: 'SELECT_EVENT', eventId: 'event-1' });
+
+      triggerKeyDown(' ');
+
+      const state = store.getState();
+      // Selection should remain unchanged
+      expect(state.selectedEventIds.has('event-1')).toBe(true);
+      expect(state.selectedEventIds.has('event-2')).toBe(false);
+    });
+
+    it('Space key prevents default behavior', () => {
+      mockFocusManager.getFocus = vi.fn(() => 'event-2');
+      const event = triggerKeyDown(' ');
+      expect(event.preventDefault).toHaveBeenCalledTimes(1);
+    });
+
+    it('Enter key prevents default behavior', () => {
+      mockFocusManager.getFocus = vi.fn(() => 'event-2');
+      const event = triggerKeyDown('Enter');
+      expect(event.preventDefault).toHaveBeenCalledTimes(1);
+    });
   });
 });

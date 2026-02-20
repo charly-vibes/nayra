@@ -79,10 +79,16 @@ describe('Input', () => {
   });
 
   describe('keyboard shortcuts', () => {
-    it('Home key triggers jump to today', async () => {
+    it('Home key triggers jump to first', async () => {
       const { KEYBOARD_SHORTCUTS } = await import('../../src/interaction/input.js');
 
-      expect(KEYBOARD_SHORTCUTS.Home).toBe('jumpToToday');
+      expect(KEYBOARD_SHORTCUTS.Home).toBe('jumpToFirst');
+    });
+
+    it('End key triggers jump to last', async () => {
+      const { KEYBOARD_SHORTCUTS } = await import('../../src/interaction/input.js');
+
+      expect(KEYBOARD_SHORTCUTS.End).toBe('jumpToLast');
     });
 
     it('h key triggers jump to today', async () => {
@@ -399,6 +405,8 @@ describe('Input', () => {
       mockFocusManager = {
         focusNext: vi.fn(),
         focusPrevious: vi.fn(),
+        focusFirst: vi.fn(),
+        focusLast: vi.fn(),
         setFocus: vi.fn(),
         getFocus: vi.fn(() => null),
       };
@@ -472,6 +480,52 @@ describe('Input', () => {
       // Home key should still work for jumpToToday, not call focus methods
       expect(mockFocusManager.focusNext).not.toHaveBeenCalled();
       expect(mockFocusManager.focusPrevious).not.toHaveBeenCalled();
+    });
+
+    it('Home key calls focusFirst', () => {
+      mockFocusManager.focusFirst = vi.fn();
+      triggerKeyDown('Home');
+      expect(mockFocusManager.focusFirst).toHaveBeenCalledTimes(1);
+    });
+
+    it('End key calls focusLast', () => {
+      mockFocusManager.focusLast = vi.fn();
+      triggerKeyDown('End');
+      expect(mockFocusManager.focusLast).toHaveBeenCalledTimes(1);
+    });
+
+    it('Home key prevents default behavior', () => {
+      mockFocusManager.focusFirst = vi.fn();
+      const event = triggerKeyDown('Home');
+      expect(event.preventDefault).toHaveBeenCalledTimes(1);
+    });
+
+    it('End key prevents default behavior', () => {
+      mockFocusManager.focusLast = vi.fn();
+      const event = triggerKeyDown('End');
+      expect(event.preventDefault).toHaveBeenCalledTimes(1);
+    });
+
+    it('Home key pans viewport to first event', () => {
+      mockFocusManager.focusFirst = vi.fn();
+      const initialViewport = store.getState().viewportStart;
+
+      triggerKeyDown('Home');
+
+      const newViewport = store.getState().viewportStart;
+      // Viewport should have changed to show first event
+      expect(newViewport).not.toBe(initialViewport);
+    });
+
+    it('End key pans viewport to last event', () => {
+      mockFocusManager.focusLast = vi.fn();
+      const initialViewport = store.getState().viewportStart;
+
+      triggerKeyDown('End');
+
+      const newViewport = store.getState().viewportStart;
+      // Viewport should have changed to show last event
+      expect(newViewport).not.toBe(initialViewport);
     });
   });
 });

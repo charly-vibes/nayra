@@ -20,7 +20,8 @@ const ZOOM_FACTOR = 1.15;
 export const DEFAULT_SCALE = RationalScale.fromSecondsPerPixel(Number(YEAR));
 
 export const KEYBOARD_SHORTCUTS = {
-  Home: 'jumpToToday',
+  Home: 'jumpToFirst',
+  End: 'jumpToLast',
   h: 'jumpToToday',
   '/': 'openSearch',
   '?': 'toggleHelp',
@@ -473,6 +474,30 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
       const state = store.getState();
       const { viewportStart, scale } = jumpToToday(state.canvasWidth);
       store.dispatch({ type: 'SET_VIEWPORT', viewportStart, scale });
+    } else if (action === 'jumpToFirst' && focusManager) {
+      e.preventDefault();
+      const state = store.getState();
+      if (state.events.length > 0) {
+        const firstEvent = state.events[0];
+        focusManager.focusFirst();
+        // Pan viewport to show the first event
+        const eventPosition = firstEvent.start;
+        const halfWidthTime = state.scale.pxToTime(state.canvasWidth / 2);
+        const newViewportStart = eventPosition - halfWidthTime;
+        store.dispatch({ type: 'SET_VIEWPORT', viewportStart: newViewportStart, scale: state.scale });
+      }
+    } else if (action === 'jumpToLast' && focusManager) {
+      e.preventDefault();
+      const state = store.getState();
+      if (state.events.length > 0) {
+        const lastEvent = state.events[state.events.length - 1];
+        focusManager.focusLast();
+        // Pan viewport to show the last event
+        const eventPosition = lastEvent.start;
+        const halfWidthTime = state.scale.pxToTime(state.canvasWidth / 2);
+        const newViewportStart = eventPosition - halfWidthTime;
+        store.dispatch({ type: 'SET_VIEWPORT', viewportStart: newViewportStart, scale: state.scale });
+      }
     } else if (action === 'openSearch' && callbacks.onOpenSearch) {
       e.preventDefault();
       callbacks.onOpenSearch();

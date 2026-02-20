@@ -41,6 +41,40 @@ const SHORTCUTS_CONTENT = `
   </table>
 
   <h2 style="margin: 24px 0 16px 0; color: #ffffff; font-size: 20px; font-weight: 600;">
+    Zoom Controls
+  </h2>
+  <table style="width: 100%; border-collapse: collapse;">
+    <tbody>
+      <tr style="border-bottom: 1px solid #3a3a4e;">
+        <td style="padding: 8px 16px 8px 0; font-family: monospace; color: #8a8aaa;">
+          <kbd style="background: #1a1a2e; padding: 2px 8px; border-radius: 4px; border: 1px solid #4a4a6a;">+</kbd>
+          <span style="margin: 0 4px; color: #6a6a8a;">or</span>
+          <kbd style="background: #1a1a2e; padding: 2px 8px; border-radius: 4px; border: 1px solid #4a4a6a;">=</kbd>
+        </td>
+        <td style="padding: 8px 0;">Zoom in</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #3a3a4e;">
+        <td style="padding: 8px 16px 8px 0; font-family: monospace; color: #8a8aaa;">
+          <kbd style="background: #1a1a2e; padding: 2px 8px; border-radius: 4px; border: 1px solid #4a4a6a;">-</kbd>
+        </td>
+        <td style="padding: 8px 0;">Zoom out</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #3a3a4e;">
+        <td style="padding: 8px 16px 8px 0; font-family: monospace; color: #8a8aaa;">
+          <kbd style="background: #1a1a2e; padding: 2px 8px; border-radius: 4px; border: 1px solid #4a4a6a;">0</kbd>
+        </td>
+        <td style="padding: 8px 0;">Fit all events in view</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px 16px 8px 0; font-family: monospace; color: #8a8aaa;">
+          <kbd style="background: #1a1a2e; padding: 2px 8px; border-radius: 4px; border: 1px solid #4a4a6a;">1</kbd>
+        </td>
+        <td style="padding: 8px 0;">Reset zoom to default</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 style="margin: 24px 0 16px 0; color: #ffffff; font-size: 20px; font-weight: 600;">
     Keyboard Navigation
   </h2>
   <table style="width: 100%; border-collapse: collapse;">
@@ -214,9 +248,13 @@ const DATA_CONTENT = `
         <td style="padding: 6px 12px 6px 0; font-family: monospace; color: #00d9ff;">ancient-civilizations</td>
         <td style="padding: 6px 0; color: #a0a0b0;">Great empires throughout history</td>
       </tr>
-      <tr>
+      <tr style="border-bottom: 1px solid #3a3a4e;">
         <td style="padding: 6px 12px 6px 0; font-family: monospace; color: #00d9ff;">wikidata-wars</td>
         <td style="padding: 6px 0; color: #a0a0b0;">Historical conflicts from Wikidata</td>
+      </tr>
+      <tr>
+        <td style="padding: 6px 12px 6px 0; font-family: monospace; color: #00d9ff;">multilane-demo</td>
+        <td style="padding: 6px 0; color: #a0a0b0;">Project timeline with overlapping tasks</td>
       </tr>
     </tbody>
   </table>

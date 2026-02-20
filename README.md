@@ -70,6 +70,7 @@ Available built-in examples:
 - `earth-history` - Major geological and biological events across billions of years
 - `ancient-civilizations` - Rise and fall of great civilizations
 - `wikidata-wars` - Historical conflicts from Wikidata SPARQL queries
+- `multilane-demo` - Project timeline demonstrating overlapping tasks in multiple lanes
 
 **Local Files**: Drag a JSON file onto the canvas (coming soon)
 
@@ -86,6 +87,12 @@ Nayra supports both mouse/keyboard and touch input for navigation:
 - **Jump to Today**: Press `h`
 - **Search**: Press `/`
 - **Help Menu**: Press `?`
+
+#### Zoom Controls
+- **Zoom In**: Press `+` or `=`
+- **Zoom Out**: Press `-`
+- **Fit to Content**: Press `0` to show all events
+- **Reset Zoom**: Press `1` to reset to default zoom level
 
 #### Keyboard Navigation (Accessibility)
 - **Tab / Shift+Tab**: Navigate forward/backward through events chronologically

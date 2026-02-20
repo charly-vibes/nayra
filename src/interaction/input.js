@@ -26,6 +26,11 @@ export const KEYBOARD_SHORTCUTS = {
   h: 'jumpToToday',
   '/': 'openSearch',
   '?': 'toggleHelp',
+  '+': 'zoomIn',
+  '=': 'zoomIn',
+  '-': 'zoomOut',
+  '0': 'fitToContent',
+  '1': 'resetZoom',
 };
 
 export function jumpToToday(canvasWidth, scale = DEFAULT_SCALE) {
@@ -33,6 +38,43 @@ export function jumpToToday(canvasWidth, scale = DEFAULT_SCALE) {
   const halfWidthTime = scale.pxToTime(canvasWidth / 2);
   const viewportStart = now - halfWidthTime;
   return { viewportStart, scale };
+}
+
+export function fitToContent(events, canvasWidth) {
+  if (events.length === 0) {
+    return { viewportStart: 0n, scale: DEFAULT_SCALE };
+  }
+
+  // Find min and max times across all events
+  let minTime = events[0].start;
+  let maxTime = events[0].end || events[0].start;
+
+  for (const event of events) {
+    if (event.start < minTime) minTime = event.start;
+    const eventEnd = event.end || event.start;
+    if (eventEnd > maxTime) maxTime = eventEnd;
+  }
+
+  // Add 10% padding on each side
+  const range = maxTime - minTime;
+  const padding = range / 10n;
+  const paddedMin = minTime - padding;
+  const paddedMax = maxTime + padding;
+  const paddedRange = paddedMax - paddedMin;
+
+  // Calculate scale to fit all events
+  const spp = Number(paddedRange) / canvasWidth;
+  const clampedSpp = Math.max(MIN_SECONDS_PER_PIXEL, Math.min(MAX_SECONDS_PER_PIXEL, spp));
+  const scale = RationalScale.fromSecondsPerPixel(clampedSpp);
+
+  return { viewportStart: paddedMin, scale };
+}
+
+export function resetZoom(canvasWidth) {
+  const now = BigInt(Math.floor(Date.now() / 1000));
+  const halfWidthTime = DEFAULT_SCALE.pxToTime(canvasWidth / 2);
+  const viewportStart = now - halfWidthTime;
+  return { viewportStart, scale: DEFAULT_SCALE };
 }
 
 export function initInput(canvas, store, callbacks = {}, focusManager = null) {
@@ -509,6 +551,30 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
         const newViewportStart = eventPosition - halfWidthTime;
         store.dispatch({ type: 'SET_VIEWPORT', viewportStart: newViewportStart, scale: state.scale });
       }
+    } else if (action === 'zoomIn') {
+      e.preventDefault();
+      const state = store.getState();
+      const rect = canvas.getBoundingClientRect();
+      // Zoom at center of viewport
+      const centerX = rect.left + rect.width / 2;
+      applyZoomAtPosition(centerX, rect, true);
+    } else if (action === 'zoomOut') {
+      e.preventDefault();
+      const state = store.getState();
+      const rect = canvas.getBoundingClientRect();
+      // Zoom at center of viewport
+      const centerX = rect.left + rect.width / 2;
+      applyZoomAtPosition(centerX, rect, false);
+    } else if (action === 'fitToContent') {
+      e.preventDefault();
+      const state = store.getState();
+      const { viewportStart, scale } = fitToContent(state.events, state.canvasWidth);
+      store.dispatch({ type: 'SET_VIEWPORT', viewportStart, scale });
+    } else if (action === 'resetZoom') {
+      e.preventDefault();
+      const state = store.getState();
+      const { viewportStart, scale } = resetZoom(state.canvasWidth);
+      store.dispatch({ type: 'SET_VIEWPORT', viewportStart, scale });
     } else if (action === 'openSearch' && callbacks.onOpenSearch) {
       e.preventDefault();
       callbacks.onOpenSearch();

@@ -19,6 +19,11 @@ export const EXAMPLES = [
     label: 'Major Wars (Wikidata)',
     desc: 'Historical conflicts sourced from Wikidata SPARQL queries',
   },
+  {
+    id: 'multilane-demo',
+    label: 'Multilane Demo (Project Timeline)',
+    desc: 'Software development project showing overlapping tasks across multiple lanes',
+  },
 ];
 
 export const DEFAULT_EXAMPLE = 'space-exploration';

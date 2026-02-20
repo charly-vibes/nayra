@@ -1,0 +1,243 @@
+[
+  {
+    "id": "project-kickoff",
+    "start": "2024-01-01",
+    "end": "2024-01-15",
+    "label": "Project Kickoff & Planning",
+    "description": "Initial project setup, requirements gathering, and team formation",
+    "category": "planning",
+    "tags": ["planning", "kickoff"],
+    "priority": 1,
+    "precision": "day"
+  },
+  {
+    "id": "design-phase",
+    "start": "2024-01-08",
+    "end": "2024-02-15",
+    "label": "Design Phase",
+    "description": "UI/UX design, system architecture, and technical specifications",
+    "category": "design",
+    "tags": ["design", "architecture"],
+    "priority": 1,
+    "precision": "day"
+  },
+  {
+    "id": "backend-setup",
+    "start": "2024-01-10",
+    "end": "2024-02-01",
+    "label": "Backend Infrastructure Setup",
+    "description": "Database schema, API framework, authentication system",
+    "category": "development",
+    "tags": ["backend", "infrastructure"],
+    "priority": 2,
+    "precision": "day"
+  },
+  {
+    "id": "frontend-setup",
+    "start": "2024-01-12",
+    "end": "2024-02-05",
+    "label": "Frontend Foundation",
+    "description": "React setup, component library, routing configuration",
+    "category": "development",
+    "tags": ["frontend", "react"],
+    "priority": 2,
+    "precision": "day"
+  },
+  {
+    "id": "auth-module",
+    "start": "2024-02-01",
+    "end": "2024-02-20",
+    "label": "Authentication Module",
+    "description": "User login, registration, password reset, OAuth integration",
+    "category": "development",
+    "tags": ["backend", "auth", "security"],
+    "priority": 1,
+    "precision": "day"
+  },
+  {
+    "id": "user-dashboard",
+    "start": "2024-02-05",
+    "end": "2024-02-25",
+    "label": "User Dashboard UI",
+    "description": "Main dashboard interface, data visualization, user profile",
+    "category": "development",
+    "tags": ["frontend", "ui"],
+    "priority": 1,
+    "precision": "day"
+  },
+  {
+    "id": "api-endpoints",
+    "start": "2024-02-10",
+    "end": "2024-03-10",
+    "label": "Core API Endpoints",
+    "description": "REST API for data CRUD operations, search, filtering",
+    "category": "development",
+    "tags": ["backend", "api"],
+    "priority": 1,
+    "precision": "day"
+  },
+  {
+    "id": "data-integration",
+    "start": "2024-02-15",
+    "end": "2024-03-05",
+    "label": "Data Integration Layer",
+    "description": "Connect frontend to backend APIs, state management",
+    "category": "development",
+    "tags": ["frontend", "integration"],
+    "priority": 2,
+    "precision": "day"
+  },
+  {
+    "id": "testing-framework",
+    "start": "2024-02-20",
+    "end": "2024-03-15",
+    "label": "Testing Framework Setup",
+    "description": "Unit tests, integration tests, E2E test infrastructure",
+    "category": "testing",
+    "tags": ["testing", "qa"],
+    "priority": 2,
+    "precision": "day"
+  },
+  {
+    "id": "performance-opt",
+    "start": "2024-03-01",
+    "end": "2024-03-20",
+    "label": "Performance Optimization",
+    "description": "Database indexing, caching strategy, frontend bundle optimization",
+    "category": "optimization",
+    "tags": ["performance", "optimization"],
+    "priority": 2,
+    "precision": "day"
+  },
+  {
+    "id": "security-audit",
+    "start": "2024-03-05",
+    "end": "2024-03-18",
+    "label": "Security Audit",
+    "description": "Security review, penetration testing, vulnerability fixes",
+    "category": "security",
+    "tags": ["security", "audit"],
+    "priority": 1,
+    "precision": "day"
+  },
+  {
+    "id": "mobile-responsive",
+    "start": "2024-03-10",
+    "end": "2024-04-05",
+    "label": "Mobile Responsiveness",
+    "description": "Mobile-first design implementation, touch interactions",
+    "category": "development",
+    "tags": ["frontend", "mobile"],
+    "priority": 2,
+    "precision": "day"
+  },
+  {
+    "id": "admin-panel",
+    "start": "2024-03-15",
+    "end": "2024-04-10",
+    "label": "Admin Panel",
+    "description": "Administrator dashboard, user management, system monitoring",
+    "category": "development",
+    "tags": ["backend", "admin"],
+    "priority": 2,
+    "precision": "day"
+  },
+  {
+    "id": "notification-system",
+    "start": "2024-03-20",
+    "end": "2024-04-08",
+    "label": "Notification System",
+    "description": "Email notifications, in-app alerts, push notifications",
+    "category": "development",
+    "tags": ["backend", "notifications"],
+    "priority": 2,
+    "precision": "day"
+  },
+  {
+    "id": "analytics-integration",
+    "start": "2024-03-25",
+    "end": "2024-04-15",
+    "label": "Analytics Integration",
+    "description": "User behavior tracking, metrics dashboard, reporting",
+    "category": "analytics",
+    "tags": ["analytics", "monitoring"],
+    "priority": 3,
+    "precision": "day"
+  },
+  {
+    "id": "documentation",
+    "start": "2024-04-01",
+    "end": "2024-04-20",
+    "label": "Documentation",
+    "description": "API documentation, user guides, developer onboarding",
+    "category": "documentation",
+    "tags": ["docs", "guides"],
+    "priority": 2,
+    "precision": "day"
+  },
+  {
+    "id": "beta-testing",
+    "start": "2024-04-10",
+    "end": "2024-04-30",
+    "label": "Beta Testing Phase",
+    "description": "Closed beta with selected users, bug fixing, feedback collection",
+    "category": "testing",
+    "tags": ["beta", "qa", "testing"],
+    "priority": 1,
+    "precision": "day"
+  },
+  {
+    "id": "bug-fixes",
+    "start": "2024-04-15",
+    "end": "2024-05-05",
+    "label": "Bug Fixes & Refinements",
+    "description": "Address beta feedback, polish UI, fix critical bugs",
+    "category": "development",
+    "tags": ["bugs", "refinement"],
+    "priority": 1,
+    "precision": "day"
+  },
+  {
+    "id": "deployment-prep",
+    "start": "2024-04-25",
+    "end": "2024-05-10",
+    "label": "Deployment Preparation",
+    "description": "Production environment setup, CI/CD pipeline, monitoring",
+    "category": "deployment",
+    "tags": ["devops", "deployment"],
+    "priority": 1,
+    "precision": "day"
+  },
+  {
+    "id": "launch",
+    "start": "2024-05-15",
+    "label": "Product Launch",
+    "description": "Public release, marketing campaign, launch event",
+    "category": "launch",
+    "tags": ["launch", "release"],
+    "priority": 0,
+    "precision": "day"
+  },
+  {
+    "id": "post-launch-monitoring",
+    "start": "2024-05-15",
+    "end": "2024-06-15",
+    "label": "Post-Launch Monitoring",
+    "description": "Monitor system performance, user feedback, rapid issue response",
+    "category": "monitoring",
+    "tags": ["monitoring", "support"],
+    "priority": 1,
+    "precision": "day"
+  },
+  {
+    "id": "feature-iteration-1",
+    "start": "2024-05-20",
+    "end": "2024-06-20",
+    "label": "Feature Iteration v1.1",
+    "description": "First post-launch feature updates based on user feedback",
+    "category": "development",
+    "tags": ["features", "iteration"],
+    "priority": 2,
+    "precision": "day"
+  }
+]

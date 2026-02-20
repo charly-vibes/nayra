@@ -4,6 +4,14 @@ import { assignLanes } from '../layout/greedy-interval-coloring.js';
 import { getLaneY, DEFAULT_CONFIG as LANE_CONFIG } from '../layout/lane-positioning.js';
 import { SpatialHash } from '../layout/spatial-hash.js';
 import { detectLabelCollisions, renderLabel } from '../layout/label-collision.js';
+import {
+  determineLOD,
+  filterEventsByLOD,
+  shouldShowLabels,
+  shouldRenderAsPoint,
+  getMinEventWidth,
+  LOD_MICRO,
+} from './lod.js';
 
 let ctx = null;
 let canvas = null;
@@ -18,6 +26,7 @@ let laneAssignments = new Map(); // eventId -> lane number
 let laneCount = 0;
 let spatialHash = new SpatialHash();
 let layoutRevision = -1; // Track when layout needs recalculation
+let currentLOD = LOD_MICRO; // Current level of detail
 
 export const EVENT_HEIGHT = 20;
 export const EVENT_COLORS = [
@@ -53,6 +62,7 @@ export function destroy() {
   laneCount = 0;
   spatialHash.clear();
   layoutRevision = -1;
+  currentLOD = LOD_MICRO;
 }
 
 /**
@@ -109,18 +119,27 @@ function calculateLayout(state, axisY, viewportStart, scale, width) {
   const getBounds = (event) => {
     const x = projectToScreen(event.start, viewportStart, scale);
 
+    // Calculate actual event width
     let eventWidth;
     if (event.end !== undefined && event.end > event.start) {
       const endX = projectToScreen(event.end, viewportStart, scale);
-      eventWidth = Math.max(endX - x, 4);
+      eventWidth = endX - x;
     } else {
-      eventWidth = 4;
+      eventWidth = 0;
     }
+
+    // Use LOD-aware sizing for hit detection
+    const minWidth = getMinEventWidth(currentLOD);
+    const renderAsPoint = shouldRenderAsPoint(eventWidth, currentLOD) || eventWidth === 0;
+    const displayWidth = renderAsPoint ? minWidth : Math.max(eventWidth, minWidth);
 
     const lane = laneAssignments.get(event.id) || 0;
     const y = getLaneY(lane, axisY, { laneHeight: EVENT_HEIGHT, ...LANE_CONFIG });
 
-    return { x, y, width: eventWidth, height: EVENT_HEIGHT };
+    // For points, center the hit area
+    const hitX = renderAsPoint ? x - displayWidth / 2 : x;
+
+    return { x: hitX, y, width: displayWidth, height: EVENT_HEIGHT };
   };
 
   spatialHash.rebuild(state.events, getBounds);
@@ -138,8 +157,21 @@ export function draw(state) {
 
   const axisY = height / 2;
 
+  // Determine LOD level based on zoom
+  const secondsPerPixel = state.scale.getSecondsPerPixel();
+  currentLOD = determineLOD(secondsPerPixel, currentLOD);
+
+  // Filter events by LOD before layout
+  const lodFilteredEvents = filterEventsByLOD(state.events, currentLOD);
+
   // Calculate layout (only if state changed)
-  calculateLayout(state, axisY, state.viewportStart, state.scale, width);
+  calculateLayout(
+    { ...state, events: lodFilteredEvents },
+    axisY,
+    state.viewportStart,
+    state.scale,
+    width
+  );
 
   ctx.fillStyle = '#1a1a2e';
   ctx.fillRect(0, 0, width, height);
@@ -156,50 +188,58 @@ export function draw(state) {
   // First pass: draw events and collect bounds for label collision detection
   const eventsWithBounds = [];
   let visibleCount = 0;
-  for (const event of state.events) {
+  for (const event of lodFilteredEvents) {
     const duration = event.end !== undefined ? event.end - event.start : 0n;
     if (!isVisible(event.start, duration, state.viewportStart, viewportEnd)) {
       continue;
     }
     visibleCount++;
-    const bounds = drawEvent(event, state, axisY, width);
+    const bounds = drawEvent(event, state, axisY, width, currentLOD);
     if (bounds) {
       eventsWithBounds.push({ id: event.id, label: event.label, bounds });
     }
   }
 
   // Second pass: detect label collisions and render visible labels
-  const secondsPerPixel = state.scale.getSecondsPerPixel();
-  const visibleLabels = detectLabelCollisions(eventsWithBounds, ctx, secondsPerPixel);
+  // Only show labels if appropriate for current LOD
+  if (shouldShowLabels(currentLOD)) {
+    const visibleLabels = detectLabelCollisions(eventsWithBounds, ctx, secondsPerPixel);
 
-  for (const eventData of eventsWithBounds) {
-    if (visibleLabels.has(eventData.id) && eventData.label) {
-      renderLabel(
-        ctx,
-        eventData.label,
-        eventData.bounds.x,
-        eventData.bounds.y,
-        eventData.bounds.width,
-        eventData.bounds.height
-      );
+    for (const eventData of eventsWithBounds) {
+      if (visibleLabels.has(eventData.id) && eventData.label) {
+        renderLabel(
+          ctx,
+          eventData.label,
+          eventData.bounds.x,
+          eventData.bounds.y,
+          eventData.bounds.width,
+          eventData.bounds.height
+        );
+      }
     }
   }
 
   drawFPS(width);
 }
 
-function drawEvent(event, state, axisY, canvasWidth) {
+function drawEvent(event, state, axisY, canvasWidth, lod) {
   const x = projectToScreen(event.start, state.viewportStart, state.scale);
 
+  // Calculate actual event width
   let eventWidth;
   if (event.end !== undefined && event.end > event.start) {
     const endX = projectToScreen(event.end, state.viewportStart, state.scale);
-    eventWidth = Math.max(endX - x, 4);
+    eventWidth = endX - x;
   } else {
-    eventWidth = 4;
+    eventWidth = 0;
   }
 
-  if (x > canvasWidth || x + eventWidth < 0) return null;
+  // Determine minimum width based on LOD
+  const minWidth = getMinEventWidth(lod);
+  const renderAsPoint = shouldRenderAsPoint(eventWidth, lod) || eventWidth === 0;
+  const displayWidth = renderAsPoint ? minWidth : Math.max(eventWidth, minWidth);
+
+  if (x > canvasWidth || x + displayWidth < 0) return null;
 
   const isHovered = state.hoveredEventId === event.id;
   const isSelected = state.selectedEventIds && state.selectedEventIds.has(event.id);
@@ -207,23 +247,49 @@ function drawEvent(event, state, axisY, canvasWidth) {
   const fillColor = getEventFillColor(event.id, isHovered, isSelected);
   const strokeStyle = getEventStrokeStyle(isSelected);
 
-  // Use lane-based positioning instead of hardcoded position
+  // Use lane-based positioning
   const lane = laneAssignments.get(event.id) || 0;
   const y = getLaneY(lane, axisY, { laneHeight: EVENT_HEIGHT, ...LANE_CONFIG });
 
   ctx.fillStyle = fillColor;
-  ctx.fillRect(x, y, eventWidth, EVENT_HEIGHT);
 
-  ctx.strokeStyle = strokeStyle.color;
-  ctx.lineWidth = strokeStyle.lineWidth;
-  if (isSelected) {
-    ctx.strokeRect(x - 1, y - 1, eventWidth + 2, EVENT_HEIGHT + 2);
+  if (renderAsPoint) {
+    // Render as a point (small square or circle)
+    const pointSize = minWidth;
+    ctx.fillRect(x - pointSize / 2, y + (EVENT_HEIGHT - pointSize) / 2, pointSize, pointSize);
+
+    ctx.strokeStyle = strokeStyle.color;
+    ctx.lineWidth = strokeStyle.lineWidth;
+    if (isSelected) {
+      ctx.strokeRect(
+        x - pointSize / 2 - 1,
+        y + (EVENT_HEIGHT - pointSize) / 2 - 1,
+        pointSize + 2,
+        pointSize + 2
+      );
+    } else {
+      ctx.strokeRect(
+        x - pointSize / 2,
+        y + (EVENT_HEIGHT - pointSize) / 2,
+        pointSize,
+        pointSize
+      );
+    }
   } else {
-    ctx.strokeRect(x, y, eventWidth, EVENT_HEIGHT);
+    // Render as a duration bar
+    ctx.fillRect(x, y, displayWidth, EVENT_HEIGHT);
+
+    ctx.strokeStyle = strokeStyle.color;
+    ctx.lineWidth = strokeStyle.lineWidth;
+    if (isSelected) {
+      ctx.strokeRect(x - 1, y - 1, displayWidth + 2, EVENT_HEIGHT + 2);
+    } else {
+      ctx.strokeRect(x, y, displayWidth, EVENT_HEIGHT);
+    }
   }
 
   // Return bounds for label collision detection
-  return { x, y, width: eventWidth, height: EVENT_HEIGHT };
+  return { x, y, width: displayWidth, height: EVENT_HEIGHT };
 }
 
 export function hashCode(str) {

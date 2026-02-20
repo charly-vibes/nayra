@@ -5,7 +5,7 @@ import { getLaneY, DEFAULT_CONFIG as LANE_CONFIG } from '../layout/lane-position
 import { SpatialHash } from '../layout/spatial-hash.js';
 import { isPointInCluster } from '../layout/event-clustering.js';
 
-// Legacy implementation (kept for backwards compatibility)
+// Lane-aware hit detection
 export function findEventAtPoint(x, y, events, viewportStart, scale, canvasHeight) {
   const axisY = canvasHeight / 2;
 
@@ -29,12 +29,10 @@ export function findEventAtPoint(x, y, events, viewportStart, scale, canvasHeigh
     }
   }
 
-  // Regular event hit detection
-  const eventTop = axisY - EVENT_HEIGHT / 2;
-  const eventBottom = axisY + EVENT_HEIGHT / 2;
+  // Build lane assignments for multilane support
+  const { layouts: laneAssignments } = assignLanes(events);
 
-  if (y < eventTop || y > eventBottom) return null;
-
+  // Check events in reverse order (last rendered = top of stack)
   for (let i = events.length - 1; i >= 0; i--) {
     const event = events[i];
     const eventX = projectToScreen(event.start, viewportStart, scale);
@@ -47,7 +45,13 @@ export function findEventAtPoint(x, y, events, viewportStart, scale, canvasHeigh
       eventWidth = 4;
     }
 
-    if (x >= eventX && x <= eventX + eventWidth) {
+    // Get the lane for this event and calculate its Y position
+    const lane = laneAssignments.get(event.id) || 0;
+    const eventY = getLaneY(lane, axisY, { laneHeight: EVENT_HEIGHT, ...LANE_CONFIG });
+
+    // Check if point is within this event's bounds (inclusive boundaries)
+    if (x >= eventX && x <= eventX + eventWidth &&
+        y >= eventY && y < eventY + EVENT_HEIGHT) {
       return event;
     }
   }

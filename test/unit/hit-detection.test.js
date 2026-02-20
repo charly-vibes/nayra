@@ -62,22 +62,30 @@ describe('findEventAtPoint', () => {
   });
 
   describe('when events overlap', () => {
-    it('returns the topmost event (last in array/draw order)', () => {
+    it('assigns overlapping events to different lanes', () => {
       const events = [
-        makeEvent('bottom', 50, 150),
-        makeEvent('top', 75, 125),
+        makeEvent('lane0', 50, 150),
+        makeEvent('lane1', 75, 125),
       ];
-      const result = findEventAtPoint(100, axisY, events, viewportStart, scale, canvasHeight);
-      expect(result.id).toBe('top');
+      // With multilane layout, overlapping events go to different lanes
+      // lane0 event is at axisY, lane1 event is above it
+      const resultLane0 = findEventAtPoint(100, axisY, events, viewportStart, scale, canvasHeight);
+      expect(resultLane0.id).toBe('lane0'); // Click on lane 0 hits lane0 event
+
+      // Click above lane 0 should hit lane1 event (lane 1 is EVENT_HEIGHT + spacing above)
+      const lane1Y = axisY - EVENT_HEIGHT - 4; // lane spacing = 4px
+      const resultLane1 = findEventAtPoint(100, lane1Y, events, viewportStart, scale, canvasHeight);
+      expect(resultLane1.id).toBe('lane1');
     });
 
     it('returns the correct event when clicking on non-overlapping region', () => {
       const events = [
-        makeEvent('bottom', 50, 150),
-        makeEvent('top', 75, 125),
+        makeEvent('lane0', 50, 150),
+        makeEvent('lane1', 75, 125),
       ];
+      // Click on the part of lane0 event that doesn't overlap temporally
       const result = findEventAtPoint(52, axisY, events, viewportStart, scale, canvasHeight);
-      expect(result.id).toBe('bottom');
+      expect(result.id).toBe('lane0');
     });
   });
 
@@ -130,9 +138,11 @@ describe('findEventAtPoint', () => {
       expect(result).toEqual(events[0]);
     });
 
-    it('detects hit at exact bottom edge', () => {
+    it('detects hit at center of event', () => {
       const events = [makeEvent('e1', 50, 150)];
-      const result = findEventAtPoint(100, eventBottom, events, viewportStart, scale, canvasHeight);
+      // Single event in lane 0, centered on axisY
+      // Should definitely hit at the center
+      const result = findEventAtPoint(100, axisY, events, viewportStart, scale, canvasHeight);
       expect(result).toEqual(events[0]);
     });
   });

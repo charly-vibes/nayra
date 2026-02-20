@@ -15,8 +15,6 @@ const SHORTCUTS_CONTENT = `
     <tbody>
       <tr style="border-bottom: 1px solid #3a3a4e;">
         <td style="padding: 8px 16px 8px 0; font-family: monospace; color: #8a8aaa;">
-          <kbd style="background: #1a1a2e; padding: 2px 8px; border-radius: 4px; border: 1px solid #4a4a6a;">Home</kbd>
-          <span style="margin: 0 4px; color: #6a6a8a;">or</span>
           <kbd style="background: #1a1a2e; padding: 2px 8px; border-radius: 4px; border: 1px solid #4a4a6a;">h</kbd>
         </td>
         <td style="padding: 8px 0;">Jump to today</td>
@@ -41,6 +39,51 @@ const SHORTCUTS_CONTENT = `
       </tr>
     </tbody>
   </table>
+
+  <h2 style="margin: 24px 0 16px 0; color: #ffffff; font-size: 20px; font-weight: 600;">
+    Keyboard Navigation
+  </h2>
+  <table style="width: 100%; border-collapse: collapse;">
+    <tbody>
+      <tr style="border-bottom: 1px solid #3a3a4e;">
+        <td style="padding: 8px 16px 8px 0; font-family: monospace; color: #8a8aaa;">
+          <kbd style="background: #1a1a2e; padding: 2px 8px; border-radius: 4px; border: 1px solid #4a4a6a;">Tab</kbd>
+        </td>
+        <td style="padding: 8px 0;">Navigate to next event</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #3a3a4e;">
+        <td style="padding: 8px 16px 8px 0; font-family: monospace; color: #8a8aaa;">
+          <kbd style="background: #1a1a2e; padding: 2px 8px; border-radius: 4px; border: 1px solid #4a4a6a;">Shift</kbd>
+          <span style="margin: 0 4px;">+</span>
+          <kbd style="background: #1a1a2e; padding: 2px 8px; border-radius: 4px; border: 1px solid #4a4a6a;">Tab</kbd>
+        </td>
+        <td style="padding: 8px 0;">Navigate to previous event</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #3a3a4e;">
+        <td style="padding: 8px 16px 8px 0; font-family: monospace; color: #8a8aaa;">
+          <kbd style="background: #1a1a2e; padding: 2px 8px; border-radius: 4px; border: 1px solid #4a4a6a;">Home</kbd>
+        </td>
+        <td style="padding: 8px 0;">Jump to first event</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #3a3a4e;">
+        <td style="padding: 8px 16px 8px 0; font-family: monospace; color: #8a8aaa;">
+          <kbd style="background: #1a1a2e; padding: 2px 8px; border-radius: 4px; border: 1px solid #4a4a6a;">End</kbd>
+        </td>
+        <td style="padding: 8px 0;">Jump to last event</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #3a3a4e;">
+        <td style="padding: 8px 16px 8px 0; font-family: monospace; color: #8a8aaa;">
+          <kbd style="background: #1a1a2e; padding: 2px 8px; border-radius: 4px; border: 1px solid #4a4a6a;">Enter</kbd>
+          <span style="margin: 0 4px; color: #6a6a8a;">or</span>
+          <kbd style="background: #1a1a2e; padding: 2px 8px; border-radius: 4px; border: 1px solid #4a4a6a;">Space</kbd>
+        </td>
+        <td style="padding: 8px 0;">Select focused event</td>
+      </tr>
+    </tbody>
+  </table>
+  <p style="margin: 16px 0 0 0; color: #8a8aaa; font-size: 13px; line-height: 1.6;">
+    Viewport automatically pans to keep focused events visible during navigation.
+  </p>
 
   <h2 style="margin: 24px 0 16px 0; color: #ffffff; font-size: 20px; font-weight: 600;">
     Mouse & Keyboard Navigation

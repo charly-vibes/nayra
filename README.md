@@ -10,7 +10,7 @@ Nayra is a framework-free timeline visualization tool designed to render interac
 - 🌌 **Deep Time Support**: BigInt temporal coordinates for billions of years
 - 🎯 **Framework-Free**: Pure vanilla JavaScript, direct DOM/Canvas control
 - 📊 **10,000+ Events**: Spatial indexing and efficient collision detection
-- ♿ **Accessible**: Parallel DOM for screen readers (WCAG compliant)
+- ♿ **Accessible**: Full keyboard navigation, WCAG 2.1 AA compliant focus indicators
 - 💾 **No Backend Required**: Static data delivery with IndexedDB storage
 - 🔍 **Infinite Zoom**: Smooth pan and zoom with floating-origin precision
 
@@ -83,9 +83,15 @@ Nayra supports both mouse/keyboard and touch input for navigation:
 - **Pan**: Click and drag to move through time
 - **Zoom**: Scroll to zoom in/out at cursor position
 - **Select**: Click on event to select, Ctrl+click to multi-select
-- **Jump to Today**: Press `Home` or `h`
+- **Jump to Today**: Press `h`
 - **Search**: Press `/`
 - **Help Menu**: Press `?`
+
+#### Keyboard Navigation (Accessibility)
+- **Tab / Shift+Tab**: Navigate forward/backward through events chronologically
+- **Home / End**: Jump to first/last event in timeline
+- **Enter / Space**: Activate (select) the focused event
+- **Automatic viewport panning**: Keeps focused events visible during navigation
 
 #### Touch Gestures
 - **Pan**: Touch and drag to move through time

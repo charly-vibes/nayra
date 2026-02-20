@@ -3,6 +3,7 @@ import { lightenColor } from './colors.js';
 import { assignLanes } from '../layout/greedy-interval-coloring.js';
 import { getLaneY, DEFAULT_CONFIG as LANE_CONFIG } from '../layout/lane-positioning.js';
 import { SpatialHash } from '../layout/spatial-hash.js';
+import { detectLabelCollisions, renderLabel } from '../layout/label-collision.js';
 
 let ctx = null;
 let canvas = null;
@@ -152,6 +153,8 @@ export function draw(state) {
   ctx.lineTo(width, axisY);
   ctx.stroke();
 
+  // First pass: draw events and collect bounds for label collision detection
+  const eventsWithBounds = [];
   let visibleCount = 0;
   for (const event of state.events) {
     const duration = event.end !== undefined ? event.end - event.start : 0n;
@@ -159,7 +162,27 @@ export function draw(state) {
       continue;
     }
     visibleCount++;
-    drawEvent(event, state, axisY, width);
+    const bounds = drawEvent(event, state, axisY, width);
+    if (bounds) {
+      eventsWithBounds.push({ id: event.id, label: event.label, bounds });
+    }
+  }
+
+  // Second pass: detect label collisions and render visible labels
+  const secondsPerPixel = state.scale.getSecondsPerPixel();
+  const visibleLabels = detectLabelCollisions(eventsWithBounds, ctx, secondsPerPixel);
+
+  for (const eventData of eventsWithBounds) {
+    if (visibleLabels.has(eventData.id) && eventData.label) {
+      renderLabel(
+        ctx,
+        eventData.label,
+        eventData.bounds.x,
+        eventData.bounds.y,
+        eventData.bounds.width,
+        eventData.bounds.height
+      );
+    }
   }
 
   drawFPS(width);
@@ -176,7 +199,7 @@ function drawEvent(event, state, axisY, canvasWidth) {
     eventWidth = 4;
   }
 
-  if (x > canvasWidth || x + eventWidth < 0) return;
+  if (x > canvasWidth || x + eventWidth < 0) return null;
 
   const isHovered = state.hoveredEventId === event.id;
   const isSelected = state.selectedEventIds && state.selectedEventIds.has(event.id);
@@ -198,6 +221,9 @@ function drawEvent(event, state, axisY, canvasWidth) {
   } else {
     ctx.strokeRect(x, y, eventWidth, EVENT_HEIGHT);
   }
+
+  // Return bounds for label collision detection
+  return { x, y, width: eventWidth, height: EVENT_HEIGHT };
 }
 
 export function hashCode(str) {

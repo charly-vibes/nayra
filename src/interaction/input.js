@@ -252,7 +252,8 @@ export function initInput(canvas, store, callbacks = {}) {
         state.scale,
         rect.height
       );
-      const eventId = event ? event.id : null;
+      // Don't hover on clusters, only on regular events
+      const eventId = (event && !event.__cluster) ? event.id : null;
       if (eventId !== state.hoveredEventId) {
         store.dispatch({ type: 'SET_HOVER', eventId });
       }
@@ -335,10 +336,28 @@ export function initInput(canvas, store, callbacks = {}) {
       );
 
       if (event) {
-        if (e.ctrlKey || e.metaKey) {
-          store.dispatch({ type: 'TOGGLE_EVENT_SELECTION', eventId: event.id });
+        // Check if this is a cluster click
+        if (event.__cluster) {
+          // Zoom to show the cluster's events
+          const clusterTimeRange = event.maxTime - event.minTime;
+          const padding = clusterTimeRange / 4n; // Add 25% padding on each side
+          const targetStart = event.minTime - padding;
+          const targetEnd = event.maxTime + padding;
+          const targetRange = targetEnd - targetStart;
+
+          // Calculate new scale to fit the cluster in view
+          const newSpp = Number(targetRange) / rect.width;
+          const newScale = RationalScale.fromSecondsPerPixel(newSpp);
+
+          // Center the cluster in view
+          store.dispatch({ type: 'SET_VIEWPORT', viewportStart: targetStart, scale: newScale });
         } else {
-          store.dispatch({ type: 'SELECT_EVENT', eventId: event.id });
+          // Regular event click
+          if (e.ctrlKey || e.metaKey) {
+            store.dispatch({ type: 'TOGGLE_EVENT_SELECTION', eventId: event.id });
+          } else {
+            store.dispatch({ type: 'SELECT_EVENT', eventId: event.id });
+          }
         }
       } else {
         store.dispatch({ type: 'CLEAR_SELECTION' });
@@ -366,7 +385,7 @@ export function initInput(canvas, store, callbacks = {}) {
         return;
       }
       const state = store.getState();
-      const event = findEventAtPoint(
+      const hitResult = findEventAtPoint(
         x,
         y,
         state.events,
@@ -374,7 +393,7 @@ export function initInput(canvas, store, callbacks = {}) {
         state.scale,
         rect.height
       );
-      canvas.style.cursor = event ? 'pointer' : 'grab';
+      canvas.style.cursor = hitResult ? 'pointer' : 'grab';
       startMomentum(velocity);
     }
   }

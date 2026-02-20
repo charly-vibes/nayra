@@ -11,7 +11,9 @@ import {
   shouldRenderAsPoint,
   getMinEventWidth,
   LOD_MICRO,
+  LOD_MACRO,
 } from './lod.js';
+import { clusterEvents, isPointInCluster } from '../layout/event-clustering.js';
 
 let ctx = null;
 let canvas = null;
@@ -27,6 +29,7 @@ let laneCount = 0;
 let spatialHash = new SpatialHash();
 let layoutRevision = -1; // Track when layout needs recalculation
 let currentLOD = LOD_MICRO; // Current level of detail
+let clusters = []; // Current event clusters (for macro zoom)
 
 export const EVENT_HEIGHT = 20;
 export const EVENT_COLORS = [
@@ -63,6 +66,7 @@ export function destroy() {
   spatialHash.clear();
   layoutRevision = -1;
   currentLOD = LOD_MICRO;
+  clusters = [];
 }
 
 /**
@@ -87,6 +91,14 @@ export function getLaneAssignments() {
  */
 export function getLaneCount() {
   return laneCount;
+}
+
+/**
+ * Get the current clusters (for hit detection)
+ * @returns {Array} - Current clusters
+ */
+export function getClusters() {
+  return clusters;
 }
 
 function setupDPI() {
@@ -164,7 +176,15 @@ export function draw(state) {
   // Filter events by LOD before layout
   const lodFilteredEvents = filterEventsByLOD(state.events, currentLOD);
 
+  // Apply clustering at macro zoom level
+  if (currentLOD === LOD_MACRO) {
+    clusters = clusterEvents(lodFilteredEvents, state.viewportStart, state.scale);
+  } else {
+    clusters = [];
+  }
+
   // Calculate layout (only if state changed)
+  // For macro zoom with clustering, we still need layout for individual events within clusters
   calculateLayout(
     { ...state, events: lodFilteredEvents },
     axisY,
@@ -185,41 +205,93 @@ export function draw(state) {
   ctx.lineTo(width, axisY);
   ctx.stroke();
 
-  // First pass: draw events and collect bounds for label collision detection
-  const eventsWithBounds = [];
-  let visibleCount = 0;
-  for (const event of lodFilteredEvents) {
-    const duration = event.end !== undefined ? event.end - event.start : 0n;
-    if (!isVisible(event.start, duration, state.viewportStart, viewportEnd)) {
-      continue;
+  // Render based on LOD level
+  if (currentLOD === LOD_MACRO && clusters.length > 0) {
+    // Render clusters at macro zoom
+    for (const cluster of clusters) {
+      if (cluster.type === 'cluster') {
+        drawCluster(cluster, state, axisY, width, viewportEnd);
+      } else if (cluster.type === 'event') {
+        // Single unclustered event
+        const event = cluster.event;
+        const duration = event.end !== undefined ? event.end - event.start : 0n;
+        if (isVisible(event.start, duration, state.viewportStart, viewportEnd)) {
+          drawEvent(event, state, axisY, width, currentLOD);
+        }
+      }
     }
-    visibleCount++;
-    const bounds = drawEvent(event, state, axisY, width, currentLOD);
-    if (bounds) {
-      eventsWithBounds.push({ id: event.id, label: event.label, bounds });
+  } else {
+    // Normal rendering: draw events and collect bounds for label collision detection
+    const eventsWithBounds = [];
+    let visibleCount = 0;
+    for (const event of lodFilteredEvents) {
+      const duration = event.end !== undefined ? event.end - event.start : 0n;
+      if (!isVisible(event.start, duration, state.viewportStart, viewportEnd)) {
+        continue;
+      }
+      visibleCount++;
+      const bounds = drawEvent(event, state, axisY, width, currentLOD);
+      if (bounds) {
+        eventsWithBounds.push({ id: event.id, label: event.label, bounds });
+      }
     }
-  }
 
-  // Second pass: detect label collisions and render visible labels
-  // Only show labels if appropriate for current LOD
-  if (shouldShowLabels(currentLOD)) {
-    const visibleLabels = detectLabelCollisions(eventsWithBounds, ctx, secondsPerPixel);
+    // Second pass: detect label collisions and render visible labels
+    // Only show labels if appropriate for current LOD
+    if (shouldShowLabels(currentLOD)) {
+      const visibleLabels = detectLabelCollisions(eventsWithBounds, ctx, secondsPerPixel);
 
-    for (const eventData of eventsWithBounds) {
-      if (visibleLabels.has(eventData.id) && eventData.label) {
-        renderLabel(
-          ctx,
-          eventData.label,
-          eventData.bounds.x,
-          eventData.bounds.y,
-          eventData.bounds.width,
-          eventData.bounds.height
-        );
+      for (const eventData of eventsWithBounds) {
+        if (visibleLabels.has(eventData.id) && eventData.label) {
+          renderLabel(
+            ctx,
+            eventData.label,
+            eventData.bounds.x,
+            eventData.bounds.y,
+            eventData.bounds.width,
+            eventData.bounds.height
+          );
+        }
       }
     }
   }
 
   drawFPS(width);
+}
+
+/**
+ * Draw a cluster marker with event count
+ */
+function drawCluster(cluster, state, axisY, canvasWidth, viewportEnd) {
+  // Check if cluster is visible
+  if (!isVisible(cluster.minTime, cluster.maxTime - cluster.minTime, state.viewportStart, viewportEnd)) {
+    return;
+  }
+
+  const x = cluster.centerX;
+  if (x < 0 || x > canvasWidth) return;
+
+  // Cluster marker size based on count
+  const baseRadius = 12;
+  const maxRadius = 24;
+  const radius = Math.min(baseRadius + Math.log(cluster.count) * 2, maxRadius);
+
+  // Draw cluster marker (circle)
+  ctx.fillStyle = '#4ecdc4';
+  ctx.strokeStyle = '#2a9d8f';
+  ctx.lineWidth = 2;
+
+  ctx.beginPath();
+  ctx.arc(x, axisY, radius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Draw count label
+  ctx.fillStyle = '#1a1a2e';
+  ctx.font = 'bold 12px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(cluster.count.toString(), x, axisY);
 }
 
 function drawEvent(event, state, axisY, canvasWidth, lod) {

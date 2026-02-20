@@ -1,5 +1,8 @@
 import { projectToScreen, isVisible, YEAR, MILLION_YEARS, BILLION_YEARS } from '../core/time.js';
 import { lightenColor } from './colors.js';
+import { assignLanes } from '../layout/greedy-interval-coloring.js';
+import { getLaneY, DEFAULT_CONFIG as LANE_CONFIG } from '../layout/lane-positioning.js';
+import { SpatialHash } from '../layout/spatial-hash.js';
 
 let ctx = null;
 let canvas = null;
@@ -8,6 +11,12 @@ let lastFrameTime = performance.now();
 let fps = 0;
 let frameCount = 0;
 let fpsUpdateTime = 0;
+
+// Layout state cache
+let laneAssignments = new Map(); // eventId -> lane number
+let laneCount = 0;
+let spatialHash = new SpatialHash();
+let layoutRevision = -1; // Track when layout needs recalculation
 
 export const EVENT_HEIGHT = 20;
 export const EVENT_COLORS = [
@@ -38,6 +47,35 @@ export function destroy() {
   }
   ctx = null;
   canvas = null;
+  // Clear layout state
+  laneAssignments.clear();
+  laneCount = 0;
+  spatialHash.clear();
+  layoutRevision = -1;
+}
+
+/**
+ * Get the current spatial hash (for hit detection)
+ * @returns {SpatialHash} - The current spatial hash
+ */
+export function getSpatialHash() {
+  return spatialHash;
+}
+
+/**
+ * Get the current lane assignments
+ * @returns {Map} - Map of eventId -> lane number
+ */
+export function getLaneAssignments() {
+  return laneAssignments;
+}
+
+/**
+ * Get the current lane count
+ * @returns {number} - Number of lanes
+ */
+export function getLaneCount() {
+  return laneCount;
 }
 
 function setupDPI() {
@@ -47,6 +85,44 @@ function setupDPI() {
   canvas.height = rect.height * dpr;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   return rect;
+}
+
+/**
+ * Calculate lane assignments for all events
+ * Only recalculates if state has changed (based on revision)
+ */
+function calculateLayout(state, axisY, viewportStart, scale, width) {
+  // Only recalculate if state has changed
+  if (layoutRevision === state.revision) {
+    return;
+  }
+
+  layoutRevision = state.revision;
+
+  // Assign lanes using greedy interval coloring
+  const result = assignLanes(state.events);
+  laneAssignments = result.layouts;
+  laneCount = result.laneCount;
+
+  // Rebuild spatial hash with new positions
+  const getBounds = (event) => {
+    const x = projectToScreen(event.start, viewportStart, scale);
+
+    let eventWidth;
+    if (event.end !== undefined && event.end > event.start) {
+      const endX = projectToScreen(event.end, viewportStart, scale);
+      eventWidth = Math.max(endX - x, 4);
+    } else {
+      eventWidth = 4;
+    }
+
+    const lane = laneAssignments.get(event.id) || 0;
+    const y = getLaneY(lane, axisY, { laneHeight: EVENT_HEIGHT, ...LANE_CONFIG });
+
+    return { x, y, width: eventWidth, height: EVENT_HEIGHT };
+  };
+
+  spatialHash.rebuild(state.events, getBounds);
 }
 
 export function draw(state) {
@@ -59,10 +135,13 @@ export function draw(state) {
   const height = canvas.height / (window.devicePixelRatio || 1);
   const viewportEnd = state.viewportStart + state.scale.pxToTime(width);
 
+  const axisY = height / 2;
+
+  // Calculate layout (only if state changed)
+  calculateLayout(state, axisY, state.viewportStart, state.scale, width);
+
   ctx.fillStyle = '#1a1a2e';
   ctx.fillRect(0, 0, width, height);
-
-  const axisY = height / 2;
 
   drawGridAndLabels(state, width, height, axisY);
 
@@ -105,7 +184,10 @@ function drawEvent(event, state, axisY, canvasWidth) {
   const fillColor = getEventFillColor(event.id, isHovered, isSelected);
   const strokeStyle = getEventStrokeStyle(isSelected);
 
-  const y = axisY - EVENT_HEIGHT / 2;
+  // Use lane-based positioning instead of hardcoded position
+  const lane = laneAssignments.get(event.id) || 0;
+  const y = getLaneY(lane, axisY, { laneHeight: EVENT_HEIGHT, ...LANE_CONFIG });
+
   ctx.fillStyle = fillColor;
   ctx.fillRect(x, y, eventWidth, EVENT_HEIGHT);
 

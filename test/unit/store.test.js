@@ -14,6 +14,9 @@ describe('Store', () => {
       expect(state.events).toEqual([]);
       expect(state.selectedEventIds).toBeInstanceOf(Set);
       expect(state.hoveredEventId).toBe(null);
+      expect(state.focusedEventId).toBe(null);
+      expect(state.focusHistory).toEqual([]);
+      expect(state.isKeyboardFocusMode).toBe(false);
       expect(state.revision).toBe(0);
     });
 
@@ -180,6 +183,40 @@ describe('Store', () => {
       store.dispatch({ type: 'SET_HOVER', eventId: 'event-1' });
       store.dispatch({ type: 'SET_HOVER', eventId: null });
       expect(store.getState().hoveredEventId).toBe(null);
+    });
+  });
+
+  describe('focus actions', () => {
+    it('SET_FOCUS sets focusedEventId', () => {
+      const store = createStore();
+      store.dispatch({ type: 'SET_FOCUS', eventId: 'event-1' });
+      expect(store.getState().focusedEventId).toBe('event-1');
+    });
+
+    it('SET_FOCUS with null clears focus', () => {
+      const store = createStore();
+      store.dispatch({ type: 'SET_FOCUS', eventId: 'event-1' });
+      store.dispatch({ type: 'SET_FOCUS', eventId: null });
+      expect(store.getState().focusedEventId).toBe(null);
+    });
+
+    it('SET_FOCUS_HISTORY updates focus history', () => {
+      const store = createStore();
+      store.dispatch({ type: 'SET_FOCUS_HISTORY', history: ['event-1', 'event-2'] });
+      expect(store.getState().focusHistory).toEqual(['event-1', 'event-2']);
+    });
+
+    it('SET_KEYBOARD_FOCUS_MODE enables keyboard focus mode', () => {
+      const store = createStore();
+      store.dispatch({ type: 'SET_KEYBOARD_FOCUS_MODE', enabled: true });
+      expect(store.getState().isKeyboardFocusMode).toBe(true);
+    });
+
+    it('SET_KEYBOARD_FOCUS_MODE disables keyboard focus mode', () => {
+      const store = createStore();
+      store.dispatch({ type: 'SET_KEYBOARD_FOCUS_MODE', enabled: true });
+      store.dispatch({ type: 'SET_KEYBOARD_FOCUS_MODE', enabled: false });
+      expect(store.getState().isKeyboardFocusMode).toBe(false);
     });
   });
 

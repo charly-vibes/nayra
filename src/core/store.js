@@ -9,6 +9,9 @@ export function createStore(initialState = {}) {
     events: [],
     selectedEventIds: new Set(),
     hoveredEventId: null,
+    focusedEventId: null,
+    focusHistory: [],
+    isKeyboardFocusMode: false,
     revision: 0,
     ...initialState,
   };
@@ -84,6 +87,15 @@ function reduce(state, action) {
 
     case 'SET_HOVER':
       return { ...state, hoveredEventId: action.eventId };
+
+    case 'SET_FOCUS':
+      return { ...state, focusedEventId: action.eventId };
+
+    case 'SET_FOCUS_HISTORY':
+      return { ...state, focusHistory: action.history };
+
+    case 'SET_KEYBOARD_FOCUS_MODE':
+      return { ...state, isKeyboardFocusMode: action.enabled };
 
     default:
       return state;

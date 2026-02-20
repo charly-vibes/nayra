@@ -376,4 +376,102 @@ describe('Input', () => {
       rafSpy.mockRestore();
     });
   });
+
+  describe('keyboard navigation', () => {
+    let canvas;
+    let store;
+    let mockFocusManager;
+    let documentListeners;
+    let mockDocument;
+    let originalDocument;
+
+    beforeEach(() => {
+      canvas = createMockCanvas();
+      store = createStore({
+        events: [
+          { id: 'event-1', start: 100n, end: 200n },
+          { id: 'event-2', start: 300n, end: 400n },
+          { id: 'event-3', start: 500n, end: 600n },
+        ],
+      });
+
+      // Mock focus manager
+      mockFocusManager = {
+        focusNext: vi.fn(),
+        focusPrevious: vi.fn(),
+        setFocus: vi.fn(),
+        getFocus: vi.fn(() => null),
+      };
+
+      // Mock document and window
+      documentListeners = {};
+      originalDocument = globalThis.document;
+      mockDocument = {
+        addEventListener: vi.fn((type, handler) => {
+          documentListeners[type] = documentListeners[type] || [];
+          documentListeners[type].push(handler);
+        }),
+        removeEventListener: vi.fn(),
+      };
+      globalThis.document = mockDocument;
+      globalThis.window = globalThis.window || {
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        matchMedia: vi.fn(() => ({ matches: false })),
+      };
+
+      initInput(canvas, store, {}, mockFocusManager);
+    });
+
+    afterEach(() => {
+      globalThis.document = originalDocument;
+    });
+
+    function triggerKeyDown(key, options = {}) {
+      const event = {
+        key,
+        shiftKey: options.shiftKey ?? false,
+        ctrlKey: options.ctrlKey ?? false,
+        metaKey: options.metaKey ?? false,
+        preventDefault: vi.fn(),
+        ...options,
+      };
+      const handlers = documentListeners.keydown || [];
+      handlers.forEach((h) => h(event));
+      return event;
+    }
+
+    it('Tab key calls focusNext', () => {
+      triggerKeyDown('Tab');
+      expect(mockFocusManager.focusNext).toHaveBeenCalledTimes(1);
+    });
+
+    it('Tab key prevents default behavior', () => {
+      const event = triggerKeyDown('Tab');
+      expect(event.preventDefault).toHaveBeenCalledTimes(1);
+    });
+
+    it('Shift+Tab calls focusPrevious', () => {
+      triggerKeyDown('Tab', { shiftKey: true });
+      expect(mockFocusManager.focusPrevious).toHaveBeenCalledTimes(1);
+    });
+
+    it('Shift+Tab prevents default behavior', () => {
+      const event = triggerKeyDown('Tab', { shiftKey: true });
+      expect(event.preventDefault).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not interfere with other keys', () => {
+      triggerKeyDown('a');
+      expect(mockFocusManager.focusNext).not.toHaveBeenCalled();
+      expect(mockFocusManager.focusPrevious).not.toHaveBeenCalled();
+    });
+
+    it('Home key is not affected by Tab handler', () => {
+      const event = triggerKeyDown('Home');
+      // Home key should still work for jumpToToday, not call focus methods
+      expect(mockFocusManager.focusNext).not.toHaveBeenCalled();
+      expect(mockFocusManager.focusPrevious).not.toHaveBeenCalled();
+    });
+  });
 });

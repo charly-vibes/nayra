@@ -33,7 +33,7 @@ export function jumpToToday(canvasWidth, scale = DEFAULT_SCALE) {
   return { viewportStart, scale };
 }
 
-export function initInput(canvas, store, callbacks = {}) {
+export function initInput(canvas, store, callbacks = {}, focusManager = null) {
   let isDragging = false;
   let lastX = 0;
   let dragStartX = 0;
@@ -457,6 +457,17 @@ export function initInput(canvas, store, callbacks = {}) {
   }
 
   function onKeyDown(e) {
+    // Handle Tab navigation for keyboard focus
+    if (e.key === 'Tab' && focusManager) {
+      e.preventDefault();
+      if (e.shiftKey) {
+        focusManager.focusPrevious();
+      } else {
+        focusManager.focusNext();
+      }
+      return;
+    }
+
     const action = KEYBOARD_SHORTCUTS[e.key];
     if (action === 'jumpToToday') {
       const state = store.getState();

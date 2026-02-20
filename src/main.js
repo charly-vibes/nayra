@@ -51,6 +51,10 @@ async function handleExampleLoad(exampleOrFile) {
 
   if (result.events.length > 0) {
     store.dispatch({ type: 'SET_EVENTS', events: result.events });
+    // Fit all content in view after loading
+    const state = store.getState();
+    const { viewportStart, scale } = fitToContent(result.events, state.canvasWidth);
+    store.dispatch({ type: 'SET_VIEWPORT', viewportStart, scale });
   }
 }
 
@@ -213,13 +217,20 @@ async function init() {
     console.warn(result.summary, result.errors);
   }
 
+  let events;
   if (result.events.length > 0) {
-    store.dispatch({ type: 'SET_EVENTS', events: result.events });
+    events = result.events;
+    store.dispatch({ type: 'SET_EVENTS', events });
   } else {
     console.warn('Loader failed, using generated samples');
-    const fallback = generateSampleEvents();
-    store.dispatch({ type: 'SET_EVENTS', events: fallback });
+    events = generateSampleEvents();
+    store.dispatch({ type: 'SET_EVENTS', events });
   }
+
+  // Fit all content in view on initial load
+  const state = store.getState();
+  const { viewportStart, scale } = fitToContent(events, state.canvasWidth);
+  store.dispatch({ type: 'SET_VIEWPORT', viewportStart, scale });
 
   // Focus canvas for keyboard navigation
   canvas.focus();

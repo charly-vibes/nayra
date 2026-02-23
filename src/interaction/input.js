@@ -1,5 +1,6 @@
 import { RationalScale } from '../core/scale.js';
 import { YEAR } from '../core/time.js';
+import { zoomToEvent } from '../core/navigation.js';
 import { findEventAtPoint } from './hit-detection.js';
 import { GestureRecognizer } from './gestures.js';
 import { initAutoPan } from '../viewport/pan.js';
@@ -425,7 +426,12 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
       const dy = y - lastTapY;
       if (now - lastTapTime <= DOUBLE_TAP_MAX_DELAY &&
         Math.hypot(dx, dy) <= DOUBLE_TAP_MAX_DISTANCE) {
-        applyZoomAtPosition(e.clientX, rect, true);
+        if (event && !event.__cluster) {
+          const { viewportStart, scale } = zoomToEvent(event, rect.width);
+          store.dispatch({ type: 'SET_VIEWPORT', viewportStart, scale });
+        } else {
+          applyZoomAtPosition(e.clientX, rect, true);
+        }
         lastTapTime = 0;
       } else {
         lastTapTime = now;

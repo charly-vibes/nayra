@@ -34,6 +34,7 @@ export function createSearchBar(container, onSubmitOrOptions) {
 
   const input = document.createElement('input');
   input.type = 'text';
+  input.setAttribute('aria-label', 'Search timeline events');
   input.placeholder = 'Jump to time (e.g., 2000, 100 Ma, 4.5 Ga, Big Bang)';
   input.style.cssText = `
     width: 400px;

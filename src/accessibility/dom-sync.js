@@ -9,6 +9,8 @@
  *   - 4.1.2 Name, Role, Value (Level A)
  */
 
+import { buildEventAriaLabel, buildEventAriaDescription } from './aria-labels.js';
+
 /**
  * Create a DOM-sync instance that maintains a hidden accessible list of events.
  *
@@ -47,14 +49,13 @@ export function createDomSync(container, options = {}) {
 
   // --- Helpers ---
 
-  function buildAriaLabel(event) {
-    const label = event.title || event.label || '';
-    return label;
-  }
-
   function createItem(event) {
     const li = document.createElement('li');
-    li.setAttribute('aria-label', buildAriaLabel(event));
+    li.setAttribute('aria-label', buildEventAriaLabel(event));
+    const desc = buildEventAriaDescription(event);
+    if (desc) {
+      li.setAttribute('aria-description', desc);
+    }
 
     const btn = document.createElement('button');
     btn.type = 'button';

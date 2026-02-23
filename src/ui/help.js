@@ -320,6 +320,9 @@ export function createHelpMenu(container, options = {}) {
 
   const element = document.createElement('div');
   element.className = 'help-menu-overlay';
+  element.setAttribute('role', 'dialog');
+  element.setAttribute('aria-modal', 'true');
+  element.setAttribute('aria-label', 'Help');
   element.style.position = 'fixed';
   element.style.top = '0';
   element.style.left = '0';

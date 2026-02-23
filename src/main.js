@@ -25,13 +25,14 @@ import { createLiveAnnouncer } from './accessibility/live-announcer.js';
 import { createAriaAnnouncer } from './accessibility/aria-announcer.js';
 import { createSkipLinks } from './accessibility/skip-links.js';
 import { detectFeatures, REQUIRED_FEATURES } from './utils/feature-detection.js';
+import { createBrowserError } from './ui/browser-error.js';
 
-// Feature detection: abort early with a clear error if required APIs are missing
+// Feature detection: show a graceful error UI if required APIs are missing
 const features = detectFeatures();
 const missing = REQUIRED_FEATURES.filter(key => !features[key].supported);
 if (missing.length > 0) {
-  const names = missing.map(k => features[k].name).join(', ');
-  throw new Error(`Nayra requires browser support for: ${names}. Please upgrade your browser.`);
+  createBrowserError(document.body, missing);
+  throw new Error(`Nayra: missing required browser features: ${missing.join(', ')}`);
 }
 
 const canvas = document.getElementById('timeline-canvas');

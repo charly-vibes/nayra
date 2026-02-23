@@ -1,0 +1,75 @@
+/* Browser compatibility error screen styles.
+   These are injected at runtime by browser-error.js. */
+
+.nayra-browser-error {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  font-family: system-ui, -apple-system, sans-serif;
+  z-index: 9999;
+  padding: 2rem;
+}
+
+.nayra-browser-error__card {
+  max-width: 480px;
+  width: 100%;
+  background: #2a2a3e;
+  border: 1px solid #4a4a6a;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.nayra-browser-error__icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.nayra-browser-error__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ff6b6b;
+  margin-bottom: 0.75rem;
+}
+
+.nayra-browser-error__message {
+  color: #b0b0c8;
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}
+
+.nayra-browser-error__features {
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  text-align: left;
+}
+
+.nayra-browser-error__features li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  background: #1a1a2e;
+  border-radius: 6px;
+  margin-bottom: 0.4rem;
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: #ff6b6b;
+}
+
+.nayra-browser-error__suggestion {
+  color: #b0b0c8;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.nayra-browser-error__browsers {
+  margin-top: 0.5rem;
+  color: #00d9ff;
+  font-weight: 600;
+}

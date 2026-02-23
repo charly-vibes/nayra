@@ -14,6 +14,9 @@ import { createEventPanel } from './ui/event-panel.js';
 import { createDropzone } from './ui/dropzone.js';
 import { parseTimeQuery } from './core/time-parser.js';
 import { RationalScale } from './core/scale.js';
+import { computePanToEvent } from './ui/search-navigation.js';
+import { createCategoryFilter } from './ui/category-filter.js';
+import { extractCategories } from './core/filter-engine.js';
 
 const canvas = document.getElementById('timeline-canvas');
 const store = createStore();
@@ -24,17 +27,31 @@ const focusManager = createFocusManager(store, ariaLiveElement);
 
 initRenderer(canvas, store.dispatch);
 
-const searchBar = createSearchBar(document.body, (query) => {
-  const result = parseTimeQuery(query);
-  if (result.success) {
-    const state = store.getState();
-    const targetWidth = state.canvasWidth * 0.8;
-    const secondsPerPixel = Number(result.span) / targetWidth;
-    const newScale = RationalScale.fromSecondsPerPixel(secondsPerPixel);
-    const halfWidthTime = newScale.pxToTime(state.canvasWidth / 2);
-    const viewportStart = result.time - halfWidthTime;
-    store.dispatch({ type: 'SET_VIEWPORT', viewportStart, scale: newScale });
-  }
+const searchBar = createSearchBar(document.body, {
+  onSubmit: (query) => {
+    const result = parseTimeQuery(query);
+    if (result.success) {
+      const state = store.getState();
+      const targetWidth = state.canvasWidth * 0.8;
+      const secondsPerPixel = Number(result.span) / targetWidth;
+      const newScale = RationalScale.fromSecondsPerPixel(secondsPerPixel);
+      const halfWidthTime = newScale.pxToTime(state.canvasWidth / 2);
+      const viewportStart = result.time - halfWidthTime;
+      store.dispatch({ type: 'SET_VIEWPORT', viewportStart, scale: newScale });
+    }
+  },
+  onSearch: (query) => {
+    store.dispatch({ type: 'SEARCH_EVENTS', query });
+  },
+  onNext: () => {
+    store.dispatch({ type: 'NEXT_RESULT' });
+  },
+  onPrev: () => {
+    store.dispatch({ type: 'PREV_RESULT' });
+  },
+  onClearAll: () => {
+    store.dispatch({ type: 'CLEAR_ALL_FILTERS' });
+  },
 });
 
 async function handleExampleLoad(exampleOrFile) {
@@ -122,6 +139,12 @@ const zoomControls = createZoomControls(document.body, {
 
 const dropzone = createDropzone(canvas.parentElement, { onLoad: handleExampleLoad });
 
+const categoryFilter = createCategoryFilter(document.body, {
+  onToggle: (category) => store.dispatch({ type: 'TOGGLE_CATEGORY', category }),
+  onSetMode: (mode) => store.dispatch({ type: 'SET_FILTER_MODE', mode }),
+  onClear: () => store.dispatch({ type: 'CLEAR_CATEGORIES' }),
+});
+
 const tooltip = createTooltip(document.body);
 const eventPanel = createEventPanel(document.body, {
   onClose: () => {
@@ -171,9 +194,21 @@ function handleSelectionChange(selectedEventIds) {
 }
 
 let lastSelectedIds = new Set();
+let lastResultIndex = -1;
+let lastSearchResultIds = null;
+let lastEvents = null;
 
 store.subscribe((state) => {
   handleHoverChange(state.hoveredEventId);
+
+  // Update category filter panel when events change
+  if (state.events !== lastEvents) {
+    lastEvents = state.events;
+    const cats = extractCategories(state.events);
+    categoryFilter.setCategories(cats);
+  }
+  categoryFilter.setSelected(state.selectedCategories);
+  categoryFilter.setMode(state.filterMode);
 
   const currentIds = [...state.selectedEventIds].sort().join(',');
   const prevIds = [...lastSelectedIds].sort().join(',');
@@ -185,6 +220,27 @@ store.subscribe((state) => {
     }
   }
   lastSelectedIds = new Set(state.selectedEventIds);
+
+  // Update search navigation UI
+  const total = state.searchResultIds ? state.searchResultIds.length : 0;
+  const activeFilterCount =
+    (state.searchQuery ? 1 : 0) + state.selectedCategories.length;
+  searchBar.updateNavigation(state.currentResultIndex, total, activeFilterCount);
+
+  // Pan to current search result when index or results change
+  const resultIndexChanged = state.currentResultIndex !== lastResultIndex;
+  const resultsChanged = state.searchResultIds !== lastSearchResultIds;
+  lastResultIndex = state.currentResultIndex;
+  lastSearchResultIds = state.searchResultIds;
+
+  if ((resultIndexChanged || resultsChanged) && state.searchResultIds && state.searchResultIds.length > 0) {
+    const currentEventId = state.searchResultIds[state.currentResultIndex];
+    const event = state.events.find((e) => e.id === currentEventId);
+    if (event) {
+      const newViewportStart = computePanToEvent(event, state.canvasWidth, state.scale);
+      store.dispatch({ type: 'SET_VIEWPORT', viewportStart: newViewportStart, scale: state.scale });
+    }
+  }
 });
 
 initInput(canvas, store, {

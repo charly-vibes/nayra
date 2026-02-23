@@ -20,6 +20,11 @@ import {
   terminateWorker,
   getWorkerThreshold,
 } from '../layout/layout-worker-manager.js';
+import {
+  getEventSearchState,
+  getSearchAlpha,
+  renderHighlightedLabel,
+} from './search-highlight.js';
 
 let ctx = null;
 let canvas = null;
@@ -284,6 +289,9 @@ export function draw(state) {
   ctx.lineTo(width, axisY);
   ctx.stroke();
 
+  // Build Set for O(1) lookups during rendering (uses combined active filter)
+  const searchResultSet = state.activeFilterIds ? new Set(state.activeFilterIds) : null;
+
   // Render based on LOD level
   if (currentLOD === LOD_MACRO && clusters.length > 0) {
     // Render clusters at macro zoom
@@ -295,21 +303,19 @@ export function draw(state) {
         const event = cluster.event;
         const duration = event.end !== undefined ? event.end - event.start : 0n;
         if (isVisible(event.start, duration, state.viewportStart, viewportEnd)) {
-          drawEvent(event, state, axisY, width, currentLOD);
+          drawEvent(event, state, axisY, width, currentLOD, searchResultSet);
         }
       }
     }
   } else {
     // Normal rendering: draw events and collect bounds for label collision detection
     const eventsWithBounds = [];
-    let visibleCount = 0;
     for (const event of lodFilteredEvents) {
       const duration = event.end !== undefined ? event.end - event.start : 0n;
       if (!isVisible(event.start, duration, state.viewportStart, viewportEnd)) {
         continue;
       }
-      visibleCount++;
-      const bounds = drawEvent(event, state, axisY, width, currentLOD);
+      const bounds = drawEvent(event, state, axisY, width, currentLOD, searchResultSet);
       if (bounds) {
         eventsWithBounds.push({ id: event.id, label: event.label, bounds });
       }
@@ -322,14 +328,26 @@ export function draw(state) {
 
       for (const eventData of eventsWithBounds) {
         if (visibleLabels.has(eventData.id) && eventData.label) {
-          renderLabel(
-            ctx,
-            eventData.label,
-            eventData.bounds.x,
-            eventData.bounds.y,
-            eventData.bounds.width,
-            eventData.bounds.height
-          );
+          if (state.searchQuery) {
+            renderHighlightedLabel(
+              ctx,
+              eventData.label,
+              eventData.bounds.x,
+              eventData.bounds.y,
+              eventData.bounds.width,
+              eventData.bounds.height,
+              state.searchQuery
+            );
+          } else {
+            renderLabel(
+              ctx,
+              eventData.label,
+              eventData.bounds.x,
+              eventData.bounds.y,
+              eventData.bounds.width,
+              eventData.bounds.height
+            );
+          }
         }
       }
     }
@@ -373,7 +391,7 @@ function drawCluster(cluster, state, axisY, canvasWidth, viewportEnd) {
   ctx.fillText(cluster.count.toString(), x, axisY);
 }
 
-function drawEvent(event, state, axisY, canvasWidth, lod) {
+function drawEvent(event, state, axisY, canvasWidth, lod, searchResultSet = null) {
   const x = projectToScreen(event.start, state.viewportStart, state.scale);
 
   // Calculate actual event width
@@ -396,6 +414,9 @@ function drawEvent(event, state, axisY, canvasWidth, lod) {
   const isSelected = state.selectedEventIds && state.selectedEventIds.has(event.id);
   const isFocused = state.focusedEventId === event.id;
 
+  const searchState = getEventSearchState(event.id, searchResultSet);
+  const alpha = getSearchAlpha(searchState);
+
   const fillColor = getEventFillColor(event.id, isHovered, isSelected);
   const strokeStyle = getEventStrokeStyle(isSelected, isFocused);
 
@@ -403,6 +424,7 @@ function drawEvent(event, state, axisY, canvasWidth, lod) {
   const lane = laneAssignments.get(event.id) || 0;
   const y = getLaneY(lane, axisY, { laneHeight: EVENT_HEIGHT, ...LANE_CONFIG });
 
+  ctx.globalAlpha = alpha;
   ctx.fillStyle = fillColor;
 
   if (renderAsPoint) {
@@ -439,6 +461,8 @@ function drawEvent(event, state, axisY, canvasWidth, lod) {
       ctx.strokeRect(x, y, displayWidth, EVENT_HEIGHT);
     }
   }
+
+  ctx.globalAlpha = 1.0;
 
   // Return bounds for label collision detection
   return { x, y, width: displayWidth, height: EVENT_HEIGHT };

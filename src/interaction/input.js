@@ -26,6 +26,7 @@ export const KEYBOARD_SHORTCUTS = {
   h: 'jumpToToday',
   '/': 'openSearch',
   '?': 'toggleHelp',
+  f: 'toggleFilter',
   '+': 'zoomIn',
   '=': 'zoomIn',
   '-': 'zoomOut',
@@ -609,6 +610,9 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
     } else if (action === 'toggleHelp' && callbacks.onToggleHelp) {
       e.preventDefault();
       callbacks.onToggleHelp();
+    } else if (action === 'toggleFilter' && callbacks.onToggleFilter) {
+      e.preventDefault();
+      callbacks.onToggleFilter();
     }
   }
 

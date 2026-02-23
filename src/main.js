@@ -335,6 +335,13 @@ initInput(canvas, store, {
     }
   },
   onToggleHelp: toggleHelp,
+  onToggleFilter: () => {
+    if (categoryFilter.isVisible()) {
+      categoryFilter.hide();
+    } else {
+      categoryFilter.show();
+    }
+  },
   onMousePosition: (x, y) => {
     mouseX = x;
     mouseY = y;

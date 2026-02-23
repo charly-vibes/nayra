@@ -87,10 +87,25 @@ export function createCategoryFilter(container, { onToggle, onSetMode, onClear }
   panel.className = 'category-filter-panel';
   panel.style.cssText = STYLES.panel;
 
+  // Header row with title and close button
+  const headerRow = document.createElement('div');
+  headerRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;';
+
   const heading = document.createElement('p');
   heading.style.cssText = STYLES.heading;
+  heading.style.margin = '0';
   heading.textContent = 'Filter by Category';
-  panel.appendChild(heading);
+
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.setAttribute('aria-label', 'Close filter panel');
+  closeBtn.textContent = '×';
+  closeBtn.style.cssText = 'background:none;border:none;color:#8888aa;cursor:pointer;font-size:16px;line-height:1;padding:0;';
+  closeBtn.addEventListener('click', () => { panel.style.display = 'none'; });
+
+  headerRow.appendChild(heading);
+  headerRow.appendChild(closeBtn);
+  panel.appendChild(headerRow);
 
   // OR / AND mode toggle
   const modeBar = document.createElement('div');
@@ -150,10 +165,7 @@ export function createCategoryFilter(container, { onToggle, onSetMode, onClear }
   function setCategories(categories) {
     currentCategories = categories;
     renderCheckboxes();
-    // Show panel only when there are categories available
-    if (categories.length > 0) {
-      panel.style.display = 'block';
-    } else {
+    if (categories.length === 0) {
       panel.style.display = 'none';
     }
   }

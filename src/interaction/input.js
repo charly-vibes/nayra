@@ -230,12 +230,19 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
       longPressTimer = setTimeout(() => {
         if (gestures.pointerCount === 1 && gestures.hasPointer(longPressPointerId)) {
           isLongPressActive = true;
+          const rect = canvas.getBoundingClientRect();
+          const pointer = gestures.getPointer(longPressPointerId);
+          const canvasX = pointer.x - rect.left;
+          const canvasY = pointer.y - rect.top;
           if (callbacks.onLongPress) {
-            const rect = canvas.getBoundingClientRect();
-            const pointer = gestures.getPointer(longPressPointerId);
-            const x = pointer.x - rect.left;
-            const y = pointer.y - rect.top;
-            callbacks.onLongPress({ x, y, pointerType: e.pointerType });
+            callbacks.onLongPress({ x: canvasX, y: canvasY, pointerType: e.pointerType });
+          }
+          if (callbacks.onContextMenu) {
+            const state = store.getState();
+            const hit = findEventAtPoint(canvasX, canvasY, state.events, state.viewportStart, state.scale, rect.height);
+            const target = (hit && !hit.__cluster) ? hit : null;
+            const targetType = target ? 'event' : 'background';
+            callbacks.onContextMenu({ x: pointer.x, y: pointer.y, canvasX, canvasY, target, targetType });
           }
         }
       }, LONG_PRESS_DELAY);
@@ -482,6 +489,22 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
     }
   }
 
+  function onContextMenu(e) {
+    e.preventDefault();
+    if (!callbacks.onContextMenu) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const state = store.getState();
+    const hit = findEventAtPoint(x, y, state.events, state.viewportStart, state.scale, rect.height);
+    const target = (hit && !hit.__cluster) ? hit : null;
+    const targetType = target ? 'event' : 'background';
+
+    callbacks.onContextMenu({ x: e.clientX, y: e.clientY, canvasX: x, canvasY: y, target, targetType });
+  }
+
   function onWheel(e) {
     e.preventDefault();
 
@@ -595,6 +618,7 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
   canvas.addEventListener('pointerleave', onPointerLeave);
   canvas.addEventListener('pointercancel', onPointerCancel);
   canvas.addEventListener('wheel', onWheel, { passive: false });
+  canvas.addEventListener('contextmenu', onContextMenu);
   document.addEventListener('keydown', onKeyDown);
   window.addEventListener('resize', resetGestures);
   window.addEventListener('orientationchange', resetGestures);
@@ -612,6 +636,7 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
     canvas.removeEventListener('pointerleave', onPointerLeave);
     canvas.removeEventListener('pointercancel', onPointerCancel);
     canvas.removeEventListener('wheel', onWheel);
+    canvas.removeEventListener('contextmenu', onContextMenu);
     document.removeEventListener('keydown', onKeyDown);
     window.removeEventListener('resize', resetGestures);
     window.removeEventListener('orientationchange', resetGestures);

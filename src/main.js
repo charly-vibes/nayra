@@ -11,6 +11,7 @@ import { createHelpButton } from './ui/help-button.js';
 import { createZoomControls } from './ui/zoom-controls.js';
 import { createTooltip } from './ui/tooltip.js';
 import { createEventPanel } from './ui/event-panel.js';
+import { createContextMenu, buildEventActions } from './ui/context-menu.js';
 import { createDropzone } from './ui/dropzone.js';
 import { parseTimeQuery } from './core/time-parser.js';
 import { RationalScale } from './core/scale.js';
@@ -175,6 +176,8 @@ const eventPanel = createEventPanel(document.body, {
     store.dispatch({ type: 'CLEAR_SELECTION' });
   },
 });
+
+const contextMenu = createContextMenu(document.body);
 
 let mouseX = 0;
 let mouseY = 0;
@@ -342,6 +345,19 @@ initInput(canvas, store, {
         tooltip.update(event, x, y);
       }
     }
+  },
+  onContextMenu: ({ x, y, target, targetType }) => {
+    tooltip.hide();
+    if (targetType === 'event' && target) {
+      const actions = buildEventActions(target, store, {
+        onShowDetails: (ev) => {
+          eventPanel.update([ev]);
+          eventPanel.show();
+        },
+      });
+      contextMenu.show(x, y, actions);
+    }
+    // Background right-click: no menu for now (per spec: implementation choice)
   },
 }, focusManager);
 

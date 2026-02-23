@@ -1,0 +1,89 @@
+name: Performance Regression
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  performance:
+    name: Performance Regression Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Cache benchmark results keyed by source + test file content hash.
+      # A cache hit means the exact same code was already measured; skip the run.
+      - name: Restore benchmark cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: .perf-cache
+          key: perf-${{ hashFiles('src/**/*.js', 'test/performance/**/*.js') }}
+
+      - name: Run performance benchmarks
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm test -- --project=performance
+
+      - name: Save results to cache
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p .perf-cache
+          cp "$(ls -t test-results/performance-*.json | head -1)" .perf-cache/results.json
+
+      - name: Restore cached results
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: |
+          mkdir -p test-results
+          cp .perf-cache/results.json "test-results/performance-cached.json"
+
+      - name: Compare against baseline
+        id: compare
+        continue-on-error: true
+        run: |
+          LATEST=$(ls -t test-results/performance-*.json | head -1)
+          node scripts/compare-benchmarks.js \
+            --baseline .performance-baseline.json \
+            --current  "$LATEST" \
+            > performance-report.md
+
+      - name: Comment performance report on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('performance-report.md', 'utf8');
+            const hasRegression = ${{ steps.compare.outcome == 'failure' }};
+            const header = hasRegression
+              ? '## ⚠️ Performance Regression Detected'
+              : '## ✅ Performance Report';
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `${header}\n\n${report}`,
+            });
+
+      - name: Upload performance results
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: performance-results
+          path: test-results/
+          retention-days: 30
+
+      - name: Fail on performance regression
+        if: steps.compare.outcome == 'failure'
+        run: |
+          echo "Performance regression detected. See the PR comment for details."
+          exit 1

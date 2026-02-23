@@ -22,6 +22,7 @@ export default defineConfig({
         test: {
           name: 'performance',
           include: ['test/performance/**/*.test.js'],
+          exclude: ['test/performance/memory-leaks.test.js'],
           environment: 'node',
         },
       },
@@ -30,6 +31,19 @@ export default defineConfig({
           name: 'monitoring',
           include: ['test/monitoring/**/*.test.js'],
           environment: 'node',
+        },
+      },
+      {
+        test: {
+          name: 'memory',
+          include: ['test/performance/memory-leaks.test.js'],
+          environment: 'node',
+          pool: 'forks',
+          poolOptions: {
+            forks: {
+              execArgv: ['--expose-gc'],
+            },
+          },
         },
       },
       {

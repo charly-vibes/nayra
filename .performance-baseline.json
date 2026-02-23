@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0",
+  "createdAt": "2026-02-23T17:03:38.536Z",
+  "note": "Baseline extracted from benchmark run on 2026-02-23. Update with: node scripts/compare-benchmarks.js --update-baseline",
+  "benchmarks": {
+    "initial-render/lane-assignment-1K":      { "p50": 0.432, "mean": 0.536 },
+    "initial-render/spatial-hash-rebuild-1K": { "p50": 0.429, "mean": 0.740 },
+    "initial-render/full-pipeline-1K":        { "p50": 0.828, "mean": 1.056 },
+    "initial-render/lane-assignment-10K":     { "p50": 11.683, "mean": 12.567 },
+    "initial-render/spatial-hash-rebuild-10K":{ "p50": 13.273, "mean": 14.107 },
+    "initial-render/full-pipeline-10K":       { "p50": 27.802, "mean": 27.280 },
+    "initial-render/lane-assignment-50K":     { "p50": 97.046, "mean": 98.575 },
+    "initial-render/spatial-hash-rebuild-50K":{ "p50": 32.767, "mean": 31.285 },
+    "initial-render/full-pipeline-50K":       { "p50": 119.172, "mean": 120.168 },
+    "pan/60-frames-1K":                       { "p50": 13.775, "mean": 14.342 },
+    "pan/30-frames-10K":                      { "p50": 108.724, "mean": 110.917 },
+    "pan/10-frames-50K":                      { "p50": 267.169, "mean": 265.360 },
+    "zoom/scale-zoom-1000x":                  { "p50": 0.062, "mean": 0.136 },
+    "zoom/determineLOD-1000x":                { "p50": 0.012, "mean": 0.012 },
+    "zoom/lod-filter-meso-1K":                { "p50": 0.011, "mean": 0.012 },
+    "zoom/lod-filter-meso-10K":               { "p50": 0.107, "mean": 0.114 },
+    "zoom/lod-filter-meso-50K":               { "p50": 0.687, "mean": 0.688 },
+    "zoom/full-zoom-out-transition-10K":      { "p50": 1.203, "mean": 1.226 },
+    "layout/project-to-screen-50K":           { "p50": 1.558, "mean": 1.610 },
+    "layout/label-collision-1K":              { "p50": 0.556, "mean": 0.622 },
+    "layout/label-collision-10K":             { "p50": 54.898, "mean": 54.915 },
+    "layout/event-clustering-macro-10K":      { "p50": 2.308, "mean": 2.335 },
+    "layout/event-clustering-macro-50K":      { "p50": 15.337, "mean": 15.820 }
+  }
+}

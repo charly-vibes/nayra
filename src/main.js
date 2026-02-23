@@ -24,6 +24,15 @@ import { createDomSync } from './accessibility/dom-sync.js';
 import { createLiveAnnouncer } from './accessibility/live-announcer.js';
 import { createAriaAnnouncer } from './accessibility/aria-announcer.js';
 import { createSkipLinks } from './accessibility/skip-links.js';
+import { detectFeatures, REQUIRED_FEATURES } from './utils/feature-detection.js';
+
+// Feature detection: abort early with a clear error if required APIs are missing
+const features = detectFeatures();
+const missing = REQUIRED_FEATURES.filter(key => !features[key].supported);
+if (missing.length > 0) {
+  const names = missing.map(k => features[k].name).join(', ');
+  throw new Error(`Nayra requires browser support for: ${names}. Please upgrade your browser.`);
+}
 
 const canvas = document.getElementById('timeline-canvas');
 const store = createStore();

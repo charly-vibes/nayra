@@ -20,6 +20,8 @@ import { extractCategories } from './core/filter-engine.js';
 import { encodeSearchState, decodeSearchState } from './core/url-state.js';
 import { createDebouncedSearch } from './core/search-engine.js';
 import { createDomSync } from './accessibility/dom-sync.js';
+import { createLiveAnnouncer } from './accessibility/live-announcer.js';
+import { createAriaAnnouncer } from './accessibility/aria-announcer.js';
 
 const canvas = document.getElementById('timeline-canvas');
 const store = createStore();
@@ -27,6 +29,10 @@ const store = createStore();
 // Create focus manager for keyboard navigation
 const ariaLiveElement = document.getElementById('aria-live');
 const focusManager = createFocusManager(store, ariaLiveElement);
+
+// ARIA announcer for search results and filter changes
+const liveAnnouncer = createLiveAnnouncer(ariaLiveElement, { debounceMs: 500 });
+const ariaAnnouncer = createAriaAnnouncer(liveAnnouncer);
 
 initRenderer(canvas, store.dispatch);
 
@@ -205,6 +211,9 @@ let lastSelectedIds = new Set();
 let lastResultIndex = -1;
 let lastSearchResultIds = null;
 let lastEvents = null;
+let lastAnnouncedQuery = '';
+let lastAnnouncedResultCount = null;
+let lastAnnouncedCatCount = 0;
 
 store.subscribe((state) => {
   handleHoverChange(state.hoveredEventId);
@@ -248,6 +257,35 @@ store.subscribe((state) => {
     if (event) {
       const newViewportStart = computePanToEvent(event, state.canvasWidth, state.scale);
       store.dispatch({ type: 'SET_VIEWPORT', viewportStart: newViewportStart, scale: state.scale });
+    }
+  }
+
+  // ARIA announcements for search results, navigation, and category filters
+  const currentQuery = state.searchQuery;
+  const currentResultCount = state.searchResultIds ? state.searchResultIds.length : null;
+  const currentCatCount = state.selectedCategories.length;
+
+  const queryChanged = currentQuery !== lastAnnouncedQuery;
+  const resultCountChanged = currentResultCount !== lastAnnouncedResultCount;
+  const catCountChanged = currentCatCount !== lastAnnouncedCatCount;
+
+  if (queryChanged || resultCountChanged) {
+    lastAnnouncedQuery = currentQuery;
+    lastAnnouncedResultCount = currentResultCount;
+    if (currentQuery) {
+      ariaAnnouncer.announceResults(currentResultCount ?? 0, currentQuery);
+    } else if (queryChanged) {
+      // Search was cleared
+      ariaAnnouncer.clear();
+    }
+  } else if (resultIndexChanged && currentResultCount > 0) {
+    ariaAnnouncer.announceNavigation(state.currentResultIndex, currentResultCount);
+  }
+
+  if (catCountChanged) {
+    lastAnnouncedCatCount = currentCatCount;
+    if (currentCatCount > 0 && state.categoryFilterIds !== null) {
+      ariaAnnouncer.announceFilterChange(state.categoryFilterIds.length);
     }
   }
 

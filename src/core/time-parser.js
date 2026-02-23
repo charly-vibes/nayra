@@ -44,7 +44,9 @@ function yearToSeconds(year) {
     if (year < 100) {
       date.setUTCFullYear(year);
     }
-    return BigInt(Math.floor(date.getTime() / 1000));
+    const ms = date.getTime();
+    if (isNaN(ms)) return null;
+    return BigInt(Math.floor(ms / 1000));
   } else {
     // For BCE years: year -1 = 1 BCE, year -44 = 44 BCE
     // JavaScript Date uses astronomical year numbering where 0 = 1 BCE
@@ -53,7 +55,9 @@ function yearToSeconds(year) {
     const jsYear = year + 1; // Convert historical to astronomical
     const date = new Date(Date.UTC(jsYear, 6, 1));
     date.setUTCFullYear(jsYear);
-    return BigInt(Math.floor(date.getTime() / 1000));
+    const ms = date.getTime();
+    if (isNaN(ms)) return null;
+    return BigInt(Math.floor(ms / 1000));
   }
 }
 
@@ -194,11 +198,11 @@ export function parseTimeQuery(query) {
         error: 'Year zero does not exist in historical convention. Use "1 BCE" or "1 CE" instead.',
       };
     }
-    return {
-      success: true,
-      time: yearToSeconds(-year),
-      span: YEAR,
-    };
+    const time = yearToSeconds(-year);
+    if (time === null) {
+      return { success: false, error: `Year ${year} BCE is out of supported range. Use Ma/Ga notation for deep time.` };
+    }
+    return { success: true, time, span: YEAR };
   }
 
   // CE/AD notation: "1066 CE", "1066 AD"
@@ -211,11 +215,11 @@ export function parseTimeQuery(query) {
         error: 'Year zero does not exist in historical convention. Use "1 BCE" or "1 CE" instead.',
       };
     }
-    return {
-      success: true,
-      time: yearToSeconds(year),
-      span: YEAR,
-    };
+    const time = yearToSeconds(year);
+    if (time === null) {
+      return { success: false, error: `Year ${year} CE is out of supported range.` };
+    }
+    return { success: true, time, span: YEAR };
   }
 
   // Year only (including negative years)
@@ -231,11 +235,11 @@ export function parseTimeQuery(query) {
       };
     }
 
-    return {
-      success: true,
-      time: yearToSeconds(year),
-      span: YEAR,
-    };
+    const time = yearToSeconds(year);
+    if (time === null) {
+      return { success: false, error: `Year ${year} is out of supported range. Use Ma/Ga notation for deep time.` };
+    }
+    return { success: true, time, span: YEAR };
   }
 
   return {

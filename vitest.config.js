@@ -27,6 +27,13 @@ export default defineConfig({
       },
       {
         test: {
+          name: 'monitoring',
+          include: ['test/monitoring/**/*.test.js'],
+          environment: 'node',
+        },
+      },
+      {
+        test: {
           name: 'accessibility',
           include: [
             'src/accessibility/**/*.test.js',

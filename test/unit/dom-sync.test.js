@@ -1,5 +1,6 @@
+// @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { createDomSync } from './dom-sync.js';
+import { createDomSync } from '../../src/accessibility/dom-sync.js';
 
 function makeEvent(overrides = {}) {
   return {

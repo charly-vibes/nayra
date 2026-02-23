@@ -19,6 +19,7 @@ import { createCategoryFilter } from './ui/category-filter.js';
 import { extractCategories } from './core/filter-engine.js';
 import { encodeSearchState, decodeSearchState } from './core/url-state.js';
 import { createDebouncedSearch } from './core/search-engine.js';
+import { createDomSync } from './accessibility/dom-sync.js';
 
 const canvas = document.getElementById('timeline-canvas');
 const store = createStore();
@@ -147,6 +148,11 @@ const categoryFilter = createCategoryFilter(document.body, {
   onClear: () => store.dispatch({ type: 'CLEAR_CATEGORIES' }),
 });
 
+const domSync = createDomSync(document.body, {
+  onFocus: (id) => store.dispatch({ type: 'SET_HOVER', eventId: id }),
+  onActivate: (id) => store.dispatch({ type: 'SELECT_EVENT', eventId: id }),
+});
+
 const tooltip = createTooltip(document.body);
 const eventPanel = createEventPanel(document.body, {
   onClose: () => {
@@ -203,9 +209,10 @@ let lastEvents = null;
 store.subscribe((state) => {
   handleHoverChange(state.hoveredEventId);
 
-  // Update category filter panel when events change
+  // Update accessible DOM tree and category filter panel when events change
   if (state.events !== lastEvents) {
     lastEvents = state.events;
+    domSync.update(state.events);
     const cats = extractCategories(state.events);
     categoryFilter.setCategories(cats);
   }

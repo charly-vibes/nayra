@@ -243,18 +243,30 @@ Key topics covered:
 
 ## Browser Support
 
-Nayra targets modern browsers with:
+| Browser | Minimum Version | Status |
+|---------|----------------|--------|
+| Chrome | 90+ | ✅ Fully supported |
+| Edge | 90+ | ✅ Fully supported |
+| Firefox | 90+ | ✅ Fully supported |
+| Safari | 14+ | ✅ Fully supported |
 
-- ✅ Canvas API (2D rendering context)
-- ✅ ES6+ modules and syntax
-- ✅ BigInt primitive type
-- ✅ IndexedDB for data persistence
-- ✅ Service Workers (optional, for offline support)
+### Required APIs
 
-Tested on:
-- Chrome/Edge 90+
-- Firefox 90+
-- Safari 14+
+| API | Chrome 90 | Firefox 90 | Safari 14 | Purpose |
+|-----|-----------|------------|-----------|---------|
+| Canvas 2D | ✅ | ✅ | ✅ | Timeline rendering |
+| BigInt | ✅ | ✅ | ✅ | Deep time coordinates |
+| IndexedDB | ✅ | ✅ | ✅ | Data persistence |
+| ResizeObserver | ✅ | ✅ | ✅ | Responsive canvas |
+| Web Workers | ✅ | ✅ | ✅ | Layout offloading |
+| requestAnimationFrame | ✅ | ✅ | ✅ | Render loop |
+| Pointer Events | ✅ | ✅ | ✅ | Unified input |
+| ES6 Modules | ✅ | ✅ | ✅ | Module loading |
+
+Nayra detects required APIs at startup and shows a friendly error if any are missing.
+See [`src/utils/feature-detection.js`](src/utils/feature-detection.js) and [`src/ui/browser-error.js`](src/ui/browser-error.js).
+
+For detailed compatibility notes and known issues, see [docs/browser-support.md](docs/browser-support.md).
 
 ## Contributing
 

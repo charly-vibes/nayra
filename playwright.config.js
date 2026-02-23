@@ -1,4 +1,4 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './test/e2e',
@@ -20,7 +20,24 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { browserName: 'chromium' },
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] },
+    },
+    // High-DPI variants
+    {
+      name: 'chromium-hidpi',
+      use: { ...devices['Desktop Chrome'], deviceScaleFactor: 2 },
+    },
+    {
+      name: 'webkit-hidpi',
+      use: { ...devices['Desktop Safari'], deviceScaleFactor: 2 },
     },
   ],
 });

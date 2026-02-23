@@ -22,5 +22,11 @@
     "bigint",
     "deep-time"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "browserslist": [
+    "Chrome >= 90",
+    "Edge >= 90",
+    "Firefox >= 90",
+    "Safari >= 14"
+  ]
 }

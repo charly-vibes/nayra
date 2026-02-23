@@ -166,5 +166,6 @@ export function getShapeLegend(events) {
  */
 export function prefersHighContrast() {
   return typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
     window.matchMedia('(prefers-contrast: more)').matches;
 }

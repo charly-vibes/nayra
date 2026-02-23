@@ -26,6 +26,7 @@ import {
   renderHighlightedLabel,
 } from './search-highlight.js';
 import { drawEventShapeIndicator } from './event-shapes.js';
+import { applyDpiScaling, getLogicalSize } from './dpi-scaling.js';
 
 let ctx = null;
 let canvas = null;
@@ -125,12 +126,7 @@ export function getClusters() {
 }
 
 function setupDPI() {
-  const rect = canvas.getBoundingClientRect();
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = rect.width * dpr;
-  canvas.height = rect.height * dpr;
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  return rect;
+  return applyDpiScaling(canvas, ctx);
 }
 
 /**
@@ -248,8 +244,7 @@ export function draw(state) {
   const now = performance.now();
   updateFPS(now);
 
-  const width = canvas.width / (window.devicePixelRatio || 1);
-  const height = canvas.height / (window.devicePixelRatio || 1);
+  const { width, height } = getLogicalSize(canvas);
   const viewportEnd = state.viewportStart + state.scale.pxToTime(width);
 
   const axisY = height / 2;

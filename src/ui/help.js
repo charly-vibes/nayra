@@ -1,4 +1,5 @@
 import { EXAMPLES } from '../data/examples.js';
+import { createFocusTrap } from '../accessibility/focus-trap.js';
 
 const TABS = [
   { id: 'shortcuts', label: 'Shortcuts' },
@@ -528,10 +529,15 @@ export function createHelpMenu(container, options = {}) {
   element.appendChild(content);
   container.appendChild(element);
 
+  // Focus trap: keeps keyboard focus inside dialog while open (WCAG 2.1.2, 2.4.3)
+  const focusTrap = createFocusTrap(content, {
+    onEscape: () => hide(),
+  });
+
   function onKeyDown(e) {
     if (!isVisible()) return;
 
-    if (e.key === 'Escape' || e.key === '?') {
+    if (e.key === '?') {
       e.preventDefault();
       hide();
     } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
@@ -549,12 +555,14 @@ export function createHelpMenu(container, options = {}) {
 
   document.addEventListener('keydown', onKeyDown);
 
-  function show() {
+  function show(triggerElement = null) {
     element.style.display = 'flex';
+    focusTrap.activate(triggerElement);
   }
 
   function hide() {
     element.style.display = 'none';
+    focusTrap.deactivate();
   }
 
   function isVisible() {
@@ -567,6 +575,7 @@ export function createHelpMenu(container, options = {}) {
 
   function destroy() {
     document.removeEventListener('keydown', onKeyDown);
+    focusTrap.destroy();
     container.removeChild(element);
   }
 

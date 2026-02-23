@@ -25,6 +25,7 @@ import {
   getSearchAlpha,
   renderHighlightedLabel,
 } from './search-highlight.js';
+import { drawEventShapeIndicator } from './event-shapes.js';
 
 let ctx = null;
 let canvas = null;
@@ -460,6 +461,9 @@ function drawEvent(event, state, axisY, canvasWidth, lod, searchResultSet = null
     } else {
       ctx.strokeRect(x, y, displayWidth, EVENT_HEIGHT);
     }
+
+    // Draw shape indicator for color-independent category encoding (WCAG 1.4.1)
+    drawEventShapeIndicator(ctx, event, x, y, displayWidth, EVENT_HEIGHT, alpha);
   }
 
   ctx.globalAlpha = 1.0;

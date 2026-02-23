@@ -22,9 +22,17 @@ import { createDebouncedSearch } from './core/search-engine.js';
 import { createDomSync } from './accessibility/dom-sync.js';
 import { createLiveAnnouncer } from './accessibility/live-announcer.js';
 import { createAriaAnnouncer } from './accessibility/aria-announcer.js';
+import { createSkipLinks } from './accessibility/skip-links.js';
 
 const canvas = document.getElementById('timeline-canvas');
 const store = createStore();
+
+// Skip navigation links: first focusable elements on the page (WCAG 2.4.1)
+createSkipLinks(document.body, [
+  { label: 'Skip to timeline', targetId: 'timeline-canvas' },
+  { label: 'Skip to search', onClick: () => { searchBar.show(); } },
+  { label: 'Skip to help', targetId: 'help-button' },
+]);
 
 // Create focus manager for keyboard navigation
 const ariaLiveElement = document.getElementById('aria-live');
@@ -95,6 +103,7 @@ function toggleHelp() {
 }
 
 const helpButton = createHelpButton(document.body, { onToggleHelp: toggleHelp });
+helpButton.element.id = 'help-button';
 
 // Zoom control handlers
 function handleZoomIn() {

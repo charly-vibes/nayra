@@ -1,4 +1,5 @@
 import { formatTimeRange } from './format.js';
+import { createFocusTrap } from '../accessibility/focus-trap.js';
 
 export function createEventPanel(container, { onClose }) {
   const overlay = document.createElement('div');
@@ -31,12 +32,38 @@ export function createEventPanel(container, { onClose }) {
   panel.style.fontFamily = 'system-ui, sans-serif';
   panel.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.5)';
 
+  // Close button (first focusable element for focus trap)
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.setAttribute('aria-label', 'Close event details');
+  closeBtn.textContent = '×';
+  closeBtn.style.cssText = `
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: 1px solid #4a4a6a;
+    border-radius: 4px;
+    color: #8a8aaa;
+    font-size: 20px;
+    line-height: 1;
+    padding: 2px 8px;
+    cursor: pointer;
+  `;
+  closeBtn.addEventListener('click', () => {
+    hide();
+    if (onClose) onClose();
+  });
+  panel.style.position = 'relative';
+  panel.appendChild(closeBtn);
+
   const titleEl = document.createElement('h2');
   titleEl.className = 'event-panel-title';
   titleEl.style.cssText = `
     margin: 0 0 8px 0;
     font-size: 20px;
     font-weight: 600;
+    padding-right: 40px;
   `;
 
   const timeEl = document.createElement('div');
@@ -70,6 +97,14 @@ export function createEventPanel(container, { onClose }) {
   overlay.appendChild(panel);
   container.appendChild(overlay);
 
+  // Focus trap: keeps keyboard focus inside panel while open (WCAG 2.1.2, 2.4.3)
+  const focusTrap = createFocusTrap(panel, {
+    onEscape: () => {
+      hide();
+      if (onClose) onClose();
+    },
+  });
+
   panel.addEventListener('click', (e) => {
     e.stopPropagation();
   });
@@ -79,23 +114,14 @@ export function createEventPanel(container, { onClose }) {
     if (onClose) onClose();
   });
 
-  function onKeyDown(e) {
-    if (!isVisible()) return;
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      hide();
-      if (onClose) onClose();
-    }
-  }
-
-  document.addEventListener('keydown', onKeyDown);
-
-  function show() {
+  function show(triggerElement = null) {
     overlay.style.display = 'flex';
+    focusTrap.activate(triggerElement);
   }
 
   function hide() {
     overlay.style.display = 'none';
+    focusTrap.deactivate();
   }
 
   function isVisible() {
@@ -158,7 +184,7 @@ export function createEventPanel(container, { onClose }) {
   }
 
   function destroy() {
-    document.removeEventListener('keydown', onKeyDown);
+    focusTrap.destroy();
     container.removeChild(overlay);
   }
 

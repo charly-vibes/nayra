@@ -1,9 +1,29 @@
 /**
  * Core search logic for filtering events by title and description.
+ *
+ * For datasets above INDEX_THRESHOLD, an InvertedIndex is used automatically
+ * for better performance. For smaller datasets, a simple linear scan is used.
  */
+import { InvertedIndex } from './inverted-index.js';
+
+const INDEX_THRESHOLD = 5000; // Use inverted index above this event count
+
+// Module-level index — rebuilt lazily when events change
+let _cachedIndex = null;
+let _cachedEvents = null;
+
+function getIndex(events) {
+  if (_cachedEvents !== events) {
+    _cachedIndex = new InvertedIndex();
+    _cachedIndex.build(events);
+    _cachedEvents = events;
+  }
+  return _cachedIndex;
+}
 
 /**
- * Filter events by a text query across title and description fields.
+ * Filter events by a text query across title/label and description fields.
+ * Automatically uses an inverted index for large datasets.
  *
  * @param {Array} events - Array of event objects
  * @param {string} query - Search query string
@@ -14,6 +34,11 @@ export function filterEvents(events, query) {
     return null;
   }
 
+  if (events.length >= INDEX_THRESHOLD) {
+    return getIndex(events).search(query);
+  }
+
+  // Linear scan for small datasets
   const lowerQuery = query.toLowerCase();
   const results = [];
 
@@ -26,6 +51,12 @@ export function filterEvents(events, query) {
   }
 
   return results;
+}
+
+/** Invalidate the cached index (call when events array reference changes). */
+export function invalidateSearchIndex() {
+  _cachedIndex = null;
+  _cachedEvents = null;
 }
 
 /**

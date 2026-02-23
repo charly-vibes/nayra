@@ -151,6 +151,25 @@ function reduce(state, action) {
         activeFilterIds: null,
       };
 
+    case 'RESTORE_FROM_URL': {
+      const { searchQuery = '', selectedCategories = [], filterMode = 'OR' } = action;
+      const searchResultIds = filterEvents(state.events, searchQuery);
+      const categoryFilterIds =
+        selectedCategories.length > 0
+          ? filterByCategories(state.events, selectedCategories, filterMode)
+          : null;
+      return {
+        ...state,
+        searchQuery,
+        searchResultIds,
+        currentResultIndex: 0,
+        selectedCategories,
+        filterMode,
+        categoryFilterIds,
+        activeFilterIds: computeActiveFilter(searchResultIds, categoryFilterIds),
+      };
+    }
+
     case 'NEXT_RESULT': {
       if (!state.searchResultIds || state.searchResultIds.length === 0) return state;
       const next = (state.currentResultIndex + 1) % state.searchResultIds.length;

@@ -17,6 +17,8 @@ import { RationalScale } from './core/scale.js';
 import { computePanToEvent } from './ui/search-navigation.js';
 import { createCategoryFilter } from './ui/category-filter.js';
 import { extractCategories } from './core/filter-engine.js';
+import { encodeSearchState, decodeSearchState } from './core/url-state.js';
+import { createDebouncedSearch } from './core/search-engine.js';
 
 const canvas = document.getElementById('timeline-canvas');
 const store = createStore();
@@ -241,6 +243,32 @@ store.subscribe((state) => {
       store.dispatch({ type: 'SET_VIEWPORT', viewportStart: newViewportStart, scale: state.scale });
     }
   }
+
+  // Sync URL hash (debounced to avoid excessive updates)
+  debouncedSyncUrl(state);
+});
+
+// Debounced URL hash sync
+const debouncedSyncUrl = createDebouncedSearch((state) => {
+  const hash = encodeSearchState({
+    searchQuery: state.searchQuery,
+    selectedCategories: state.selectedCategories,
+    filterMode: state.filterMode,
+  });
+  const newHash = hash || (window.location.hash ? '' : undefined);
+  if (newHash !== undefined && newHash !== window.location.hash) {
+    window.history.replaceState(null, '', hash || window.location.pathname + window.location.search);
+  }
+}, 500);
+
+// Restore state from URL hash on browser back/forward
+window.addEventListener('hashchange', () => {
+  const restored = decodeSearchState(window.location.hash);
+  if (restored.searchQuery || restored.selectedCategories.length > 0) {
+    store.dispatch({ type: 'RESTORE_FROM_URL', ...restored });
+  } else {
+    store.dispatch({ type: 'CLEAR_ALL_FILTERS' });
+  }
 });
 
 initInput(canvas, store, {
@@ -287,6 +315,12 @@ async function init() {
   const state = store.getState();
   const { viewportStart, scale } = fitToContent(events, state.canvasWidth);
   store.dispatch({ type: 'SET_VIEWPORT', viewportStart, scale });
+
+  // Restore search/filter state from URL hash (if present)
+  const urlState = decodeSearchState(window.location.hash);
+  if (urlState.searchQuery || urlState.selectedCategories.length > 0) {
+    store.dispatch({ type: 'RESTORE_FROM_URL', ...urlState });
+  }
 
   // Focus canvas for keyboard navigation
   canvas.focus();

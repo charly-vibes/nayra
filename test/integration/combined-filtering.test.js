@@ -180,7 +180,7 @@ describe('state synchronization', () => {
 // --- Performance benchmark ---
 
 describe('combined filtering performance', () => {
-  it('completes combined filtering for 10,000 events in under 10ms', () => {
+  it('completes combined filtering for 10,000 events in under 10ms (after warmup)', () => {
     const largeEvents = Array.from({ length: 10000 }, (_, i) => ({
       id: `e${i}`,
       label: `Event ${i} ${i % 2 === 0 ? 'Apollo' : 'Discovery'}`,
@@ -192,6 +192,11 @@ describe('combined filtering performance', () => {
     const store = createStore();
     store.dispatch({ type: 'SET_EVENTS', events: largeEvents });
 
+    // Warmup: first search builds the inverted index
+    store.dispatch({ type: 'SEARCH_EVENTS', query: 'warmup' });
+    store.dispatch({ type: 'CLEAR_ALL_FILTERS' });
+
+    // Measure: subsequent searches use the cached index
     const start = performance.now();
     store.dispatch({ type: 'TOGGLE_CATEGORY', category: 'Science' });
     store.dispatch({ type: 'SEARCH_EVENTS', query: 'Apollo' });

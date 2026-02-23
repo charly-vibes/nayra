@@ -58,3 +58,10 @@ export const CLEAR_ALL_FILTERS = 'CLEAR_ALL_FILTERS';
 export function clearAllFilters() {
   return { type: CLEAR_ALL_FILTERS };
 }
+
+export const RESTORE_FROM_URL = 'RESTORE_FROM_URL';
+
+/** Restore search/filter state from URL hash. */
+export function restoreFromUrl({ searchQuery, selectedCategories, filterMode }) {
+  return { type: RESTORE_FROM_URL, searchQuery, selectedCategories, filterMode };
+}

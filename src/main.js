@@ -149,11 +149,20 @@ function handleResetZoom() {
   store.dispatch({ type: 'SET_VIEWPORT', viewportStart, scale });
 }
 
+function toggleFilter() {
+  if (categoryFilter.isVisible()) {
+    categoryFilter.hide();
+  } else {
+    categoryFilter.show();
+  }
+}
+
 const zoomControls = createZoomControls(document.body, {
   onZoomIn: handleZoomIn,
   onZoomOut: handleZoomOut,
   onFitToContent: handleFitToContent,
   onResetZoom: handleResetZoom,
+  onToggleFilter: toggleFilter,
 });
 
 const dropzone = createDropzone(canvas.parentElement, { onLoad: handleExampleLoad });
@@ -239,6 +248,7 @@ store.subscribe((state) => {
   }
   categoryFilter.setSelected(state.selectedCategories);
   categoryFilter.setMode(state.filterMode);
+  zoomControls.setFilterActive(state.selectedCategories.length > 0);
 
   const currentIds = [...state.selectedEventIds].sort().join(',');
   const prevIds = [...lastSelectedIds].sort().join(',');
@@ -335,13 +345,7 @@ initInput(canvas, store, {
     }
   },
   onToggleHelp: toggleHelp,
-  onToggleFilter: () => {
-    if (categoryFilter.isVisible()) {
-      categoryFilter.hide();
-    } else {
-      categoryFilter.show();
-    }
-  },
+  onToggleFilter: toggleFilter,
   onMousePosition: (x, y) => {
     mouseX = x;
     mouseY = y;

@@ -1,4 +1,4 @@
-export function createZoomControls(container, { onZoomIn, onZoomOut, onFitToContent, onResetZoom }) {
+export function createZoomControls(container, { onZoomIn, onZoomOut, onFitToContent, onResetZoom, onToggleFilter }) {
   const controlsContainer = document.createElement('div');
   controlsContainer.setAttribute('aria-label', 'Zoom controls');
   controlsContainer.style.position = 'fixed';
@@ -69,8 +69,24 @@ export function createZoomControls(container, { onZoomIn, onZoomOut, onFitToCont
   resetBtn.style.fontSize = '12px';
   Object.assign(resetBtn.style, buttonStyle);
 
+  // Separator before filter
+  const separator2 = document.createElement('div');
+  separator2.style.height = '1px';
+  separator2.style.background = '#4a4a6a';
+  separator2.style.margin = '4px 8px';
+
+  // Filter toggle button
+  const filterBtn = document.createElement('button');
+  filterBtn.type = 'button';
+  filterBtn.setAttribute('aria-label', 'Toggle category filter');
+  filterBtn.setAttribute('title', 'Filter by category (f)');
+  filterBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M2 4h14M5 9h8M8 14h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </svg>`;
+  Object.assign(filterBtn.style, buttonStyle);
+
   // Add hover effects
-  const buttons = [zoomInBtn, zoomOutBtn, fitBtn, resetBtn];
+  const buttons = [zoomInBtn, zoomOutBtn, fitBtn, resetBtn, filterBtn];
   buttons.forEach(btn => {
     btn.addEventListener('pointerenter', () => {
       btn.style.background = '#3a3a4e';
@@ -108,13 +124,29 @@ export function createZoomControls(container, { onZoomIn, onZoomOut, onFitToCont
     onResetZoom();
   });
 
+  if (onToggleFilter) {
+    filterBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      onToggleFilter();
+    });
+  }
+
   // Assemble controls
   controlsContainer.appendChild(zoomInBtn);
   controlsContainer.appendChild(zoomOutBtn);
   controlsContainer.appendChild(separator);
   controlsContainer.appendChild(fitBtn);
   controlsContainer.appendChild(resetBtn);
+  if (onToggleFilter) {
+    controlsContainer.appendChild(separator2);
+    controlsContainer.appendChild(filterBtn);
+  }
   container.appendChild(controlsContainer);
+
+  function setFilterActive(active) {
+    filterBtn.style.background = active ? '#4a4a8a' : '#2a2a3e';
+    filterBtn.style.borderColor = active ? '#6a6aaa' : '#4a4a6a';
+  }
 
   function destroy() {
     zoomInBtn.removeEventListener('click', onZoomIn);
@@ -124,5 +156,5 @@ export function createZoomControls(container, { onZoomIn, onZoomOut, onFitToCont
     container.removeChild(controlsContainer);
   }
 
-  return { element: controlsContainer, destroy };
+  return { element: controlsContainer, setFilterActive, destroy };
 }

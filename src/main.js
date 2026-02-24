@@ -18,7 +18,7 @@ import { RationalScale } from './core/scale.js';
 import { computePanToEvent } from './ui/search-navigation.js';
 import { createCategoryFilter } from './ui/category-filter.js';
 import { extractCategories } from './core/filter-engine.js';
-import { encodeSearchState, decodeSearchState } from './core/url-state.js';
+import { encodeAllState, decodeSearchState, decodeViewportState } from './core/url-state.js';
 import { createDebouncedSearch } from './core/search-engine.js';
 import { createDomSync } from './accessibility/dom-sync.js';
 import { createLiveAnnouncer } from './accessibility/live-announcer.js';
@@ -327,10 +327,12 @@ store.subscribe((state) => {
 
 // Debounced URL hash sync
 const debouncedSyncUrl = createDebouncedSearch((state) => {
-  const hash = encodeSearchState({
+  const hash = encodeAllState({
     searchQuery: state.searchQuery,
     selectedCategories: state.selectedCategories,
     filterMode: state.filterMode,
+    viewportStart: state.viewportStart,
+    spp: state.scale.getSecondsPerPixel(),
   });
   const newHash = hash || (window.location.hash ? '' : undefined);
   if (newHash !== undefined && newHash !== window.location.hash) {
@@ -345,6 +347,12 @@ window.addEventListener('hashchange', () => {
     store.dispatch({ type: 'RESTORE_FROM_URL', ...restored });
   } else {
     store.dispatch({ type: 'CLEAR_ALL_FILTERS' });
+  }
+
+  const { viewportStart, spp } = decodeViewportState(window.location.hash);
+  if (viewportStart !== null && spp !== null) {
+    const scale = RationalScale.fromSecondsPerPixel(spp);
+    store.dispatch({ type: 'SET_VIEWPORT', viewportStart, scale });
   }
 });
 
@@ -402,10 +410,16 @@ async function init() {
     store.dispatch({ type: 'SET_EVENTS', events });
   }
 
-  // Fit all content in view on initial load
-  const state = store.getState();
-  const { viewportStart, scale } = fitToContent(events, state.canvasWidth);
-  store.dispatch({ type: 'SET_VIEWPORT', viewportStart, scale });
+  // Restore viewport from URL hash if present, otherwise fit all content
+  const { viewportStart: urlVs, spp: urlSpp } = decodeViewportState(window.location.hash);
+  if (urlVs !== null && urlSpp !== null) {
+    const scale = RationalScale.fromSecondsPerPixel(urlSpp);
+    store.dispatch({ type: 'SET_VIEWPORT', viewportStart: urlVs, scale });
+  } else {
+    const state = store.getState();
+    const { viewportStart, scale } = fitToContent(events, state.canvasWidth);
+    store.dispatch({ type: 'SET_VIEWPORT', viewportStart, scale });
+  }
 
   // Restore search/filter state from URL hash (if present)
   const urlState = decodeSearchState(window.location.hash);

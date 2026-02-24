@@ -84,6 +84,56 @@ export function encodeSearchState({ searchQuery, selectedCategories, filterMode 
 }
 
 /**
+ * Encode all app state (search/filter + viewport) to a URL hash string.
+ *
+ * @param {{ searchQuery: string, selectedCategories: string[], filterMode: string, viewportStart: bigint, spp: number }} state
+ * @returns {string} Hash string, or ''
+ */
+export function encodeAllState({ searchQuery, selectedCategories, filterMode, viewportStart, spp }) {
+  const params = {};
+
+  if (searchQuery) {
+    params.q = searchQuery;
+  }
+
+  if (selectedCategories && selectedCategories.length > 0) {
+    params.cats = selectedCategories.map(encodeURIComponent).join(',');
+  }
+
+  if (filterMode && filterMode !== 'OR') {
+    params.mode = filterMode;
+  }
+
+  if (viewportStart != null) {
+    params.vs = viewportStart.toString();
+  }
+
+  if (spp != null) {
+    params.spp = String(spp);
+  }
+
+  return buildHashString(params);
+}
+
+/**
+ * Decode viewport state from a URL hash string.
+ * Returns null values if not present or malformed.
+ *
+ * @param {string|null|undefined} hash
+ * @returns {{ viewportStart: bigint|null, spp: number|null }}
+ */
+export function decodeViewportState(hash) {
+  try {
+    const params = parseHashString(hash);
+    const viewportStart = params.vs != null ? BigInt(params.vs) : null;
+    const spp = params.spp != null ? Number(params.spp) : null;
+    return { viewportStart, spp };
+  } catch {
+    return { viewportStart: null, spp: null };
+  }
+}
+
+/**
  * Decode a URL hash string back to search/filter state.
  * Returns safe defaults if the hash is empty or malformed.
  *

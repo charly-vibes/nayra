@@ -131,7 +131,7 @@ Nayra follows a rigorous Spec-Driven Development (SDD) and Test-Driven Developme
 4. **Refactor**: Clean up while keeping tests green
 5. **Verify**: Ensure 60 FPS performance and 10,000+ event capacity
 
-See [AGENTS.md](AGENTS.md) for complete development guidelines.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for complete development guidelines.
 
 ## Data Format
 
@@ -278,7 +278,7 @@ We follow strict development practices:
 4. **Performance-Aware**: Always consider 60 FPS target
 5. **No Frameworks**: Maintain vanilla JS architecture
 
-See [AGENTS.md](AGENTS.md) for complete contribution guidelines.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow — issue tracking (Beads), spec proposals (OpenSpec), coding standards, and git conventions.
 
 ## Available Commands
 

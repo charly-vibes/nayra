@@ -363,7 +363,8 @@ Development dependencies only:
 ## Reference Documents
 
 - **Technical Architecture**: `Vanilla JS Data Visualization Backend Review.md`
-- **Development Workflow**: `AGENTS.md`
+- **Contributing**: `CONTRIBUTING.md` (issue tracking, spec proposals, git conventions)
+- **Agent Guidelines**: `AGENTS.md`
 - **Specifications**: `specs/*.feature` (11 files, 266 scenarios)
 - **Implementation Plan**: `plans/2026-01-12-comprehensive-specifications-plan.md`
 - **Research**: `research/2026-01-12-initial-codebase-architecture.md`

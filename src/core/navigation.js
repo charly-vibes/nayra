@@ -2,7 +2,7 @@ import { RationalScale } from './scale.js';
 
 const MIN_SECONDS_PER_PIXEL = 0.001;
 const MAX_SECONDS_PER_PIXEL = 1e15;
-const MIN_POINT_EVENT_SPAN = BigInt(86400); // 1 day fallback for point events
+const MIN_POINT_EVENT_SPAN = 86400n; // 1 day fallback for point events
 const ZOOM_PADDING = 0.2; // 20% padding each side
 
 /**

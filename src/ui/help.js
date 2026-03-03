@@ -507,6 +507,8 @@ export function createHelpMenu(container, options = {}) {
     <span style="margin: 0 8px;">switch tabs</span>
     <kbd style="background: #1a1a2e; padding: 2px 6px; border-radius: 3px; border: 1px solid #4a4a6a;">Esc</kbd>
     <span style="margin-left: 4px;">close</span>
+    <span style="margin: 0 12px; color: #3a3a5a;">|</span>
+    <a href="https://github.com/charly-vibes/nayra" target="_blank" rel="noopener" style="color: #00d9ff; text-decoration: none;">Documentation</a>
   `;
 
   content.appendChild(tabBar);

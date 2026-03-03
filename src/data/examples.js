@@ -15,6 +15,26 @@ export const EXAMPLES = [
     desc: 'Rise and fall of great civilizations throughout human history',
   },
   {
+    id: 'kurzgesagt-history',
+    label: 'The History of the World (Kurzgesagt)',
+    desc: 'Major milestones from the Big Bang to the Heat Death of the universe, inspired by Kurzgesagt (https://www.youtube.com/watch?v=5TbUxGZtwGI)',
+  },
+  {
+    id: 'human-era',
+    label: 'The Human Era (Kurzgesagt)',
+    desc: '12,000 years of human progress, from the first temple to the moon landing (https://www.youtube.com/watch?v=dGiQaabX3_o)',
+  },
+  {
+    id: 'dinosaur-apocalypse',
+    label: 'The Dinosaur Apocalypse (Kurzgesagt)',
+    desc: 'The last day of the dinosaurs, minute by minute, and its long-term aftermath (https://www.youtube.com/watch?v=CWu29PRCUvQ)',
+  },
+  {
+    id: 'the-anthropocene',
+    label: 'The Anthropocene (Kurzgesagt)',
+    desc: "Humanity's impact on Earth's geology and the future of our species (https://www.youtube.com/watch?v=czgOWmtGVGs)",
+  },
+  {
     id: 'wikidata-wars',
     label: 'Major Wars (Wikidata)',
     desc: 'Historical conflicts sourced from Wikidata SPARQL queries',

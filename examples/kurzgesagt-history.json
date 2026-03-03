@@ -1,0 +1,225 @@
+[
+  {
+    "id": "big-bang",
+    "start": "13.8 Ga",
+    "label": "The Big Bang",
+    "description": "The beginning of the universe, space, and time itself.",
+    "category": "cosmology",
+    "tags": ["universe", "origin", "kurzgesagt"],
+    "priority": 0
+  },
+  {
+    "id": "first-stars",
+    "start": "13.7 Ga",
+    "label": "First Stars & Galaxies",
+    "description": "The first stars ignite, ending the cosmic dark ages.",
+    "category": "cosmology",
+    "tags": ["stars", "galaxies", "kurzgesagt"]
+  },
+  {
+    "id": "sun-formation",
+    "start": "4.6 Ga",
+    "label": "Formation of the Sun",
+    "description": "Our star is born from a collapsing cloud of gas and dust.",
+    "category": "cosmology",
+    "tags": ["sun", "solar-system", "kurzgesagt"]
+  },
+  {
+    "id": "earth-formation",
+    "start": "4.5 Ga",
+    "label": "Formation of the Earth",
+    "description": "Earth forms from the leftover debris of the Sun's formation.",
+    "category": "geology",
+    "tags": ["earth", "formation", "kurzgesagt"],
+    "priority": 0
+  },
+  {
+    "id": "first-life",
+    "start": "4.1 Ga",
+    "label": "First Evidence of Life",
+    "description": "Earliest traces of single-celled life appear in the oceans.",
+    "category": "biology",
+    "tags": ["life", "origin", "kurzgesagt"]
+  },
+  {
+    "id": "photosynthesis",
+    "start": "3.5 Ga",
+    "label": "Photosynthesis Begins",
+    "description": "Life starts using sunlight to produce energy, releasing oxygen as a byproduct.",
+    "category": "biology",
+    "tags": ["oxygen", "evolution", "kurzgesagt"]
+  },
+  {
+    "id": "eukaryotes",
+    "start": "2.1 Ga",
+    "label": "Complex Cells (Eukaryotes)",
+    "description": "Cells with nuclei and organelles evolve, paving the way for complex life.",
+    "category": "biology",
+    "tags": ["cells", "evolution", "kurzgesagt"]
+  },
+  {
+    "id": "multicellular-life",
+    "start": "1.5 Ga",
+    "label": "Multicellular Life",
+    "description": "Individual cells begin to work together, forming larger organisms.",
+    "category": "biology",
+    "tags": ["evolution", "kurzgesagt"]
+  },
+  {
+    "id": "cambrian-explosion",
+    "start": "540 Ma",
+    "label": "Cambrian Explosion",
+    "description": "A rapid diversification of animal life leads to most major phyla.",
+    "category": "biology",
+    "tags": ["evolution", "animals", "kurzgesagt"],
+    "priority": 1
+  },
+  {
+    "id": "permian-extinction",
+    "start": "250 Ma",
+    "label": "Permian-Triassic Extinction",
+    "description": "The 'Great Dying' – the largest mass extinction in Earth's history.",
+    "category": "extinction",
+    "tags": ["extinction", "mass-extinction", "kurzgesagt"],
+    "priority": 1
+  },
+  {
+    "id": "first-dinosaurs",
+    "start": "230 Ma",
+    "label": "First Dinosaurs",
+    "description": "The era of the dinosaurs begins.",
+    "category": "biology",
+    "tags": ["dinosaurs", "mesozoic", "kurzgesagt"]
+  },
+  {
+    "id": "dinosaur-extinction",
+    "start": "66 Ma",
+    "label": "Dinosaur Extinction",
+    "description": "A massive asteroid impact ends the reign of the dinosaurs.",
+    "category": "extinction",
+    "tags": ["asteroid", "extinction", "dinosaurs", "kurzgesagt"],
+    "priority": 1
+  },
+  {
+    "id": "human-ancestor",
+    "start": "6 Ma",
+    "label": "Human-Chimp Ancestor",
+    "description": "The last common ancestor of humans and chimpanzees lived around this time.",
+    "category": "humanity",
+    "tags": ["evolution", "humans", "kurzgesagt"]
+  },
+  {
+    "id": "genus-homo",
+    "start": "2.5 Ma",
+    "label": "Genus Homo & Stone Tools",
+    "description": "Our ancestors begin using stone tools, a major technological leap.",
+    "category": "humanity",
+    "tags": ["tools", "evolution", "kurzgesagt"]
+  },
+  {
+    "id": "homo-sapiens",
+    "start": "0.2 Ma",
+    "label": "Modern Humans (Homo sapiens)",
+    "description": "Anatomically modern humans evolve in Africa.",
+    "category": "humanity",
+    "tags": ["evolution", "humans", "kurzgesagt"],
+    "priority": 0
+  },
+  {
+    "id": "cognitive-revolution",
+    "start": "0.07 Ma",
+    "label": "Cognitive Revolution",
+    "description": "Humans develop complex language, art, and abstract thought.",
+    "category": "humanity",
+    "tags": ["language", "culture", "kurzgesagt"]
+  },
+  {
+    "id": "agricultural-revolution",
+    "start": "0.012 Ma",
+    "label": "Agricultural Revolution",
+    "description": "Transition from hunter-gatherer lifestyles to settled farming.",
+    "category": "humanity",
+    "tags": ["farming", "civilization", "kurzgesagt"]
+  },
+  {
+    "id": "first-civilizations",
+    "start": "3000 BCE",
+    "label": "First Civilizations",
+    "description": "Sumer, Egypt, and the invention of writing mark the start of recorded history.",
+    "category": "humanity",
+    "tags": ["writing", "history", "kurzgesagt"]
+  },
+  {
+    "id": "scientific-revolution",
+    "start": "1543 CE",
+    "label": "Scientific Revolution",
+    "description": "Modern science begins to transform our understanding of the world.",
+    "category": "humanity",
+    "tags": ["science", "history", "kurzgesagt"]
+  },
+  {
+    "id": "industrial-revolution",
+    "start": "1760 CE",
+    "label": "Industrial Revolution",
+    "description": "Steam power and machinery lead to rapid global industrialization.",
+    "category": "humanity",
+    "tags": ["technology", "history", "kurzgesagt"]
+  },
+  {
+    "id": "today",
+    "start": "today",
+    "label": "Today",
+    "description": "The Information Age and the beginning of the Anthropocene.",
+    "category": "humanity",
+    "tags": ["current", "anthropocene", "kurzgesagt"],
+    "priority": 0
+  },
+  {
+    "id": "future-asteroid",
+    "start": "-100 Ma",
+    "label": "Future Asteroid Impact",
+    "description": "Earth will likely be hit by another dinosaur-scale asteroid.",
+    "category": "future",
+    "tags": ["future", "asteroid", "kurzgesagt"]
+  },
+  {
+    "id": "uninhabitable-earth",
+    "start": "-1 Ga",
+    "label": "Earth Becomes Uninhabitable",
+    "description": "The Sun's increasing heat evaporates the oceans.",
+    "category": "future",
+    "tags": ["future", "sun", "earth", "kurzgesagt"]
+  },
+  {
+    "id": "galaxy-collision",
+    "start": "-4 Ga",
+    "label": "Milky Way-Andromeda Collision",
+    "description": "Our galaxy begins to merge with the Andromeda galaxy.",
+    "category": "future",
+    "tags": ["future", "galaxy", "kurzgesagt"]
+  },
+  {
+    "id": "sun-red-giant",
+    "start": "-5 Ga",
+    "label": "Sun Becomes a Red Giant",
+    "description": "The Sun expands, likely consuming Mercury, Venus, and Earth.",
+    "category": "future",
+    "tags": ["future", "sun", "solar-system", "kurzgesagt"]
+  },
+  {
+    "id": "last-stars",
+    "start": "-1e5 Ga",
+    "label": "The Last Stars Die",
+    "description": "The Stelliferous Era ends as the last red dwarfs burn out.",
+    "category": "future",
+    "tags": ["future", "stars", "universe", "kurzgesagt"]
+  },
+  {
+    "id": "heat-death",
+    "start": "-1e91 Ga",
+    "label": "Heat Death of the Universe",
+    "description": "The universe reaches maximum entropy, and nothing ever happens again.",
+    "category": "future",
+    "tags": ["future", "universe", "entropy", "kurzgesagt"]
+  }
+]

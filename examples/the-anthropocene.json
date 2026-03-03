@@ -1,0 +1,77 @@
+[
+  {
+    "id": "agriculture-start",
+    "start": "8000 BCE",
+    "label": "Year 2,000 HE: Agricultural Revolution",
+    "description": "Humanity's impact begins as we start modifying the environment to grow food.",
+    "category": "humanity",
+    "tags": ["agriculture", "impact", "kurzgesagt"]
+  },
+  {
+    "id": "early-cities",
+    "start": "5000 BCE",
+    "label": "Year 5,000 HE: Rise of Cities",
+    "description": "Humans begin to cluster into the first urban settlements, creating concentrated environmental impacts.",
+    "category": "humanity",
+    "tags": ["urbanization", "kurzgesagt"]
+  },
+  {
+    "id": "industrial-revolution-he",
+    "start": "1760 CE",
+    "label": "Year 11,760 HE: Industrial Revolution",
+    "description": "The steam engine and fossil fuels mark the true beginning of massive human impact on Earth's atmosphere.",
+    "category": "humanity",
+    "tags": ["industrial", "coal", "kurzgesagt"],
+    "priority": 0
+  },
+  {
+    "id": "great-acceleration",
+    "start": "1950 CE",
+    "label": "Year 11,950 HE: The Great Acceleration",
+    "description": "A sharp increase in human activity and population leads to rapid changes in Earth's chemistry and biology.",
+    "category": "humanity",
+    "tags": ["acceleration", "growth", "kurzgesagt"],
+    "priority": 0
+  },
+  {
+    "id": "atomic-age",
+    "start": "1945 CE",
+    "label": "Year 11,945 HE: The Atomic Age",
+    "description": "Nuclear testing leaves a permanent radioactive marker in the global geological record.",
+    "category": "humanity",
+    "tags": ["nuclear", "marker", "kurzgesagt"]
+  },
+  {
+    "id": "anthropocene-today",
+    "start": "today",
+    "label": "Year 12,026 HE: The Anthropocene Today",
+    "description": "Humans are now the primary driver of environmental change. Our activities redefine the planet's future.",
+    "category": "humanity",
+    "tags": ["current", "impact", "kurzgesagt"],
+    "priority": 0
+  },
+  {
+    "id": "climate-tipping-points",
+    "start": "2050 CE",
+    "label": "Year 12,050 HE: Climate Tipping Points?",
+    "description": "Potential future where critical climate boundaries are reached unless major changes are made.",
+    "category": "future",
+    "tags": ["climate", "future", "kurzgesagt"]
+  },
+  {
+    "id": "sustainable-civilization",
+    "start": "2100 CE",
+    "label": "Year 12,100 HE: Sustainable Future?",
+    "description": "A possible transition to a circular, carbon-neutral global society.",
+    "category": "future",
+    "tags": ["sustainability", "future", "kurzgesagt"]
+  },
+  {
+    "id": "far-future-humanity",
+    "start": "10000 CE",
+    "label": "Year 20,000 HE: The Far Future",
+    "description": "What will the world look like in 10,000 years? Humanity's long-term legacy on Earth and beyond.",
+    "category": "future",
+    "tags": ["future", "legacy", "kurzgesagt"]
+  }
+]

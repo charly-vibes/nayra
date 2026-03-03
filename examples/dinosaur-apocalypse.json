@@ -1,0 +1,70 @@
+[
+  {
+    "id": "asteroid-impact",
+    "start": "66 Ma",
+    "label": "Impact: The Chicxulub Asteroid",
+    "description": "A 10km-wide asteroid strikes the Yucatan Peninsula. The energy release is equivalent to billions of Hiroshima bombs, vaporizing rock and water instantly.",
+    "category": "geology",
+    "tags": ["impact", "asteroid", "extinction", "kurzgesagt"],
+    "priority": 0
+  },
+  {
+    "id": "shockwave",
+    "start": "66 Ma",
+    "label": "Minutes Later: Supersonic Shockwave",
+    "description": "A massive shockwave radiates from the impact site, leveling forests and destroying everything in its path for thousands of kilometers.",
+    "category": "geology",
+    "tags": ["shockwave", "destruction", "kurzgesagt"]
+  },
+  {
+    "id": "ejecta-fire",
+    "start": "66 Ma",
+    "label": "Hours Later: The Sky on Fire",
+    "description": "Vaporized rock launched into space falls back as 'ejecta'. Friction heats the atmosphere to oven-like temperatures, igniting global wildfires.",
+    "category": "extinction",
+    "tags": ["fire", "heat", "kurzgesagt"],
+    "priority": 1
+  },
+  {
+    "id": "megatsunamis",
+    "start": "66 Ma",
+    "label": "Hours Later: Megatsunamis",
+    "description": "Massive waves hundreds of meters high scour the coastlines of the world, rearranging the geography of the Gulf of Mexico.",
+    "category": "geology",
+    "tags": ["tsunami", "water", "kurzgesagt"]
+  },
+  {
+    "id": "impact-winter",
+    "start": "65.99 Ma",
+    "label": "Weeks Later: Impact Winter",
+    "description": "Soot and sulfur block the sun. Photosynthesis stops, and global temperatures plummet. The world enters a deep, dark freeze.",
+    "category": "geology",
+    "tags": ["winter", "climate", "kurzgesagt"],
+    "priority": 0
+  },
+  {
+    "id": "acid-rain",
+    "start": "65.99 Ma",
+    "label": "Months Later: Acid Rain",
+    "description": "Sulfur in the atmosphere creates highly acidic rain, devastating the remaining vegetation and marine life.",
+    "category": "extinction",
+    "tags": ["acid-rain", "pollution", "kurzgesagt"]
+  },
+  {
+    "id": "mass-extinction-dinosaurs",
+    "start": "65.98 Ma",
+    "label": "Years Later: The End of Dinosaurs",
+    "description": "With the food chain shattered, 75% of all species, including all non-avian dinosaurs, go extinct.",
+    "category": "extinction",
+    "tags": ["extinction", "dinosaurs", "kurzgesagt"],
+    "priority": 0
+  },
+  {
+    "id": "survivors-recovery",
+    "start": "65.9 Ma",
+    "label": "100k Years Later: Life Recovers",
+    "description": "Small scavengers and burrowing mammals emerge into a new world, beginning the long process of evolutionary recovery.",
+    "category": "biology",
+    "tags": ["recovery", "mammals", "evolution", "kurzgesagt"]
+  }
+]

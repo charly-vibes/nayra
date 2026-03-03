@@ -250,6 +250,22 @@ const DATA_CONTENT = `
         <td style="padding: 6px 0; color: #a0a0b0;">Great empires throughout history</td>
       </tr>
       <tr style="border-bottom: 1px solid #3a3a4e;">
+        <td style="padding: 6px 12px 6px 0; font-family: monospace; color: #00d9ff;">kurzgesagt-history</td>
+        <td style="padding: 6px 0; color: #a0a0b0;">Deep time to far future, inspired by Kurzgesagt (https://www.youtube.com/watch?v=5TbUxGZtwGI)</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #3a3a4e;">
+        <td style="padding: 6px 12px 6px 0; font-family: monospace; color: #00d9ff;">human-era</td>
+        <td style="padding: 6px 0; color: #a0a0b0;">12,000 years of progress, inspired by Kurzgesagt (https://www.youtube.com/watch?v=dGiQaabX3_o)</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #3a3a4e;">
+        <td style="padding: 6px 12px 6px 0; font-family: monospace; color: #00d9ff;">dinosaur-apocalypse</td>
+        <td style="padding: 6px 0; color: #a0a0b0;">The last day of the dinosaurs (https://www.youtube.com/watch?v=CWu29PRCUvQ)</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #3a3a4e;">
+        <td style="padding: 6px 12px 6px 0; font-family: monospace; color: #00d9ff;">the-anthropocene</td>
+        <td style="padding: 6px 0; color: #a0a0b0;">Humanity's impact on Earth (https://www.youtube.com/watch?v=czgOWmtGVGs)</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #3a3a4e;">
         <td style="padding: 6px 12px 6px 0; font-family: monospace; color: #00d9ff;">wikidata-wars</td>
         <td style="padding: 6px 0; color: #a0a0b0;">Historical conflicts from Wikidata</td>
       </tr>

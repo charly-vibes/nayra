@@ -81,7 +81,7 @@ export function parseTimeQuery(query) {
   }
 
   // Ga/BYA: billion years ago
-  const gaMatch = trimmed.match(/^(-?\d+(?:\.\d+)?)\s*(ga|bya)$/);
+  const gaMatch = trimmed.match(/^(-?\d+(?:\.\d+)?(?:e[+-]?\d+)?)\s*(ga|bya)$/);
   if (gaMatch) {
     const value = parseFloat(gaMatch[1]);
     const seconds = BigInt(Math.round(value * Number(BILLION_YEARS)));
@@ -93,7 +93,7 @@ export function parseTimeQuery(query) {
   }
 
   // Ma/MYA: million years ago
-  const maMatch = trimmed.match(/^(-?\d+(?:\.\d+)?)\s*(ma|mya)$/);
+  const maMatch = trimmed.match(/^(-?\d+(?:\.\d+)?(?:e[+-]?\d+)?)\s*(ma|mya)$/);
   if (maMatch) {
     const value = parseFloat(maMatch[1]);
     const seconds = BigInt(Math.round(value * Number(MILLION_YEARS)));

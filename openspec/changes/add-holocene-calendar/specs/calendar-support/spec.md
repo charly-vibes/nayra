@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Calendar Mode Selection
-The system SHALL support two calendar display modes: `gregorian` (default) and `holocene`. The active mode SHALL be stored in global state and persist across re-renders.
+The system SHALL support two calendar display modes: `gregorian` (default) and `holocene`. The active mode SHALL be stored in application state, persist across re-renders, and be restorable from the URL.
 
 #### Scenario: Default mode is Gregorian
 - **WHEN** the application loads without a `cal` URL parameter
@@ -18,7 +18,7 @@ The system SHALL support two calendar display modes: `gregorian` (default) and `
 ---
 
 ### Requirement: Human Era Year Formatting
-When calendar mode is `holocene`, the system SHALL display years using the Human Era convention: `HE_year = astronomical_year + 10,000`. Years SHALL be displayed as positive integers with an `HE` suffix. BCE/CE notation SHALL NOT appear in HE mode.
+When calendar mode is `holocene`, the system SHALL display years using the Human Era convention: `HE_year = astronomical_year + 10,000`. Years at or after 10,000 BCE SHALL display as positive integers with an `HE` suffix. Years before 10,000 BCE SHALL display as positive integers with a `BHE` (Before Human Era) suffix. BCE/CE notation SHALL NOT appear in HE mode.
 
 #### Scenario: CE year in HE mode
 - **WHEN** calendar is `holocene` and an event or axis label has year 2024 CE (astronomical 2024)
@@ -32,9 +32,17 @@ When calendar mode is `holocene`, the system SHALL display years using the Human
 - **WHEN** calendar is `holocene` and a timestamp corresponds to 10,000 BCE (astronomical −9,999)
 - **THEN** it displays as `1 HE`
 
+#### Scenario: Pre-Human Era year in HE mode
+- **WHEN** calendar is `holocene` and a timestamp corresponds to 50,000 BCE (astronomical −49,999)
+- **THEN** it displays as `39,999 BHE`
+
 #### Scenario: Year range in HE mode
 - **WHEN** calendar is `holocene` and an event spans from 500 BCE to 2024 CE
 - **THEN** the range displays as `9,501 – 12,024 HE` (suffix once at end)
+
+#### Scenario: Sub-year precision suppressed in HE mode
+- **WHEN** calendar is `holocene` and an event has day or month precision
+- **THEN** it displays as a year-only HE label (e.g. `12,024 HE`, not `Jan 1, 12,024 HE`)
 
 #### Scenario: Deep time unaffected
 - **WHEN** calendar is `holocene` and a timestamp is in the Ma or Ga range
@@ -43,7 +51,7 @@ When calendar mode is `holocene`, the system SHALL display years using the Human
 ---
 
 ### Requirement: Calendar URL Persistence
-The active calendar mode SHALL be encoded in the URL hash as `cal=he` (Holocene) or omitted (Gregorian). On load, the app SHALL restore calendar mode from the URL.
+The active calendar mode SHALL be encoded in the URL hash as `cal=he` (Holocene) or omitted (Gregorian) in all URL outputs (full-state and search-only). On load, the app SHALL restore calendar mode from the URL.
 
 #### Scenario: HE mode encoded in URL
 - **WHEN** calendar is `holocene`

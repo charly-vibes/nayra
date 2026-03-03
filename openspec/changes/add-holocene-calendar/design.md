@@ -35,7 +35,19 @@ HE conversion is a display-layer year arithmetic operation (`year + 10000`), not
 1. **BigInt path** (line 36): used when time is outside JavaScript `Date` range. Derives `year = 1970 + yearsFromEpoch`.
 2. **Date path** (line 43): used for timestamps within `Date` range. Derives `year = date.getUTCFullYear()`.
 
-Both must apply `if (calendar === 'holocene') year += 10000` before formatting. The `year < 1` BCE check must run **before** the HE offset in the original year variable, and the HE year is always displayed as a plain positive integer with the `HE` suffix (never "BCE").
+Both must delegate to `toDisplayYear(year, calendar)` instead of the inline BCE/CE logic. Pseudocode for the shared helper:
+
+```
+function toDisplayYear(astronomicalYear, calendar):
+  if calendar !== 'holocene':
+    if astronomicalYear < 1: return `${1 - astronomicalYear} BCE`
+    return String(astronomicalYear)
+  heYear = astronomicalYear + 10000
+  if heYear >= 1: return `${heYear} HE`
+  return `${1 - heYear} BHE`   // before 10,000 BCE
+```
+
+HE years are always positive; the `year < 1` BCE check is never used in HE mode. Sub-year precision (`day`, `month`) is suppressed to year-only in HE mode (see Day/Month Precision decision below).
 
 ### `timeToYear` in `formatTimeRange` also needs HE awareness
 `formatTimeRange` calls `timeToYear()` directly for range labels (lines 96–99), bypassing `formatYear`. The range year values must also be offset. Either pass `calendar` into `formatTimeRange` and apply the offset to both `startYear` and `endYear`, or extract a shared `toDisplayYear(timeValue, calendar)` helper.
@@ -47,17 +59,29 @@ HE only applies in the `year` scale (below `MILLION_YEARS`). Geological scales (
 
 ### URL parameter
 - Key: `cal`, value: `he` when active. Absence defaults to `gregorian`. Invalid values silently fall back to `gregorian`.
-- `encodeAllState` and `encodeSearchState` both emit `cal=he` when active.
-- `decodeViewportState` and `decodeSearchState` both read `cal` and return `calendar: 'holocene' | 'gregorian'`.
+- Both `encodeAllState` and `encodeSearchState` emit `cal=he` when active, so all shareable URLs (search-only or full-viewport) preserve calendar mode.
+- Both `decodeViewportState` and `decodeSearchState` read `cal` and return `calendar: 'holocene' | 'gregorian'`.
 - `RESTORE_FROM_URL` action in `store.js` must include `calendar`.
+
+### Day/month precision in HE mode
+`formatYear` handles `precision === 'day'` → "Jan 1, 2024" and `precision === 'month'` → "Jan 2024". In HE mode these precisions are suppressed to year-only — month names do not combine naturally with the HE count — returning e.g. `"12,024 HE"` regardless of precision.
+
+### `needsCirca` prefix with HE suffix
+The "c. " circa prefix is retained in HE mode: `"c. 12,024 HE"`. This preserves the precision signal without ambiguity.
 
 ### Keyboard shortcut
 `k` (mnemonic: K for Kurzgesagt / Kalender) toggles calendar mode. Verified free: only `?`, `Tab`, `Enter`, `Space`, and arrow keys are currently bound.
 
 ## Risks / Trade-offs
-- **Confusion at year 0 boundary:** 1 BCE → 10,000 HE, 1 CE → 10,001 HE. This is a 1-year gap in the HE sequence at the BCE/CE boundary because the Gregorian calendar has no year 0. Acceptable — same behavior as the standard Holocene calendar definition.
-- **BCE display eliminated in HE mode:** Events in BCE display as "9,501 HE" not "500 BCE". A parenthetical Gregorian date is not required.
+- **Year 10,000 HE is not a round milestone:** Because the codebase uses astronomical years (1 BCE = 0, 1 CE = 1), the sequence is continuous — 1 BCE → 10,000 HE, 1 CE → 10,001 HE with no gap. Users expecting "Year 10,000" to mark exactly the 1 CE boundary will be surprised; it actually marks 1 BCE. Acceptable — this is standard Holocene calendar behaviour.
+- **BCE display eliminated in HE mode:** Events previously labelled "500 BCE" display as "9,501 HE". No parenthetical Gregorian date is required.
+- **Pre-10,000 BCE events get BHE notation:** Events earlier than 10,000 BCE (astronomical year < −9,999) produce HE years below 1. These are displayed as "X BHE" (Before Human Era), analogous to BCE. For example, 50,000 BCE → "39,999 BHE". This is a new notation not in common use; a tooltip explanation may be warranted.
+
+## Migration Plan
+No migration required. This change is purely additive — `gregorian` is the default and all existing URLs and data are unaffected.
 
 ## Open Questions
 - Should the calendar toggle appear as a button in the help modal, a dedicated UI widget, or both?
-- Should `encodeSearchState` (search-only hash) also include `cal`? Currently scoped to `encodeAllState` only.
+  - **Decision:** Button in the help/settings modal (simplest; consistent with existing settings UI). No dedicated widget in MVP.
+- Should `encodeSearchState` (search-only hash) also include `cal`?
+  - **Decision:** Yes — include `cal` in all URL outputs. Partial persistence (search URLs losing calendar mode) is a confusing UX bug that outweighs the added complexity of one extra param.

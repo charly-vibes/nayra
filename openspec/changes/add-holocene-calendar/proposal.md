@@ -7,7 +7,7 @@ Users exploring deep human history — especially Kurzgesagt-style timelines —
 - Add `calendar: 'gregorian' | 'holocene'` to global store state with `SET_CALENDAR` action
 - Update `src/ui/format.js`: `formatYear` and `formatTimeRange` to apply HE conversion when active
 - Update `src/rendering/renderer.js`: grid axis labels respect calendar preference
-- Add `cal=he` URL hash parameter; update `encodeAllState`, `decodeViewportState`, and `RESTORE_FROM_URL`
+- Add `cal=he` URL hash parameter; update `encodeAllState`, `encodeSearchState`, `decodeViewportState`, and `decodeSearchState` in `src/core/url-state.js`; update `RESTORE_FROM_URL` action in `src/core/store.js`
 - Add calendar toggle in Help/Settings UI and `k` keyboard shortcut
 
 ## Impact

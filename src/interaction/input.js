@@ -24,6 +24,8 @@ export const DEFAULT_SCALE = RationalScale.fromSecondsPerPixel(Number(YEAR));
 export const KEYBOARD_SHORTCUTS = {
   Home: 'jumpToFirst',
   End: 'jumpToLast',
+  H: 'jumpToFirst',
+  L: 'jumpToLast',
   h: 'jumpToToday',
   '/': 'openSearch',
   '?': 'toggleHelp',
@@ -188,9 +190,21 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
     momentumRaf = requestAnimationFrame(step);
   }
 
+  function getSelectedEventCenterPx(state, canvasWidth) {
+    if (state.selectedEventIds.size !== 1) return null;
+    const [selectedId] = state.selectedEventIds;
+    const event = state.events.find(e => e.id === selectedId);
+    if (!event) return null;
+    const centerTime = event.start + (event.end != null ? event.end - event.start : 0n) / 2n;
+    const px = state.scale.timeToPx(centerTime - state.viewportStart);
+    if (px < 0 || px > canvasWidth) return null;
+    return px;
+  }
+
   function applyZoomAtPosition(clientX, rect, zoomIn) {
-    const mouseX = clientX - rect.left;
     const state = store.getState();
+    const selectedPx = getSelectedEventCenterPx(state, rect.width);
+    const mouseX = selectedPx !== null ? selectedPx : clientX - rect.left;
     const anchor = state.viewportStart + state.scale.pxToTime(mouseX);
     const factor = zoomIn ? ZOOM_FACTOR : 1 / ZOOM_FACTOR;
     const currentSpp = state.scale.getSecondsPerPixel();
@@ -516,10 +530,14 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
     e.preventDefault();
 
     const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
     const state = store.getState();
 
-    const anchor = state.viewportStart + state.scale.pxToTime(mouseX);
+    // Use selected event center as zoom anchor when an event is selected,
+    // otherwise fall back to mouse position.
+    const selectedPx = getSelectedEventCenterPx(state, rect.width);
+    const anchorX = selectedPx !== null ? selectedPx : e.clientX - rect.left;
+
+    const anchor = state.viewportStart + state.scale.pxToTime(anchorX);
 
     const zoomIn = e.deltaY < 0;
     const factor = zoomIn ? ZOOM_FACTOR : 1 / ZOOM_FACTOR;
@@ -530,7 +548,7 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
 
     const newScale = RationalScale.fromSecondsPerPixel(newSpp);
 
-    const newStart = anchor - newScale.pxToTime(mouseX);
+    const newStart = anchor - newScale.pxToTime(anchorX);
 
     store.dispatch({ type: 'SET_VIEWPORT', viewportStart: newStart, scale: newScale });
   }
@@ -547,12 +565,21 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
       return;
     }
 
-    // Handle Enter/Space to activate (select) focused event
-    if ((e.key === 'Enter' || e.key === ' ') && focusManager) {
+    // Handle Enter/Space to activate (select) focused event, or open already-selected event
+    if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      const focusedEventId = focusManager.getFocus();
+      const focusedEventId = focusManager ? focusManager.getFocus() : null;
       if (focusedEventId) {
         store.dispatch({ type: 'SELECT_EVENT', eventId: focusedEventId });
+      } else {
+        // Open the currently selected event's detail panel (nayra-1l2)
+        const state = store.getState();
+        if (state.selectedEventIds.size > 0) {
+          const [selectedId] = state.selectedEventIds;
+          if (callbacks.onOpenSelectedEvent) {
+            callbacks.onOpenSelectedEvent(selectedId);
+          }
+        }
       }
       return;
     }
@@ -562,24 +589,24 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
       const state = store.getState();
       const { viewportStart, scale } = jumpToToday(state.canvasWidth);
       store.dispatch({ type: 'SET_VIEWPORT', viewportStart, scale });
-    } else if (action === 'jumpToFirst' && focusManager) {
+    } else if (action === 'jumpToFirst') {
       e.preventDefault();
       const state = store.getState();
       if (state.events.length > 0) {
         const firstEvent = state.events[0];
-        focusManager.focusFirst();
+        if (focusManager) focusManager.focusFirst();
         // Pan viewport to show the first event
         const eventPosition = firstEvent.start;
         const halfWidthTime = state.scale.pxToTime(state.canvasWidth / 2);
         const newViewportStart = eventPosition - halfWidthTime;
         store.dispatch({ type: 'SET_VIEWPORT', viewportStart: newViewportStart, scale: state.scale });
       }
-    } else if (action === 'jumpToLast' && focusManager) {
+    } else if (action === 'jumpToLast') {
       e.preventDefault();
       const state = store.getState();
       if (state.events.length > 0) {
         const lastEvent = state.events[state.events.length - 1];
-        focusManager.focusLast();
+        if (focusManager) focusManager.focusLast();
         // Pan viewport to show the last event
         const eventPosition = lastEvent.start;
         const halfWidthTime = state.scale.pxToTime(state.canvasWidth / 2);

@@ -73,8 +73,9 @@ export function getSearchAlpha(searchState) {
  * @param {number} maxWidth - Maximum width for the label
  * @param {number} eventHeight - Height of the event rectangle
  * @param {string} [highlightQuery=''] - Active search query (empty = no highlighting)
+ * @param {number} [symbolOffset=0] - Additional x offset to clear a symbol/shape indicator
  */
-export function renderHighlightedLabel(ctx, text, x, y, maxWidth, eventHeight, highlightQuery = '') {
+export function renderHighlightedLabel(ctx, text, x, y, maxWidth, eventHeight, highlightQuery = '', symbolOffset = 0) {
   if (!text) return;
 
   ctx.save();
@@ -84,11 +85,13 @@ export function renderHighlightedLabel(ctx, text, x, y, maxWidth, eventHeight, h
   ctx.textAlign = 'left';
 
   const labelY = y + eventHeight / 2;
-  const textX = x + LABEL_PADDING;
 
-  // Clip to event bounds
+  // Text starts after the symbol/shape indicator plus standard padding
+  const textX = x + LABEL_PADDING + symbolOffset;
+
+  // Clip to event bounds (from text start to right edge of event)
   ctx.beginPath();
-  ctx.rect(textX, y, maxWidth - LABEL_PADDING * 2, eventHeight);
+  ctx.rect(textX, y, maxWidth - LABEL_PADDING - symbolOffset, eventHeight);
   ctx.clip();
 
   const spans = getMatchSpans(text, highlightQuery);

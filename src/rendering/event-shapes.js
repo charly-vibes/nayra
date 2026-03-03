@@ -109,6 +109,23 @@ export function drawShape(ctx, shape, cx, cy, size, color) {
 }
 
 /**
+ * Calculate the X offset (from the event bar's left edge) where the shape
+ * indicator's right edge falls, plus a small gap. Label text should start
+ * at or after this offset so it doesn't overlap the shape.
+ *
+ * @param {number} width - Event rectangle width
+ * @param {number} height - Event rectangle height
+ * @returns {number} Minimum x offset (from bar left) at which label text should start
+ */
+export function getShapeIndicatorLabelOffset(width, height) {
+  const size = Math.min(height * 0.28, 4);
+  if (size < 1) return 0; // No shape drawn, no offset needed
+  const cx = Math.min(width * 0.5, height * 0.5);
+  // Right edge of shape + 2px gap
+  return cx + size + 2;
+}
+
+/**
  * Draw the category shape indicator inside an event rectangle.
  * The shape is drawn as a small white symbol to be visible on any category color.
  *

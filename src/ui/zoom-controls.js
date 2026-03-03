@@ -2,8 +2,8 @@ export function createZoomControls(container, { onZoomIn, onZoomOut, onFitToCont
   const controlsContainer = document.createElement('div');
   controlsContainer.setAttribute('aria-label', 'Zoom controls');
   controlsContainer.style.position = 'fixed';
-  controlsContainer.style.bottom = 'env(safe-area-inset-bottom, 16px)';
-  controlsContainer.style.left = 'env(safe-area-inset-left, 16px)';
+  controlsContainer.style.top = 'env(safe-area-inset-top, 16px)';
+  controlsContainer.style.right = 'env(safe-area-inset-right, 16px)';
   controlsContainer.style.display = 'flex';
   controlsContainer.style.flexDirection = 'column';
   controlsContainer.style.gap = '8px';

@@ -25,7 +25,7 @@ import {
   getSearchAlpha,
   renderHighlightedLabel,
 } from './search-highlight.js';
-import { drawEventShapeIndicator } from './event-shapes.js';
+import { drawEventShapeIndicator, getShapeIndicatorLabelOffset } from './event-shapes.js';
 import { applyDpiScaling, getLogicalSize } from './dpi-scaling.js';
 
 let ctx = null;
@@ -327,6 +327,7 @@ export function draw(state) {
 
       for (const eventData of eventsWithBounds) {
         if (visibleLabels.has(eventData.id) && eventData.label) {
+          const symbolOffset = eventData.bounds.symbolOffset || 0;
           if (state.searchQuery) {
             renderHighlightedLabel(
               ctx,
@@ -335,7 +336,8 @@ export function draw(state) {
               eventData.bounds.y,
               eventData.bounds.width,
               eventData.bounds.height,
-              state.searchQuery
+              state.searchQuery,
+              symbolOffset
             );
           } else {
             renderLabel(
@@ -344,7 +346,8 @@ export function draw(state) {
               eventData.bounds.x,
               eventData.bounds.y,
               eventData.bounds.width,
-              eventData.bounds.height
+              eventData.bounds.height,
+              symbolOffset
             );
           }
         }
@@ -466,8 +469,13 @@ function drawEvent(event, state, axisY, canvasWidth, lod, searchResultSet = null
 
   ctx.globalAlpha = 1.0;
 
-  // Return bounds for label collision detection
-  return { x, y, width: displayWidth, height: EVENT_HEIGHT };
+  // Calculate label x offset to avoid overlapping the shape indicator
+  const symbolOffset = renderAsPoint
+    ? 0
+    : getShapeIndicatorLabelOffset(displayWidth, EVENT_HEIGHT);
+
+  // Return bounds for label collision detection (includes symbolOffset for text positioning)
+  return { x, y, width: displayWidth, height: EVENT_HEIGHT, symbolOffset };
 }
 
 export function hashCode(str) {
@@ -566,34 +574,60 @@ export function getGridInterval(secondsPerPixel, targetPixelSpacing = 100) {
   return { interval: BILLION_YEARS, unit: 'Ga', multiplier: 1n };
 }
 
+const MONTH_ABBREVS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+// Ordinal suffix for century labels: 1 → "1st", 2 → "2nd", 3 → "3rd", 4 → "4th", …
+function ordinalSuffix(n) {
+  const abs = Math.abs(n);
+  const mod100 = abs % 100;
+  if (mod100 >= 11 && mod100 <= 13) return `${abs}th`;
+  const mod10 = abs % 10;
+  if (mod10 === 1) return `${abs}st`;
+  if (mod10 === 2) return `${abs}nd`;
+  if (mod10 === 3) return `${abs}rd`;
+  return `${abs}th`;
+}
+
 export function formatTime(timeValue, unit, interval) {
   if (unit === 'Ga') {
-    const gaWhole = timeValue / BILLION_YEARS;
-    const gaRemainder = timeValue % BILLION_YEARS;
+    const gaAbs = timeValue < 0n ? -timeValue : timeValue;
+    const gaWhole = gaAbs / BILLION_YEARS;
+    const gaRemainder = gaAbs % BILLION_YEARS;
     const decimal = Number(gaRemainder * 10n / BILLION_YEARS);
     const gaNum = Number(gaWhole) + decimal / 10;
-    if (gaNum < 0) {
-      return `${Math.abs(gaNum).toFixed(1)} Ga`;
+    if (timeValue <= 0n) {
+      return `${gaNum.toFixed(1)} Bya`;
     }
     return `+${gaNum.toFixed(1)} Ga`;
   }
 
   if (unit === 'Ma') {
-    const maWhole = timeValue / MILLION_YEARS;
-    const maNum = Number(maWhole);
-    if (maNum < 0) {
-      return `${Math.abs(maNum)} Ma`;
+    const maAbs = timeValue < 0n ? -timeValue : timeValue;
+    const maWhole = maAbs / MILLION_YEARS;
+    const maRemainder = maAbs % MILLION_YEARS;
+    const maInt = Number(maWhole);
+    if (timeValue <= 0n) {
+      if (maInt === 0) {
+        const tenths = Number(maRemainder * 10n / MILLION_YEARS);
+        return `0.${tenths} Mya`;
+      }
+      return `${maInt} Mya`;
     }
-    return `+${maNum} Ma`;
+    return `+${maInt} Ma`;
   }
 
   if (unit === 'ky') {
-    const kyWhole = timeValue / (YEAR * 1000n);
-    const kyNum = Number(kyWhole);
-    if (kyNum < 0) {
-      return `${Math.abs(kyNum)} kya`;
+    const kyAbs = timeValue < 0n ? -timeValue : timeValue;
+    const kyWhole = kyAbs / (YEAR * 1000n);
+    const kyInt = Number(kyWhole);
+    if (timeValue <= 0n) {
+      if (kyInt === 0) {
+        const yrs = Number(kyAbs / YEAR);
+        return yrs > 0 ? `${yrs.toLocaleString()} BCE` : 'now';
+      }
+      return `${kyInt} kya`;
     }
-    return `${kyNum} ky`;
+    return `${kyInt} ky`;
   }
 
   const secondsFromEpoch = Number(timeValue);
@@ -603,16 +637,65 @@ export function formatTime(timeValue, unit, interval) {
   }
 
   const date = new Date(secondsFromEpoch * 1000);
+  const month = MONTH_ABBREVS[date.getUTCMonth()];
 
   if (unit === 'y') {
-    return `${date.getUTCFullYear()}`;
+    const yr = date.getUTCFullYear();
+    if (yr > 0) {
+      if (interval !== undefined && interval >= YEAR * 100n) {
+        const century = Math.ceil(yr / 100);
+        return `${ordinalSuffix(century)} c.`;
+      }
+      return `${yr}`;
+    }
+    // BCE: getUTCFullYear() 0 → 1 BCE, -1 → 2 BCE, etc.
+    const bceYear = 1 - yr;
+    if (interval !== undefined && interval >= YEAR * 100n) {
+      const century = Math.ceil(bceYear / 100);
+      return `${ordinalSuffix(century)} c. BCE`;
+    }
+    if (bceYear >= 1000) {
+      return `${bceYear.toLocaleString()} BCE`;
+    }
+    return `${bceYear} BCE`;
   }
 
-  if (unit === 'd' || unit === 'h' || unit === 'min') {
-    const year = date.getUTCFullYear();
-    const month = date.getUTCMonth() + 1;
+  if (unit === 'd') {
+    // Day-level resolution: show "Jan 8" — year context comes from neighboring labels
     const day = date.getUTCDate();
-    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    // Show year when it's the first day of the year to provide context
+    if (day === 1 && date.getUTCMonth() === 0) {
+      return `${date.getUTCFullYear()}`;
+    }
+    // Show month name when it's the first of the month
+    if (day === 1) {
+      return `${month} '${String(date.getUTCFullYear()).slice(-2)}`;
+    }
+    return `${month} ${day}`;
+  }
+
+  if (unit === 'h') {
+    // Hour-level resolution: show "Jan 8" or time for intra-day
+    const day = date.getUTCDate();
+    const hours = date.getUTCHours();
+    if (hours === 0) {
+      return `${month} ${day}`;
+    }
+    return `${String(hours).padStart(2, '0')}:00`;
+  }
+
+  if (unit === 'min') {
+    // Minute-level resolution: show HH:MM
+    const hours = date.getUTCHours();
+    const minutes = date.getUTCMinutes();
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+  }
+
+  if (unit === 's') {
+    const hours = date.getUTCHours();
+    const minutes = date.getUTCMinutes();
+    const seconds = date.getUTCSeconds();
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   }
 
   return date.toISOString().substring(0, 19);
@@ -628,28 +711,54 @@ function drawGridAndLabels(state, width, height, axisY) {
 
   ctx.strokeStyle = 'rgba(100, 100, 140, 0.3)';
   ctx.lineWidth = 1;
-  ctx.font = '10px monospace';
+  ctx.font = '11px sans-serif';
   ctx.fillStyle = '#8888aa';
   ctx.textAlign = 'center';
 
+  // Minimum horizontal gap between label centers (in pixels) to avoid overlap
+  const LABEL_MIN_GAP = 4;
+
   let gridTime = startGrid;
   let gridCount = 0;
-  const maxGridLines = 50;
+  const maxGridLines = 200;
 
+  // Track the right edge of the last drawn label so we can skip overlapping ones
+  let lastLabelRightEdge = -Infinity;
+
+  // First pass: collect all tick positions and labels
+  const ticks = [];
   while (gridTime <= viewportEnd && gridCount < maxGridLines) {
     const x = projectToScreen(gridTime, state.viewportStart, state.scale);
-
-    if (x >= 0 && x <= width) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, height);
-      ctx.stroke();
-
+    if (x >= -1 && x <= width + 1) {
       const label = formatTime(gridTime, unit, interval);
-      ctx.fillText(label, x, axisY + 30);
+      ticks.push({ x, gridTime, label });
     }
-
     gridTime = gridTime + interval;
     gridCount++;
+  }
+
+  // Draw grid lines for all ticks (always draw lines, only skip labels when crowded)
+  for (const tick of ticks) {
+    ctx.strokeStyle = 'rgba(100, 100, 140, 0.3)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(tick.x, 0);
+    ctx.lineTo(tick.x, height);
+    ctx.stroke();
+  }
+
+  // Draw labels with collision avoidance: measure each label and skip if it
+  // would overlap the previously drawn label.
+  ctx.fillStyle = '#8888aa';
+  ctx.textAlign = 'center';
+  for (const tick of ticks) {
+    const measured = ctx.measureText ? ctx.measureText(tick.label) : { width: 0 };
+    const labelWidth = measured.width;
+    const labelLeft = tick.x - labelWidth / 2 - LABEL_MIN_GAP;
+
+    if (labelLeft >= lastLabelRightEdge) {
+      ctx.fillText(tick.label, tick.x, axisY + 30);
+      lastLabelRightEdge = tick.x + labelWidth / 2 + LABEL_MIN_GAP;
+    }
   }
 }

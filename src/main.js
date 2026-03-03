@@ -362,6 +362,14 @@ initInput(canvas, store, {
       searchBar.show();
     }
   },
+  onOpenSelectedEvent: (eventId) => {
+    const state = store.getState();
+    const event = state.events.find(e => e.id === eventId);
+    if (event) {
+      eventPanel.update([event]);
+      eventPanel.show();
+    }
+  },
   onToggleHelp: toggleHelp,
   onToggleFilter: toggleFilter,
   onMousePosition: (x, y) => {

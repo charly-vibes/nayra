@@ -163,8 +163,9 @@ export function detectLabelCollisions(events, ctx, zoomLevel, bucketWidth = 50) 
  * @param {number} y - Y position (center of event)
  * @param {number} maxWidth - Maximum width for label
  * @param {number} eventHeight - Height of the event rectangle
+ * @param {number} [symbolOffset=0] - Additional x offset to clear a symbol/shape indicator
  */
-export function renderLabel(ctx, text, x, y, maxWidth, eventHeight) {
+export function renderLabel(ctx, text, x, y, maxWidth, eventHeight, symbolOffset = 0) {
   ctx.save();
 
   ctx.font = '11px system-ui, sans-serif';
@@ -175,13 +176,16 @@ export function renderLabel(ctx, text, x, y, maxWidth, eventHeight) {
   // Center label vertically in event
   const labelY = y + eventHeight / 2;
 
-  // Clip to event bounds
+  // Text starts after the symbol/shape indicator plus standard padding
+  const textX = x + LABEL_PADDING + symbolOffset;
+
+  // Clip to event bounds (from text start to right edge of event)
   ctx.beginPath();
-  ctx.rect(x + LABEL_PADDING, y, maxWidth - LABEL_PADDING * 2, eventHeight);
+  ctx.rect(textX, y, maxWidth - LABEL_PADDING - symbolOffset, eventHeight);
   ctx.clip();
 
   // Draw text
-  ctx.fillText(text, x + LABEL_PADDING, labelY);
+  ctx.fillText(text, textX, labelY);
 
   ctx.restore();
 }

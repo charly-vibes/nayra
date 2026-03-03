@@ -189,16 +189,16 @@ describe('Renderer', () => {
   });
 
   describe('formatTime', () => {
-    it('formats Ga values correctly for negative (past) times', () => {
+    it('formats Ga values correctly for negative (past) times using Bya notation', () => {
       const time = -4n * BILLION_YEARS;
       const result = formatTime(time, 'Ga', BILLION_YEARS);
-      expect(result).toMatch(/4.*Ga/);
+      expect(result).toMatch(/4.*Bya/);
     });
 
-    it('formats Ma values correctly for negative (past) times', () => {
+    it('formats Ma values correctly for negative (past) times using Mya notation', () => {
       const time = -100n * MILLION_YEARS;
       const result = formatTime(time, 'Ma', MILLION_YEARS);
-      expect(result).toMatch(/100.*Ma/);
+      expect(result).toMatch(/100.*Mya/);
     });
 
     it('formats recent years correctly', () => {
@@ -207,24 +207,68 @@ describe('Renderer', () => {
       expect(result).toBe('2000');
     });
 
-    it('formats dates correctly for day-scale', () => {
+    it('formats dates correctly for day-scale (Jan 1 shows year)', () => {
       const date = 946684800n; // 2000-01-01 00:00:00 UTC
       const result = formatTime(date, 'd', 86400n);
-      expect(result).toBe('2000-01-01');
+      expect(result).toBe('2000');
+    });
+
+    it('formats dates correctly for day-scale (first of month shows month abbreviation)', () => {
+      const feb1 = 949363200n; // 2000-02-01 00:00:00 UTC
+      const result = formatTime(feb1, 'd', 86400n);
+      expect(result).toBe("Feb '00");
+    });
+
+    it('formats dates correctly for day-scale (mid-month shows month and day)', () => {
+      const jan8 = 947289600n; // 2000-01-08 00:00:00 UTC
+      const result = formatTime(jan8, 'd', 86400n);
+      expect(result).toBe('Jan 8');
     });
 
     it('handles deep time values without NaN (regression test for 1800 Ma)', () => {
       const time = -1800n * MILLION_YEARS;
       const result = formatTime(time, 'Ma', MILLION_YEARS);
       expect(result).not.toContain('NaN');
-      expect(result).toMatch(/1800.*Ma/);
+      expect(result).toMatch(/1800.*Mya/);
     });
 
     it('handles values exceeding Number.MAX_SAFE_INTEGER', () => {
       const time = -13n * BILLION_YEARS;
       const result = formatTime(time, 'Ga', BILLION_YEARS);
       expect(result).not.toContain('NaN');
-      expect(result).toMatch(/13.*Ga/);
+      expect(result).toMatch(/13.*Bya/);
+    });
+
+    it('formats BCE years with BCE suffix', () => {
+      const time = -2469n * YEAR;
+      const result = formatTime(time, 'y', YEAR);
+      expect(result).toContain('BCE');
+    });
+
+    it('formats large BCE years with comma separator', () => {
+      const time = -11969n * YEAR;
+      const result = formatTime(time, 'y', YEAR);
+      expect(result).toContain('BCE');
+      expect(result).toMatch(/10[,\d]\d{3}/);
+    });
+
+    it('formats century-scale BCE as ordinal century', () => {
+      const time = -2469n * YEAR;
+      const result = formatTime(time, 'y', YEAR * 100n);
+      expect(result).toMatch(/c\. BCE/);
+    });
+
+    it('formats century-scale CE as ordinal century', () => {
+      const time = -470n * YEAR;
+      const result = formatTime(time, 'y', YEAR * 100n);
+      expect(result).toMatch(/c\./);
+      expect(result).not.toContain('BCE');
+    });
+
+    it('formats ky (kiloyear) past values as kya', () => {
+      const time = -10n * YEAR * 1000n;
+      const result = formatTime(time, 'ky', YEAR * 1000n);
+      expect(result).toBe('10 kya');
     });
   });
 

@@ -1,5 +1,7 @@
 # nayra
 
+> **nayra** (Aymara): *"eye," "sight," "past," "in front of"* — In the Aymara language, the past is in front of you because you can see it; the future is behind you because it is unknown. [Learn more →](docs/name.md)
+
 **High-Performance Vanilla JavaScript Timeline Visualization**
 
 Nayra is a framework-free timeline visualization tool designed to render interactive timelines spanning from microseconds to cosmological epochs, maintaining 60 FPS performance with 10,000+ data points.

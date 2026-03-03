@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nayra - Timeline Visualization</title>
+  <meta name="description" content="Nayra — a high-performance timeline visualization tool. Named after the Aymara word for 'eye' and 'past': face the past, see what is known.">
+  <meta name="theme-color" content="#1a1a2e">
   <style>
     * {
       margin: 0;
@@ -61,10 +63,15 @@
   </style>
 </head>
 <body>
-  <div id="app">
-    <div id="timeline-container">
-      <canvas id="timeline-canvas" tabindex="0" aria-label="Timeline visualization"></canvas>
-    </div>
+  <a href="#timeline-canvas" class="sr-only skip-link">Skip to timeline</a>
+  <div id="app" role="application" aria-label="Nayra timeline visualization">
+    <header class="sr-only">
+      <h1>Nayra — Timeline Visualization</h1>
+      <p>Interactive timeline. Use keyboard shortcuts: ? for help, / for search, Tab to navigate events.</p>
+    </header>
+    <main id="timeline-container">
+      <canvas id="timeline-canvas" tabindex="0" role="img" aria-label="Interactive timeline visualization. Use arrow keys to pan, +/- to zoom, Tab to navigate events, ? for help."></canvas>
+    </main>
     <!-- ARIA live region for screen reader announcements -->
     <div id="aria-live" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
   </div>

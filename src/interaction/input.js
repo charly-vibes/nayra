@@ -570,7 +570,12 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
       e.preventDefault();
       const focusedEventId = focusManager ? focusManager.getFocus() : null;
       if (focusedEventId) {
+        const state = store.getState();
+        const alreadySelected = state.selectedEventIds.has(focusedEventId);
         store.dispatch({ type: 'SELECT_EVENT', eventId: focusedEventId });
+        if (alreadySelected && callbacks.onOpenSelectedEvent) {
+          callbacks.onOpenSelectedEvent(focusedEventId);
+        }
       } else {
         // Open the currently selected event's detail panel (nayra-1l2)
         const state = store.getState();

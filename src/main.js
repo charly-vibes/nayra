@@ -227,15 +227,8 @@ function handleHoverChange(hoveredEventId) {
   }
 }
 
-function handleSelectionChange(selectedEventIds) {
-  if (selectedEventIds.size > 0) {
-    const state = store.getState();
-    const selectedEvents = state.events.filter(e => selectedEventIds.has(e.id));
-    if (selectedEvents.length > 0) {
-      eventPanel.update(selectedEvents);
-      eventPanel.show();
-    }
-  }
+function handleSelectionChange(_selectedEventIds) {
+  // Panel opens only via Enter/Space, double-click, or context menu — not on single click
 }
 
 let lastSelectedIds = new Set();

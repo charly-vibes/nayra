@@ -46,6 +46,9 @@ let clusters = []; // Current event clusters (for macro zoom)
 let pendingLayoutRevision = -1; // Track pending async layout calculation
 let isLayoutPending = false; // Flag to prevent duplicate layout requests
 
+export const AXIS_BOTTOM_MARGIN = 60;
+export function getAxisY(height) { return height - AXIS_BOTTOM_MARGIN; }
+
 export const EVENT_HEIGHT = 20;
 export const EVENT_COLORS = [
   '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4',
@@ -247,7 +250,7 @@ export function draw(state) {
   const { width, height } = getLogicalSize(canvas);
   const viewportEnd = state.viewportStart + state.scale.pxToTime(width);
 
-  const axisY = height / 2;
+  const axisY = getAxisY(height);
 
   // Determine LOD level based on zoom
   const secondsPerPixel = state.scale.getSecondsPerPixel();

@@ -3,6 +3,7 @@ import { YEAR } from '../../src/core/time.js';
 import { RationalScale } from '../../src/core/scale.js';
 import { initInput } from '../../src/interaction/input.js';
 import { createStore } from '../../src/core/store.js';
+import { getAxisY } from '../../src/rendering/renderer.js';
 
 function createMockCanvas() {
   const listeners = {};
@@ -162,7 +163,7 @@ describe('Input', () => {
 
     it('tap on event dispatches SELECT_EVENT', () => {
       const eventX = 100;
-      const eventY = 200;
+      const eventY = getAxisY(400);
 
       canvas.dispatchEvent('pointerdown', createMockPointerEvent(eventX, eventY, { buttons: 1, timeStamp: 10 }));
       canvas.dispatchEvent('pointerup', createMockPointerEvent(eventX, eventY, { timeStamp: 20 }));
@@ -176,7 +177,7 @@ describe('Input', () => {
       store.dispatch({ type: 'SELECT_EVENT', eventId: 'evt-1' });
 
       const eventX = 200;
-      const eventY = 200;
+      const eventY = getAxisY(400);
 
       canvas.dispatchEvent('pointerdown', createMockPointerEvent(eventX, eventY, { buttons: 1, timeStamp: 10 }));
       canvas.dispatchEvent(
@@ -206,7 +207,7 @@ describe('Input', () => {
 
     it('pointermove over event dispatches SET_HOVER', () => {
       const eventX = 100;
-      const eventY = 200;
+      const eventY = getAxisY(400);
 
       canvas.dispatchEvent('pointermove', createMockPointerEvent(eventX, eventY, { timeStamp: 10 }));
 
@@ -261,7 +262,7 @@ describe('Input', () => {
 
     it('cursor changes to pointer when hovering over event', () => {
       const eventX = 100;
-      const eventY = 200;
+      const eventY = getAxisY(400);
 
       canvas.dispatchEvent('pointermove', createMockPointerEvent(eventX, eventY, { timeStamp: 10 }));
 

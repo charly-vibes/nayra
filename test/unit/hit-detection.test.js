@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { findEventAtPoint } from '../../src/interaction/hit-detection.js';
 import { RationalScale } from '../../src/core/scale.js';
+import { getAxisY } from '../../src/rendering/renderer.js';
 
 const EVENT_HEIGHT = 20;
 
@@ -14,7 +15,7 @@ function makeEvent(id, start, end = undefined) {
 
 describe('findEventAtPoint', () => {
   const canvasHeight = 100;
-  const axisY = canvasHeight / 2;
+  const axisY = getAxisY(canvasHeight);
   const eventTop = axisY - EVENT_HEIGHT / 2;
   const eventBottom = axisY + EVENT_HEIGHT / 2;
   const viewportStart = 0n;

@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { createStore } from '../../src/core/store.js';
 import { RationalScale } from '../../src/core/scale.js';
 import { initInput } from '../../src/interaction/input.js';
+import { getAxisY } from '../../src/rendering/renderer.js';
 import './setup.js';
 
 function createMockCanvas() {
@@ -107,7 +108,7 @@ describe('Pointer Gesture Integration', () => {
   describe('single touch gestures', () => {
     it('tap on event selects the event', () => {
       const eventX = 100;
-      const eventY = 200;
+      const eventY = getAxisY(400);
 
       canvas.dispatchEvent('pointerdown', createMockPointerEvent(eventX, eventY, {
         pointerId: 1,

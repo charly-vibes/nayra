@@ -1,5 +1,5 @@
 import { projectToScreen } from '../core/time.js';
-import { EVENT_HEIGHT, getClusters } from '../rendering/renderer.js';
+import { EVENT_HEIGHT, getClusters, getAxisY } from '../rendering/renderer.js';
 import { assignLanes } from '../layout/greedy-interval-coloring.js';
 import { getLaneY, DEFAULT_CONFIG as LANE_CONFIG } from '../layout/lane-positioning.js';
 import { SpatialHash } from '../layout/spatial-hash.js';
@@ -7,7 +7,7 @@ import { isPointInCluster } from '../layout/event-clustering.js';
 
 // Lane-aware hit detection
 export function findEventAtPoint(x, y, events, viewportStart, scale, canvasHeight) {
-  const axisY = canvasHeight / 2;
+  const axisY = getAxisY(canvasHeight);
 
   // First check for cluster hits (if in macro zoom mode)
   const clusters = getClusters();
@@ -70,7 +70,7 @@ export function findEventAtPoint(x, y, events, viewportStart, scale, canvasHeigh
  * @returns {Object|null} - Event at point, or null
  */
 export function findEventAtPointFast(x, y, events, viewportStart, scale, canvasHeight) {
-  const axisY = canvasHeight / 2;
+  const axisY = getAxisY(canvasHeight);
 
   // Build lane assignments
   const { layouts: laneAssignments } = assignLanes(events);

@@ -4,7 +4,7 @@ import {
   getTotalHeight,
   getLaneBounds,
   getLaneAtY,
-  getAdaptiveLaneConfig,
+  getDynamicLaneConfig,
   DEFAULT_CONFIG,
 } from '../../src/layout/lane-positioning.js';
 
@@ -230,18 +230,47 @@ describe('lane-positioning', () => {
     });
   });
 
-  describe('getAdaptiveLaneConfig', () => {
-    it('returns default config for now', () => {
-      const config = getAdaptiveLaneConfig(1000);
-      expect(config).toEqual(DEFAULT_CONFIG);
-    });
-
+  describe('getDynamicLaneConfig', () => {
     it('returns config object with expected properties', () => {
-      const config = getAdaptiveLaneConfig(100);
+      const config = getDynamicLaneConfig(400, 3);
 
       expect(config).toHaveProperty('laneHeight');
       expect(config).toHaveProperty('laneSpacing');
       expect(config).toHaveProperty('baselineOffset');
+    });
+
+    it('fills available height for a single lane', () => {
+      const axisY = 500;
+      const config = getDynamicLaneConfig(axisY, 1);
+      // Single lane should be large (up to MAX_LANE_HEIGHT)
+      expect(config.laneHeight).toBe(120);
+    });
+
+    it('scales down for many lanes', () => {
+      const axisY = 400;
+      const fewLanes = getDynamicLaneConfig(axisY, 2);
+      const manyLanes = getDynamicLaneConfig(axisY, 10);
+      expect(fewLanes.laneHeight).toBeGreaterThan(manyLanes.laneHeight);
+    });
+
+    it('never goes below minimum lane height', () => {
+      // Even with 100 lanes, height should be at least 20
+      const config = getDynamicLaneConfig(400, 100);
+      expect(config.laneHeight).toBeGreaterThanOrEqual(20);
+    });
+
+    it('never exceeds maximum lane height', () => {
+      const config = getDynamicLaneConfig(400, 1);
+      expect(config.laneHeight).toBeLessThanOrEqual(120);
+    });
+
+    it('all lanes fit within available canvas height', () => {
+      const axisY = 400;
+      const laneCount = 4;
+      const config = getDynamicLaneConfig(axisY, laneCount);
+      const topLaneY = getLaneY(laneCount - 1, axisY, config);
+      // Top of topmost lane should be above the canvas top padding
+      expect(topLaneY).toBeGreaterThanOrEqual(0);
     });
   });
 

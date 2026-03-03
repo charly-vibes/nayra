@@ -1,7 +1,7 @@
 import { projectToScreen } from '../core/time.js';
-import { EVENT_HEIGHT, getClusters, getAxisY } from '../rendering/renderer.js';
+import { getClusters, getAxisY, getCurrentLaneConfig } from '../rendering/renderer.js';
 import { assignLanes } from '../layout/greedy-interval-coloring.js';
-import { getLaneY, DEFAULT_CONFIG as LANE_CONFIG } from '../layout/lane-positioning.js';
+import { getLaneY } from '../layout/lane-positioning.js';
 import { SpatialHash } from '../layout/spatial-hash.js';
 import { isPointInCluster } from '../layout/event-clustering.js';
 
@@ -31,6 +31,8 @@ export function findEventAtPoint(x, y, events, viewportStart, scale, canvasHeigh
 
   // Build lane assignments for multilane support
   const { layouts: laneAssignments } = assignLanes(events);
+  const laneConfig = getCurrentLaneConfig();
+  const eventHeight = laneConfig.laneHeight;
 
   // Check events in reverse order (last rendered = top of stack)
   for (let i = events.length - 1; i >= 0; i--) {
@@ -47,11 +49,11 @@ export function findEventAtPoint(x, y, events, viewportStart, scale, canvasHeigh
 
     // Get the lane for this event and calculate its Y position
     const lane = laneAssignments.get(event.id) || 0;
-    const eventY = getLaneY(lane, axisY, { laneHeight: EVENT_HEIGHT, ...LANE_CONFIG });
+    const eventY = getLaneY(lane, axisY, laneConfig);
 
     // Check if point is within this event's bounds (inclusive boundaries)
     if (x >= eventX && x <= eventX + eventWidth &&
-        y >= eventY && y < eventY + EVENT_HEIGHT) {
+        y >= eventY && y < eventY + eventHeight) {
       return event;
     }
   }
@@ -71,6 +73,8 @@ export function findEventAtPoint(x, y, events, viewportStart, scale, canvasHeigh
  */
 export function findEventAtPointFast(x, y, events, viewportStart, scale, canvasHeight) {
   const axisY = getAxisY(canvasHeight);
+  const laneConfig = getCurrentLaneConfig();
+  const eventHeight = laneConfig.laneHeight;
 
   // Build lane assignments
   const { layouts: laneAssignments } = assignLanes(events);
@@ -89,9 +93,9 @@ export function findEventAtPointFast(x, y, events, viewportStart, scale, canvasH
     }
 
     const lane = laneAssignments.get(event.id) || 0;
-    const eventY = getLaneY(lane, axisY, { laneHeight: EVENT_HEIGHT, ...LANE_CONFIG });
+    const eventY = getLaneY(lane, axisY, laneConfig);
 
-    return { x: eventX, y: eventY, width: eventWidth, height: EVENT_HEIGHT };
+    return { x: eventX, y: eventY, width: eventWidth, height: eventHeight };
   };
 
   hash.rebuild(events, getBounds);

@@ -55,21 +55,36 @@ export function getTotalHeight(laneCount, config = {}) {
   return laneCount * cfg.laneHeight + (laneCount - 1) * cfg.laneSpacing;
 }
 
+const TOP_LANE_PADDING = 40;  // pixels reserved above the topmost lane
+const MAX_LANE_HEIGHT = 120;  // cap so events don't become absurdly tall
+const MIN_LANE_HEIGHT = 20;   // floor so events stay readable
+
 /**
- * Get adaptive lane configuration based on zoom level
+ * Compute a lane config that fills the available vertical space.
  *
- * This allows lanes to scale with zoom for better visual density
- * at different zoom levels (optional feature for future enhancement)
+ * Distributes the canvas height between the axis and the top padding
+ * evenly across all active lanes, capped at MAX_LANE_HEIGHT and floored
+ * at MIN_LANE_HEIGHT.
  *
- * @param {number} secondsPerPixel - Current zoom level
- * @returns {Object} - Configuration object with adaptive sizing
+ * @param {number} axisY - Y coordinate of the timeline axis
+ * @param {number} laneCount - Number of active lanes
+ * @returns {Object} - Configuration object with adaptive laneHeight
  */
-export function getAdaptiveLaneConfig(secondsPerPixel) {
-  // For now, return default config
-  // Future: adjust lane height based on zoom level
-  // e.g., smaller lanes when zoomed out (macro view)
-  // larger lanes when zoomed in (micro view)
-  return { ...DEFAULT_CONFIG };
+export function getDynamicLaneConfig(axisY, laneCount) {
+  const effectiveLanes = Math.max(1, laneCount);
+  const { laneSpacing } = DEFAULT_CONFIG;
+  const availableHeight = axisY - TOP_LANE_PADDING;
+
+  // Solve: laneHeight * N + laneSpacing * (N-1) = availableHeight
+  const laneHeight = Math.max(
+    MIN_LANE_HEIGHT,
+    Math.min(
+      MAX_LANE_HEIGHT,
+      Math.floor((availableHeight - laneSpacing * (effectiveLanes - 1)) / effectiveLanes)
+    )
+  );
+
+  return { ...DEFAULT_CONFIG, laneHeight };
 }
 
 /**

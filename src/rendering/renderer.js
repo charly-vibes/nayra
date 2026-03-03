@@ -1,7 +1,7 @@
 import { projectToScreen, isVisible, YEAR, MILLION_YEARS, BILLION_YEARS } from '../core/time.js';
 import { lightenColor } from './colors.js';
 import { assignLanes } from '../layout/greedy-interval-coloring.js';
-import { getLaneY, DEFAULT_CONFIG as LANE_CONFIG } from '../layout/lane-positioning.js';
+import { getLaneY, DEFAULT_CONFIG as LANE_CONFIG, getDynamicLaneConfig } from '../layout/lane-positioning.js';
 import { SpatialHash } from '../layout/spatial-hash.js';
 import { detectLabelCollisions, renderLabel } from '../layout/label-collision.js';
 import {
@@ -39,6 +39,7 @@ let fpsUpdateTime = 0;
 // Layout state cache
 let laneAssignments = new Map(); // eventId -> lane number
 let laneCount = 0;
+let currentLaneConfig = { ...LANE_CONFIG }; // dynamic config updated each frame
 let spatialHash = new SpatialHash();
 let layoutRevision = -1; // Track when layout needs recalculation
 let currentLOD = LOD_MICRO; // Current level of detail
@@ -88,6 +89,7 @@ export function destroy() {
   // Clear layout state
   laneAssignments.clear();
   laneCount = 0;
+  currentLaneConfig = { ...LANE_CONFIG };
   spatialHash.clear();
   layoutRevision = -1;
   currentLOD = LOD_MICRO;
@@ -126,6 +128,14 @@ export function getLaneCount() {
  */
 export function getClusters() {
   return clusters;
+}
+
+/**
+ * Get the current lane config (dynamic, updated each draw frame)
+ * @returns {Object} - { laneHeight, laneSpacing, baselineOffset }
+ */
+export function getCurrentLaneConfig() {
+  return currentLaneConfig;
 }
 
 function setupDPI() {
@@ -212,6 +222,9 @@ function calculateLayout(state, axisY, viewportStart, scale, width) {
  * Extracted to reduce duplication between sync and async paths
  */
 function rebuildSpatialHash(events, axisY, viewportStart, scale) {
+  const laneConfig = getDynamicLaneConfig(axisY, laneCount);
+  const eventHeight = laneConfig.laneHeight;
+
   const getBounds = (event) => {
     const x = projectToScreen(event.start, viewportStart, scale);
 
@@ -230,12 +243,12 @@ function rebuildSpatialHash(events, axisY, viewportStart, scale) {
     const displayWidth = renderAsPoint ? minWidth : Math.max(eventWidth, minWidth);
 
     const lane = laneAssignments.get(event.id) || 0;
-    const y = getLaneY(lane, axisY, { laneHeight: EVENT_HEIGHT, ...LANE_CONFIG });
+    const y = getLaneY(lane, axisY, laneConfig);
 
     // For points, center the hit area
     const hitX = renderAsPoint ? x - displayWidth / 2 : x;
 
-    return { x: hitX, y, width: displayWidth, height: EVENT_HEIGHT };
+    return { x: hitX, y, width: displayWidth, height: eventHeight };
   };
 
   spatialHash.rebuild(events, getBounds);
@@ -276,6 +289,9 @@ export function draw(state) {
     width
   );
 
+  // Update dynamic lane config based on current lane count and canvas height
+  currentLaneConfig = getDynamicLaneConfig(axisY, laneCount);
+
   ctx.fillStyle = '#1a1a2e';
   ctx.fillRect(0, 0, width, height);
 
@@ -302,7 +318,7 @@ export function draw(state) {
         const event = cluster.event;
         const duration = event.end !== undefined ? event.end - event.start : 0n;
         if (isVisible(event.start, duration, state.viewportStart, viewportEnd)) {
-          drawEvent(event, state, axisY, width, currentLOD, searchResultSet);
+          drawEvent(event, state, axisY, width, currentLOD, searchResultSet, currentLaneConfig);
         }
       }
     }
@@ -314,7 +330,7 @@ export function draw(state) {
       if (!isVisible(event.start, duration, state.viewportStart, viewportEnd)) {
         continue;
       }
-      const bounds = drawEvent(event, state, axisY, width, currentLOD, searchResultSet);
+      const bounds = drawEvent(event, state, axisY, width, currentLOD, searchResultSet, currentLaneConfig);
       if (bounds) {
         eventsWithBounds.push({ id: event.id, label: event.label, bounds });
       }
@@ -393,7 +409,10 @@ function drawCluster(cluster, state, axisY, canvasWidth, viewportEnd) {
   ctx.fillText(cluster.count.toString(), x, axisY);
 }
 
-function drawEvent(event, state, axisY, canvasWidth, lod, searchResultSet = null) {
+function drawEvent(event, state, axisY, canvasWidth, lod, searchResultSet = null, laneConfig = null) {
+  const cfg = laneConfig || currentLaneConfig;
+  const eventHeight = cfg.laneHeight;
+
   const x = projectToScreen(event.start, state.viewportStart, state.scale);
 
   // Calculate actual event width
@@ -424,7 +443,7 @@ function drawEvent(event, state, axisY, canvasWidth, lod, searchResultSet = null
 
   // Use lane-based positioning
   const lane = laneAssignments.get(event.id) || 0;
-  const y = getLaneY(lane, axisY, { laneHeight: EVENT_HEIGHT, ...LANE_CONFIG });
+  const y = getLaneY(lane, axisY, cfg);
 
   ctx.globalAlpha = alpha;
   ctx.fillStyle = fillColor;
@@ -432,39 +451,39 @@ function drawEvent(event, state, axisY, canvasWidth, lod, searchResultSet = null
   if (renderAsPoint) {
     // Render as a point (small square or circle)
     const pointSize = minWidth;
-    ctx.fillRect(x - pointSize / 2, y + (EVENT_HEIGHT - pointSize) / 2, pointSize, pointSize);
+    ctx.fillRect(x - pointSize / 2, y + (eventHeight - pointSize) / 2, pointSize, pointSize);
 
     ctx.strokeStyle = strokeStyle.color;
     ctx.lineWidth = strokeStyle.lineWidth;
     if (isSelected) {
       ctx.strokeRect(
         x - pointSize / 2 - 1,
-        y + (EVENT_HEIGHT - pointSize) / 2 - 1,
+        y + (eventHeight - pointSize) / 2 - 1,
         pointSize + 2,
         pointSize + 2
       );
     } else {
       ctx.strokeRect(
         x - pointSize / 2,
-        y + (EVENT_HEIGHT - pointSize) / 2,
+        y + (eventHeight - pointSize) / 2,
         pointSize,
         pointSize
       );
     }
   } else {
     // Render as a duration bar
-    ctx.fillRect(x, y, displayWidth, EVENT_HEIGHT);
+    ctx.fillRect(x, y, displayWidth, eventHeight);
 
     ctx.strokeStyle = strokeStyle.color;
     ctx.lineWidth = strokeStyle.lineWidth;
     if (isSelected) {
-      ctx.strokeRect(x - 1, y - 1, displayWidth + 2, EVENT_HEIGHT + 2);
+      ctx.strokeRect(x - 1, y - 1, displayWidth + 2, eventHeight + 2);
     } else {
-      ctx.strokeRect(x, y, displayWidth, EVENT_HEIGHT);
+      ctx.strokeRect(x, y, displayWidth, eventHeight);
     }
 
     // Draw shape indicator for color-independent category encoding (WCAG 1.4.1)
-    drawEventShapeIndicator(ctx, event, x, y, displayWidth, EVENT_HEIGHT, alpha);
+    drawEventShapeIndicator(ctx, event, x, y, displayWidth, eventHeight, alpha);
   }
 
   ctx.globalAlpha = 1.0;
@@ -472,10 +491,10 @@ function drawEvent(event, state, axisY, canvasWidth, lod, searchResultSet = null
   // Calculate label x offset to avoid overlapping the shape indicator
   const symbolOffset = renderAsPoint
     ? 0
-    : getShapeIndicatorLabelOffset(displayWidth, EVENT_HEIGHT);
+    : getShapeIndicatorLabelOffset(displayWidth, eventHeight);
 
   // Return bounds for label collision detection (includes symbolOffset for text positioning)
-  return { x, y, width: displayWidth, height: EVENT_HEIGHT, symbolOffset };
+  return { x, y, width: displayWidth, height: eventHeight, symbolOffset };
 }
 
 export function hashCode(str) {

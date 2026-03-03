@@ -258,6 +258,10 @@ const DATA_CONTENT = `
         <td style="padding: 6px 0; color: #a0a0b0;">12,000 years of progress, inspired by Kurzgesagt (https://www.youtube.com/watch?v=dGiQaabX3_o)</td>
       </tr>
       <tr style="border-bottom: 1px solid #3a3a4e;">
+        <td style="padding: 6px 12px 6px 0; font-family: monospace; color: #00d9ff;">human-history-hour</td>
+        <td style="padding: 6px 0; color: #a0a0b0;">200,000 years of human history (https://www.youtube.com/watch?v=KNwMiydCYA4)</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #3a3a4e;">
         <td style="padding: 6px 12px 6px 0; font-family: monospace; color: #00d9ff;">dinosaur-apocalypse</td>
         <td style="padding: 6px 0; color: #a0a0b0;">The last day of the dinosaurs (https://www.youtube.com/watch?v=CWu29PRCUvQ)</td>
       </tr>

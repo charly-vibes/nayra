@@ -25,6 +25,11 @@ export const EXAMPLES = [
     desc: '12,000 years of human progress, from the first temple to the moon landing (https://www.youtube.com/watch?v=dGiQaabX3_o)',
   },
   {
+    id: 'human-history-hour',
+    label: 'All of Human History in One Hour (Kurzgesagt)',
+    desc: 'A continuous tracking shot of 200,000 years of human history, where 1 second = 50 years (https://www.youtube.com/watch?v=KNwMiydCYA4)',
+  },
+  {
     id: 'dinosaur-apocalypse',
     label: 'The Dinosaur Apocalypse (Kurzgesagt)',
     desc: 'The last day of the dinosaurs, minute by minute, and its long-term aftermath (https://www.youtube.com/watch?v=CWu29PRCUvQ)',

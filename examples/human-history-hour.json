@@ -1,0 +1,133 @@
+[
+  {
+    "id": "homo-sapiens-origin",
+    "start": "0.2 Ma",
+    "label": "00:00 - First Homo Sapiens",
+    "description": "Anatomically modern humans appear in East Africa. This marks the beginning of the 'One Hour' journey (1 sec = 50 years).",
+    "category": "humanity",
+    "tags": ["evolution", "origins", "kurzgesagt"],
+    "priority": 0
+  },
+  {
+    "id": "green-arabia",
+    "start": "0.12 Ma",
+    "label": "26:40 - Green Arabia",
+    "description": "Human footprints found in Saudi Arabia from a time when the region was a lush wetland.",
+    "category": "humanity",
+    "tags": ["migration", "climate", "kurzgesagt"]
+  },
+  {
+    "id": "first-burials",
+    "start": "0.1 Ma",
+    "label": "33:20 - First Burials",
+    "description": "The oldest known evidence of intentional human burial, indicating early symbolic thought and social bonds.",
+    "category": "humanity",
+    "tags": ["culture", "death", "kurzgesagt"]
+  },
+  {
+    "id": "ritual-art",
+    "start": "0.07 Ma",
+    "label": "43:20 - Ritual Art (Botswana)",
+    "description": "A carved python rock in Botswana suggests early ritualistic and symbolic human behavior.",
+    "category": "humanity",
+    "tags": ["art", "ritual", "kurzgesagt"]
+  },
+  {
+    "id": "cultural-revolution",
+    "start": "0.05 Ma",
+    "label": "50:00 - Cultural Expansion",
+    "description": "Humans arrive in New Guinea; a massive expansion of cave art and technological innovation.",
+    "category": "humanity",
+    "tags": ["migration", "art", "kurzgesagt"]
+  },
+  {
+    "id": "earliest-violence",
+    "start": "0.035 Ma",
+    "label": "55:00 - Evidence of Violence",
+    "description": "The oldest fossil of a human with a smashed skull, providing early evidence of interpersonal conflict.",
+    "category": "humanity",
+    "tags": ["conflict", "history", "kurzgesagt"]
+  },
+  {
+    "id": "pottery-china",
+    "start": "0.02 Ma",
+    "label": "56:40 - Invention of Pottery",
+    "description": "The oldest ceramic fragments found in China, a major technological milestone for food storage and cooking.",
+    "category": "humanity",
+    "tags": ["technology", "pottery", "kurzgesagt"]
+  },
+  {
+    "id": "blonde-hair",
+    "start": "0.017 Ma",
+    "label": "57:16 - Genetic Adaptation",
+    "description": "The appearance of genetic traits like blonde hair in North Eurasia as humans adapt to new environments.",
+    "category": "humanity",
+    "tags": ["genetics", "evolution", "kurzgesagt"]
+  },
+  {
+    "id": "ritual-cannibalism",
+    "start": "0.0158 Ma",
+    "label": "57:38 - Funerary Rites",
+    "description": "Evidence of ritual cannibalism in Europe, highlighting the diversity of early human cultural practices.",
+    "category": "humanity",
+    "tags": ["culture", "ritual", "kurzgesagt"]
+  },
+  {
+    "id": "gobekli-tepe-hour",
+    "start": "10000 BCE",
+    "label": "56:00* - Göbekli Tepe",
+    "description": "Construction of the first temple. As the hour reaches its final minutes, human progress begins to accelerate rapidly.",
+    "category": "humanity",
+    "tags": ["temple", "civilization", "kurzgesagt"],
+    "priority": 0
+  },
+  {
+    "id": "agriculture-hour",
+    "start": "10000 BCE",
+    "label": "56:00 - Agricultural Revolution",
+    "description": "Humans begin to settle in permanent villages and domesticate plants and animals.",
+    "category": "humanity",
+    "tags": ["farming", "revolution", "kurzgesagt"]
+  },
+  {
+    "id": "dawn-history-hour",
+    "start": "3000 BCE",
+    "label": "58:20 - Dawn of History",
+    "description": "The invention of writing (Cuneiform) and the construction of the Great Pyramids.",
+    "category": "humanity",
+    "tags": ["writing", "history", "kurzgesagt"]
+  },
+  {
+    "id": "roman-han-hour",
+    "start": "1 CE",
+    "label": "59:20 - Height of Empires",
+    "description": "The Roman Empire and the Han Dynasty reach their peaks. Civilization is now global.",
+    "category": "humanity",
+    "tags": ["empires", "history", "kurzgesagt"]
+  },
+  {
+    "id": "industrial-rev-hour",
+    "start": "1760 CE",
+    "label": "59:50 - Industrial Revolution",
+    "description": "The final 10 seconds of the hour: Steam power and fossil fuels transform the world.",
+    "category": "humanity",
+    "tags": ["technology", "industry", "kurzgesagt"]
+  },
+  {
+    "id": "atomic-space-hour",
+    "start": "1945 CE",
+    "label": "59:58 - Atomic & Space Age",
+    "description": "The last 2 seconds: Humans split the atom and walk on the moon.",
+    "category": "humanity",
+    "tags": ["space", "atomic", "kurzgesagt"]
+  },
+  {
+    "id": "today-hour",
+    "start": "today",
+    "label": "60:00 - Today",
+    "description": "The present moment. The entire journey from first humans to now, compressed into one hour.",
+    "category": "humanity",
+    "tags": ["current", "history", "kurzgesagt"],
+    "priority": 0
+  }
+]

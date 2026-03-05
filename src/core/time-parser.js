@@ -128,14 +128,12 @@ export function parseTimeQuery(query) {
     };
   }
 
-  // ISO 8601 datetime: 2024-03-15T10:30:00Z or 2024-03-15T10:30:00
-  const isoDatetimeMatch = query.trim().match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(Z|[+-]\d{2}:\d{2})?$/i);
+  // ISO 8601 datetime: 2024-03-15T10:30:00Z, with optional fractional seconds and/or timezone
+  const isoDatetimeMatch = query.trim().match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/i);
   if (isoDatetimeMatch) {
     const dateStr = query.trim();
     // Treat no timezone as UTC
-    const normalizedStr = dateStr.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(dateStr)
-      ? dateStr
-      : dateStr + 'Z';
+    const normalizedStr = /Z$|[+-]\d{2}:\d{2}$/.test(dateStr) ? dateStr : dateStr + 'Z';
     const date = new Date(normalizedStr);
     if (!isNaN(date.getTime())) {
       return {

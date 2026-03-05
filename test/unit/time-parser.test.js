@@ -181,6 +181,36 @@ describe('TimeParser', () => {
       expect(result.time).toBe(expected);
     });
 
+    it('parses ISO datetime with milliseconds (2024-03-15T10:30:00.123Z)', async () => {
+      const { parseTimeQuery } = await import('../../src/core/time-parser.js');
+
+      const result = parseTimeQuery('2024-03-15T10:30:00.123Z');
+
+      expect(result.success).toBe(true);
+      const expected = BigInt(Math.floor(new Date('2024-03-15T10:30:00.123Z').getTime() / 1000));
+      expect(result.time).toBe(expected);
+    });
+
+    it('parses ISO datetime with timezone offset (2024-03-15T10:30:00+05:30)', async () => {
+      const { parseTimeQuery } = await import('../../src/core/time-parser.js');
+
+      const result = parseTimeQuery('2024-03-15T10:30:00+05:30');
+
+      expect(result.success).toBe(true);
+      const expected = BigInt(Math.floor(new Date('2024-03-15T10:30:00+05:30').getTime() / 1000));
+      expect(result.time).toBe(expected);
+    });
+
+    it('parses ISO datetime with milliseconds and timezone offset', async () => {
+      const { parseTimeQuery } = await import('../../src/core/time-parser.js');
+
+      const result = parseTimeQuery('2024-03-15T10:30:00.500+02:00');
+
+      expect(result.success).toBe(true);
+      const expected = BigInt(Math.floor(new Date('2024-03-15T10:30:00.500+02:00').getTime() / 1000));
+      expect(result.time).toBe(expected);
+    });
+
     it('parses natural language "X billion years ago"', async () => {
       const { parseTimeQuery } = await import('../../src/core/time-parser.js');
 

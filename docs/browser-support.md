@@ -24,14 +24,25 @@ Mobile browsers (iOS Safari 14+, Chrome for Android 90+) are also supported.
 | `Pointer Events` | ✅ | ✅ | ✅ | ✅ | Unified mouse/touch/pen input |
 | ES6 modules (`import`) | ✅ | ✅ | ✅ | ✅ | Module loading (no bundler needed) |
 
-## Feature Detection
+## Graceful Failure & Browser Error UI
 
-Nayra runs feature detection at startup via [`src/utils/feature-detection.js`](../src/utils/feature-detection.js).
-If any **required** API is missing, a user-friendly error screen is shown (see [`src/ui/browser-error.js`](../src/ui/browser-error.js)):
+Nayra is designed to fail gracefully when run in legacy browsers. Before initialization, a dedicated feature detection suite checks for the presence of all [required APIs](#required-api-availability).
 
-- Names the missing feature(s)
-- Explains why the feature is needed
-- Suggests upgrading to Chrome 90+, Firefox 90+, or Safari 14+
+### Feature Detection Process
+
+1. **At Startup:** [`src/utils/feature-detection.js`](../src/utils/feature-detection.js) runs a series of non-destructive checks (e.g., checking `typeof BigInt !== 'undefined'`, attempting to create a small `CanvasRenderingContext2D`, etc.).
+2. **On Failure:** If any required feature is missing, the application halts initialization to prevent script crashes and shows a full-screen error overlay.
+
+### Browser Error Overlay
+
+The error UI ([`src/ui/browser-error.js`](../src/ui/browser-error.js)) is a high-contrast, accessible overlay that provides the following information to the user:
+
+- **Explicit "Not Supported" Message:** A clear visual and ARIA-announced title.
+- **List of Missing Features:** Dynamically identifies which specific APIs are causing the failure (e.g., "BigInt", "Canvas 2D API").
+- **Actionable Upgrade Path:** Explicitly recommends upgrading to **Chrome 90+**, **Firefox 90+**, or **Safari 14+**.
+- **Accessibility:** The overlay uses `role="alert"` and `aria-live="assertive"` to ensure immediate announcement by screen readers, and it manages focus to prevent interaction with the broken background application.
+
+By providing this detailed feedback instead of a silent failure or a cryptic console error, Nayra ensures a professional user experience even on incompatible hardware or software.
 
 ## High-DPI Display Support
 

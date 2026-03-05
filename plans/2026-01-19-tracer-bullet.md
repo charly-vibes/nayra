@@ -9,7 +9,7 @@ A tracer-bullet implementation that proves the core architecture is viable: Canv
 ## Related
 
 - Specs: `openspec/specs/core-rendering/spec.md`, `openspec/specs/time-coordinates/spec.md`, `openspec/specs/state-management/spec.md`
-- Research: `Vanilla JS Data Visualization Backend Review.md`
+- Research: `../docs/architecture.md`
 
 ## Current State
 
@@ -434,6 +434,6 @@ This is greenfield—if approach fails:
 
 ## References
 
-- [Vanilla JS Data Visualization Backend Review.md](../Vanilla%20JS%20Data%20Visualization%20Backend%20Review.md) - Architecture patterns and code samples
+- [Architecture Review](../docs/architecture.md) - Architecture patterns and code samples
 - [MDN Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API)
 - [BigInt MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt)

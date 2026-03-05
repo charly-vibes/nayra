@@ -225,7 +225,7 @@ Nayra is designed to meet these benchmarks:
 
 For deep technical analysis of the architecture and implementation strategies, see:
 
-- [Vanilla JS Data Visualization Backend Review.md](Vanilla%20JS%20Data%20Visualization%20Backend%20Review.md) - Comprehensive technical analysis
+- [Architecture Review](docs/architecture.md) - Comprehensive technical analysis
 
 Key topics covered:
 - Canvas vs SVG vs DOM rendering trade-offs

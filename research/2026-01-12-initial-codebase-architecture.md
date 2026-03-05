@@ -44,7 +44,7 @@ nayra/
 ├── justfile              # Unified local/CI workflow commands
 ├── AGENTS.md             # Development workflow and philosophy
 ├── README.md             # Project overview and quick start
-└── Vanilla JS Data Visualization Backend Review.md  # Technical reference
+└── docs/architecture.md  # Technical reference
 ```
 
 ### Development Infrastructure
@@ -155,7 +155,7 @@ Tested on:
 
 ### Rendering Architecture: The Hybrid "Sandwich" Pattern
 
-From `Vanilla JS Data Visualization Backend Review.md`, the architecture uses a layered approach:
+From `../docs/architecture.md`, the architecture uses a layered approach:
 
 | Layer | Technology | Purpose | Rationale |
 |-------|-----------|---------|-----------|
@@ -501,7 +501,7 @@ Key files from technical review that should be implemented:
 
 ## Related
 
-- `Vanilla JS Data Visualization Backend Review.md` - Complete technical architecture reference
+- `../docs/architecture.md` - Complete technical architecture reference
 - `AGENTS.md` - Development workflow and philosophy
 - `README.md` - Project overview and quick start
 - `justfile` - Development commands

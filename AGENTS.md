@@ -92,7 +92,7 @@ Commands are available as slash commands in Claude Code:
 
 ## Technical Principles
 
-Based on our architectural analysis (see `Vanilla JS Data Visualization Backend Review.md`):
+Based on our architectural analysis (see `docs/architecture.md`):
 
 1. **Hybrid Rendering**: Use Canvas for high-performance visualization, DOM for UI controls and accessibility
 2. **Deep Time Support**: Use BigInt for temporal coordinates spanning billions of years

@@ -136,6 +136,76 @@ describe('Wikidata SPARQL Transformer', () => {
       expect(result[1].id).toBe('Q43653');
     });
 
+    describe('deep time dates', () => {
+      it('converts Big Bang date to Ga notation', () => {
+        const sparqlResult = {
+          results: {
+            bindings: [{
+              item: { value: 'http://www.wikidata.org/entity/Q1' },
+              itemLabel: { value: 'Big Bang' },
+              startTime: { value: '-13799999999-01-01T00:00:00Z' },
+              startTimePrecision: { value: '0' },
+            }],
+          },
+        };
+
+        const result = transformWikidata(sparqlResult);
+
+        expect(result[0].start).toBe('13.8 Ga');
+      });
+
+      it('converts Earth formation to Ga notation', () => {
+        const sparqlResult = {
+          results: {
+            bindings: [{
+              item: { value: 'http://www.wikidata.org/entity/Q2' },
+              itemLabel: { value: 'Earth formation' },
+              startTime: { value: '-4499999999-01-01T00:00:00Z' },
+              startTimePrecision: { value: '0' },
+            }],
+          },
+        };
+
+        const result = transformWikidata(sparqlResult);
+
+        expect(result[0].start).toBe('4.5 Ga');
+      });
+
+      it('converts dinosaur extinction to Ma notation', () => {
+        const sparqlResult = {
+          results: {
+            bindings: [{
+              item: { value: 'http://www.wikidata.org/entity/Q3' },
+              itemLabel: { value: 'Cretaceous–Paleogene extinction event' },
+              startTime: { value: '-65999999-01-01T00:00:00Z' },
+              startTimePrecision: { value: '3' },
+            }],
+          },
+        };
+
+        const result = transformWikidata(sparqlResult);
+
+        expect(result[0].start).toBe('66 Ma');
+      });
+
+      it('converts million-year-scale date to Ma notation without Ga', () => {
+        const sparqlResult = {
+          results: {
+            bindings: [{
+              item: { value: 'http://www.wikidata.org/entity/Q4' },
+              itemLabel: { value: 'Cambrian explosion' },
+              startTime: { value: '-538000000-01-01T00:00:00Z' },
+              startTimePrecision: { value: '3' },
+            }],
+          },
+        };
+
+        const result = transformWikidata(sparqlResult);
+
+        expect(result[0].start).toBe('538 Ma');
+      });
+    });
+
     describe('BCE date adjustment', () => {
       it('adjusts astronomical year -43 to 44 BCE', () => {
         const sparqlResult = {

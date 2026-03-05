@@ -31,7 +31,7 @@ export class RationalScale {
     }
     const factorBig = BigInt(Math.round(factor * 1000000));
     const newNumer = (this._numer * factorBig) / 1000000n;
-    return new RationalScale(newNumer, this._denom);
+    return new RationalScale(newNumer < 1n ? 1n : newNumer, this._denom);
   }
 
   static fromSecondsPerPixel(secondsPerPixel) {

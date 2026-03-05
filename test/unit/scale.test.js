@@ -77,6 +77,15 @@ describe('RationalScale', () => {
       expect(() => scale.zoom(0)).toThrow('Zoom factor must be positive');
       expect(() => scale.zoom(-1)).toThrow('Zoom factor must be positive');
     });
+
+    it('never produces a numerator < 1 when zooming out to SPP 1e15', () => {
+      // Start at 1 SPP and zoom out ~50 steps of 0.5 to reach ~1e15 SPP
+      let scale = RationalScale.fromSecondsPerPixel(1);
+      for (let i = 0; i < 50; i++) {
+        scale = scale.zoom(0.5);
+        expect(scale.numerator).toBeGreaterThanOrEqual(1n);
+      }
+    });
   });
 
   describe('deep time precision', () => {

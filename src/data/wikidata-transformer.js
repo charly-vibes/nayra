@@ -13,6 +13,16 @@ function getValue(binding, key) {
   return binding[key]?.value;
 }
 
+function formatBceYear(bceYear) {
+  if (bceYear >= 1_000_000_000) {
+    return `${parseFloat((bceYear / 1e9).toFixed(2))} Ga`;
+  }
+  if (bceYear >= 1_000_000) {
+    return `${parseFloat((bceYear / 1e6).toFixed(1))} Ma`;
+  }
+  return `${bceYear} BCE`;
+}
+
 function astronomicalToHistorical(dateStr) {
   const match = dateStr.match(/^(-?\d+)-(\d{2})-(\d{2})/);
   if (!match) return dateStr;
@@ -20,8 +30,7 @@ function astronomicalToHistorical(dateStr) {
   let year = parseInt(match[1], 10);
 
   if (year <= 0) {
-    const bceYear = 1 - year;
-    return `${bceYear} BCE`;
+    return formatBceYear(1 - year);
   }
 
   return `${year}-${match[2]}-${match[3]}`;
@@ -33,7 +42,7 @@ function simplifyDate(dateStr, precision) {
     if (match) {
       const year = parseInt(match[1], 10);
       if (year <= 0) {
-        return `${1 - year} BCE`;
+        return formatBceYear(1 - year);
       }
       return String(year);
     }

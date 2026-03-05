@@ -64,7 +64,7 @@ Nayra supports multiple ways to load timeline data:
 
 **URL Parameter** (default method):
 ```
-http://localhost:5173/?example=earth-history
+http://localhost:8080/?example=earth-history
 ```
 
 Available built-in examples:
@@ -74,9 +74,9 @@ Available built-in examples:
 - `wikidata-wars` - Historical conflicts from Wikidata SPARQL queries
 - `multilane-demo` - Project timeline demonstrating overlapping tasks in multiple lanes
 
-**Local Files**: Drag a JSON file onto the canvas (coming soon)
+**Local Files**: Drag a JSON or JSON-LD file directly onto the timeline canvas to load it.
 
-**File Picker**: Use the Examples tab in the help menu (coming soon)
+**File Picker**: Use the **Load from file...** button in the **Examples** tab of the help menu (`?`).
 
 ### Interaction & Navigation
 

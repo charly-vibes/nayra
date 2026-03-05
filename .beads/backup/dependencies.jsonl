@@ -22,6 +22,7 @@
 {"created_at":"2026-03-03T17:22:04Z","created_by":"charly vibes","depends_on_id":"nayra-5bd","issue_id":"nayra-4op","type":"blocks"}
 {"created_at":"2026-03-03T17:22:04Z","created_by":"charly vibes","depends_on_id":"nayra-6m5","issue_id":"nayra-4op","type":"blocks"}
 {"created_at":"2026-03-03T17:22:03Z","created_by":"charly vibes","depends_on_id":"nayra-5bd","issue_id":"nayra-4po","type":"blocks"}
+{"created_at":"2026-03-05T19:53:14Z","created_by":"charly vibes","depends_on_id":"nayra-3ab","issue_id":"nayra-5bd","type":"blocks"}
 {"created_at":"2026-01-22T03:30:06Z","created_by":"charly vibes","depends_on_id":"nayra-qvm","issue_id":"nayra-5jt","type":"blocks"}
 {"created_at":"2026-03-03T17:22:04Z","created_by":"charly vibes","depends_on_id":"nayra-4op","issue_id":"nayra-5ti","type":"blocks"}
 {"created_at":"2026-03-03T17:22:04Z","created_by":"charly vibes","depends_on_id":"nayra-4po","issue_id":"nayra-5ti","type":"blocks"}
@@ -33,6 +34,7 @@
 {"created_at":"2026-01-24T00:58:43Z","created_by":"charly vibes","depends_on_id":"nayra-9gz","issue_id":"nayra-8ns","type":"blocks"}
 {"created_at":"2026-01-24T00:58:43Z","created_by":"charly vibes","depends_on_id":"nayra-pnu","issue_id":"nayra-8ns","type":"blocks"}
 {"created_at":"2026-01-20T22:49:25Z","created_by":"charly vibes","depends_on_id":"nayra-0e2","issue_id":"nayra-96o","type":"blocks"}
+{"created_at":"2026-03-05T19:53:19Z","created_by":"charly vibes","depends_on_id":"nayra-089","issue_id":"nayra-9bv","type":"blocks"}
 {"created_at":"2026-02-20T13:55:48Z","created_by":"charly vibes","depends_on_id":"nayra-4kv","issue_id":"nayra-9wc","type":"blocks"}
 {"created_at":"2026-01-24T01:21:28Z","created_by":"charly vibes","depends_on_id":"nayra-a39","issue_id":"nayra-a39.1","type":"parent-child"}
 {"created_at":"2026-01-24T01:21:39Z","created_by":"charly vibes","depends_on_id":"nayra-a39","issue_id":"nayra-a39.2","type":"parent-child"}
@@ -47,6 +49,7 @@
 {"created_at":"2026-01-20T22:49:25Z","created_by":"charly vibes","depends_on_id":"nayra-96o","issue_id":"nayra-a9u","type":"blocks"}
 {"created_at":"2026-01-22T03:30:12Z","created_by":"charly vibes","depends_on_id":"nayra-h19","issue_id":"nayra-adr","type":"blocks"}
 {"created_at":"2026-02-06T15:10:17Z","created_by":"charly vibes","depends_on_id":"nayra-eay","issue_id":"nayra-de8","type":"blocks"}
+{"created_at":"2026-03-05T19:57:56Z","created_by":"charly vibes","depends_on_id":"nayra-8q5","issue_id":"nayra-duw","type":"blocks"}
 {"created_at":"2026-02-20T13:55:48Z","created_by":"charly vibes","depends_on_id":"nayra-erc","issue_id":"nayra-e8q","type":"blocks"}
 {"created_at":"2026-01-22T03:33:10Z","created_by":"charly vibes","depends_on_id":"nayra-2zs","issue_id":"nayra-e9d","type":"blocks"}
 {"created_at":"2026-01-22T03:24:56Z","created_by":"charly vibes","depends_on_id":"nayra-5jt","issue_id":"nayra-e9d","type":"blocks"}
@@ -146,6 +149,7 @@
 {"created_at":"2026-02-20T20:58:35Z","created_by":"charly vibes","depends_on_id":"nayra-tnj.6","issue_id":"nayra-tnj.7","type":"blocks"}
 {"created_at":"2026-02-08T20:28:35Z","created_by":"charly vibes","depends_on_id":"nayra-s1p","issue_id":"nayra-u6f","type":"parent-child"}
 {"created_at":"2026-02-08T20:28:31Z","created_by":"charly vibes","depends_on_id":"nayra-ztj","issue_id":"nayra-u6f","type":"blocks"}
+{"created_at":"2026-03-05T19:58:01Z","created_by":"charly vibes","depends_on_id":"nayra-xic","issue_id":"nayra-xfj","type":"blocks"}
 {"created_at":"2026-01-20T22:49:25Z","created_by":"charly vibes","depends_on_id":"nayra-8cl","issue_id":"nayra-y9x","type":"blocks"}
 {"created_at":"2026-02-08T20:28:35Z","created_by":"charly vibes","depends_on_id":"nayra-s1p","issue_id":"nayra-ztj","type":"parent-child"}
 {"created_at":"2026-02-20T13:55:48Z","created_by":"charly vibes","depends_on_id":"nayra-9wc","issue_id":"nayra-zxs","type":"blocks"}

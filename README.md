@@ -208,7 +208,7 @@ nayra/
 ├── handoffs/              # Session handoff documents
 ├── debates/               # Design debates and decisions
 ├── .agents/commands/      # Agent workflow commands
-└── docs/                  # Documentation
+└── docs/                  # [Documentation Index](docs/README.md)
 ```
 
 ## Performance Targets

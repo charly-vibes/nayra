@@ -40,7 +40,7 @@ nayra/
 ├── debates/              # Design debates and decisions (currently empty)
 ├── src/                  # Source code - NOT YET CREATED
 ├── test/                 # Test files - NOT YET CREATED
-├── docs/                 # Documentation - NOT YET CREATED
+├── docs/                 # [Documentation Index](docs/README.md)
 ├── justfile              # Unified local/CI workflow commands
 ├── AGENTS.md             # Development workflow and philosophy
 ├── README.md             # Project overview and quick start

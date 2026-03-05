@@ -14,7 +14,7 @@ Nayra is a framework-free timeline visualization tool designed to render interac
 - 📊 **10,000+ Events**: Spatial indexing and efficient collision detection
 - ♿ **Accessible**: Full keyboard navigation, WCAG 2.1 AA compliant focus indicators
 - 💾 **No Backend Required**: Static data delivery with IndexedDB storage
-- 🔍 **Infinite Zoom**: Smooth pan and zoom with floating-origin precision
+- 🔍 **Deep Time Zoom**: Smooth pan and zoom from cosmological epochs to microseconds
 
 ## Architecture
 
@@ -29,6 +29,8 @@ Nayra implements a hybrid rendering architecture:
 
 ### Technical Highlights
 
+- **Deep Time Scale**: Supports temporal ranges from the Big Bang (~13.8 Ga) to the far future.
+- **Microsecond Precision**: High-resolution zoom down to the microsecond level.
 - **Immediate Mode Graphics**: Canvas API for rendering 10,000+ objects at 60 FPS
 - **BigInt Coordinates**: Handle temporal scales from microseconds to billions of years
 - **Floating Origin**: Viewport-relative coordinates prevent floating-point precision loss

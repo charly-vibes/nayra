@@ -170,7 +170,16 @@ Coverage targets: 80%+ overall, 100% on critical paths (rendering, layout, state
 
 ## Coding Standards
 
-- **Language**: Vanilla JavaScript (ES6+). No TypeScript, no frameworks.
+### Core Principles
+
+- **No Frameworks**: Maintain a pure vanilla JavaScript architecture (ES6+). No React, Vue, Angular, or other heavy runtime abstractions.
+- **Performance-Aware**: Always prioritize the 60 FPS rendering target. Minimize GC pressure, avoid unnecessary DOM reflows, and optimize tight loops.
+- **Tidy First**: Apply structural refactors ("tidying") in separate commits before adding new features or changing behavior.
+- **Test-Driven**: Always write a failing test case before implementing a fix or feature.
+
+### Implementation Details
+
+- **Language**: Vanilla JavaScript (ES6+). No TypeScript.
 - **Formatting**: Prettier — 2-space indent, single quotes, semicolons, 80-char lines.
 - **Naming**:
   - Classes: `PascalCase`

@@ -114,26 +114,18 @@ All touch gestures are implemented using the Pointer Events API for unified hand
 
 ### Development Commands
 
+Run `just` (default) for a development server, or `just ci` for the full test/build pipeline.
+
 ```bash
-just dev          # Start development server with hot reload
-just test         # Run test suite
-just lint         # Run linter (ESLint)
-just fmt          # Format code (Prettier)
-just build        # Build for production
-just ci           # Run full CI pipeline
+just dev          # Start development server
+just ci           # Run full CI pipeline (lint + test + build)
 ```
+
+Detailed development commands are in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Development Workflow
 
-Nayra follows a rigorous Spec-Driven Development (SDD) and Test-Driven Development (TDD) methodology:
-
-1. **Create Spec**: Write `.feature` files in `specs/` describing user-facing behavior
-2. **Write Test**: Implement failing tests based on spec scenarios
-3. **Implement**: Write minimal code to make tests pass
-4. **Refactor**: Clean up while keeping tests green
-5. **Verify**: Ensure 60 FPS performance and 10,000+ event capacity
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for complete development guidelines.
+Nayra follows a rigorous Spec-Driven Development (SDD) and Test-Driven Development (TDD) methodology. See [CONTRIBUTING.md](CONTRIBUTING.md) for the complete development lifecycle, coding standards, and git conventions.
 
 ## Data Format
 
@@ -272,15 +264,13 @@ For detailed compatibility notes and known issues, see [docs/browser-support.md]
 
 ## Contributing
 
-We follow strict development practices:
+Contributions are welcome! We follow strict development practices (No Frameworks, TDD, Tidy First).
 
-1. **Tidy First**: Refactor before adding features (separate commits)
-2. **Test-Driven**: Write tests before implementation
-3. **Conventional Commits**: Use `feat:`, `fix:`, `refactor:`, etc.
-4. **Performance-Aware**: Always consider 60 FPS target
-5. **No Frameworks**: Maintain vanilla JS architecture
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow — issue tracking (Beads), spec proposals (OpenSpec), coding standards, and git conventions.
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for full details on:
+- **Issue Tracking**: How we use [Beads](https://github.com/steveyegge/beads).
+- **Spec Management**: How we use [OpenSpec](openspec/project.md).
+- **Coding Standards**: Conventions for vanilla JavaScript development.
+- **Git Protocol**: Commit message formats and branching strategy.
 
 ## Available Commands
 

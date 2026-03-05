@@ -49,6 +49,30 @@ describe('encodeSearchState / decodeSearchState', () => {
   });
 });
 
+describe('single encoding (no double-encoding)', () => {
+  it('category with special chars is encoded exactly once', () => {
+    const hash = encodeSearchState({
+      searchQuery: '',
+      selectedCategories: ['Science & Technology'],
+      filterMode: 'OR',
+    });
+    // %25 would mean the % itself was encoded — a sign of double-encoding
+    expect(hash).not.toContain('%25');
+    // The ampersand should be encoded as %26, not %2526
+    expect(hash).toContain('%26');
+  });
+
+  it('category with spaces is encoded exactly once', () => {
+    const hash = encodeSearchState({
+      searchQuery: '',
+      selectedCategories: ['Moon Landing'],
+      filterMode: 'OR',
+    });
+    expect(hash).not.toContain('%25');
+    expect(hash).toContain('Moon%20Landing');
+  });
+});
+
 describe('special character encoding', () => {
   it('encodes and decodes queries with spaces', () => {
     const hash = encodeSearchState({ searchQuery: 'Moon Landing', selectedCategories: [], filterMode: 'OR' });

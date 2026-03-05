@@ -73,7 +73,7 @@ export function encodeSearchState({ searchQuery, selectedCategories, filterMode 
 
   if (selectedCategories && selectedCategories.length > 0) {
     // Encode each category individually, join with comma
-    params.cats = selectedCategories.map(encodeURIComponent).join(',');
+    params.cats = selectedCategories.join(',');
   }
 
   if (filterMode && filterMode !== 'OR') {
@@ -97,7 +97,7 @@ export function encodeAllState({ searchQuery, selectedCategories, filterMode, vi
   }
 
   if (selectedCategories && selectedCategories.length > 0) {
-    params.cats = selectedCategories.map(encodeURIComponent).join(',');
+    params.cats = selectedCategories.join(',');
   }
 
   if (filterMode && filterMode !== 'OR') {
@@ -149,9 +149,7 @@ export function decodeSearchState(hash) {
     const searchQuery = params.q || '';
 
     const selectedCategories = params.cats
-      ? params.cats.split(',').map((c) => {
-          try { return decodeURIComponent(c); } catch { return c; }
-        }).filter(Boolean)
+      ? params.cats.split(',').filter(Boolean)
       : [];
 
     const filterMode = params.mode === 'AND' ? 'AND' : 'OR';

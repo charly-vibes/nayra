@@ -2,9 +2,9 @@
  * Performance benchmarks for text search.
  * Compares linear scan (filterEvents) vs inverted index (InvertedIndex) at scale.
  */
-import { describe, it, expect, beforeAll } from 'vitest';
-import { filterEvents } from '../../src/core/search-engine.js';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { InvertedIndex } from '../../src/core/inverted-index.js';
+import { filterEvents } from '../../src/core/search-engine.js';
 
 function makeEvents(count) {
   const categories = ['Science', 'Military', 'Political', 'Cultural', 'Economic'];
@@ -65,7 +65,10 @@ describe('InvertedIndex', () => {
   it('updates when new events are added', () => {
     const idx = new InvertedIndex();
     idx.build([{ id: 'e1', label: 'Moon', description: '' }]);
-    idx.build([{ id: 'e1', label: 'Moon', description: '' }, { id: 'e2', label: 'Mars', description: '' }]);
+    idx.build([
+      { id: 'e1', label: 'Moon', description: '' },
+      { id: 'e2', label: 'Mars', description: '' },
+    ]);
     expect(idx.search('Mars')).toContain('e2');
   });
 

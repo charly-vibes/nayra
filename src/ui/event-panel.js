@@ -1,5 +1,5 @@
-import { formatTimeRange } from './format.js';
 import { createFocusTrap } from '../accessibility/focus-trap.js';
+import { formatTimeRange } from './format.js';
 
 export function createEventPanel(container, { onClose }) {
   const overlay = document.createElement('div');
@@ -152,9 +152,12 @@ export function createEventPanel(container, { onClose }) {
     }
 
     if (event.tags && event.tags.length > 0) {
-      const tagSpans = event.tags.map(t => 
-        `<span style="background: #1a1a2e; padding: 2px 8px; border-radius: 4px; margin-right: 4px;">${escapeHtml(t)}</span>`
-      ).join('');
+      const tagSpans = event.tags
+        .map(
+          (t) =>
+            `<span style="background: #1a1a2e; padding: 2px 8px; border-radius: 4px; margin-right: 4px;">${escapeHtml(t)}</span>`,
+        )
+        .join('');
       metaHtml += `<div class="event-panel-tags" style="margin-bottom: 8px;">
         <strong>Tags:</strong> ${tagSpans}
       </div>`;

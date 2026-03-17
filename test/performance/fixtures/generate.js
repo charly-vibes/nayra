@@ -6,7 +6,7 @@
  */
 
 const BASE_TIME = -2208988800n; // 1900-01-01 00:00:00 UTC (seconds)
-const RANGE     = 6311520000n;  // 200 years in seconds
+const RANGE = 6311520000n; // 200 years in seconds
 
 const CATEGORIES = ['science', 'politics', 'culture', 'technology', 'nature'];
 
@@ -39,7 +39,7 @@ export function generateEvents(count, seed = 42) {
       : undefined;
 
     const category = CATEGORIES[Math.floor(rand() * CATEGORIES.length)];
-    const priority  = Math.floor(rand() * 3); // 0 | 1 | 2
+    const priority = Math.floor(rand() * 3); // 0 | 1 | 2
 
     events.push({
       id: `evt-${i}`,
@@ -57,10 +57,16 @@ export function generateEvents(count, seed = 42) {
 // Module-level caches: datasets are generated once and reused across tests.
 let _1k, _10k, _50k;
 
-export function getDataset1K()  { return _1k  ?? (_1k  = generateEvents(1_000)); }
-export function getDataset10K() { return _10k ?? (_10k = generateEvents(10_000)); }
-export function getDataset50K() { return _50k ?? (_50k = generateEvents(50_000)); }
+export function getDataset1K() {
+  return _1k ?? (_1k = generateEvents(1_000));
+}
+export function getDataset10K() {
+  return _10k ?? (_10k = generateEvents(10_000));
+}
+export function getDataset50K() {
+  return _50k ?? (_50k = generateEvents(50_000));
+}
 
 /** Time constants re-exported for benchmark convenience */
 export const DATASET_BASE_TIME = BASE_TIME;
-export const DATASET_RANGE     = RANGE;
+export const DATASET_RANGE = RANGE;

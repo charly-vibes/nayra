@@ -10,21 +10,21 @@
  *   3. WeakRef registry confirms objects are collected after all references drop.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { createStore } from '../../src/core/store.js';
 import {
-  forceGC,
   captureHeapBytes,
-  measureGrowthMB,
   createWeakRegistry,
+  forceGC,
+  measureGrowthMB,
 } from '../../src/monitoring/memory-profiler.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-const CYCLES         = 100;
-const MAX_GROWTH_MB  = 5;
+const CYCLES = 100;
+const MAX_GROWTH_MB = 5;
 
 /**
  * Create a store, subscribe once (returns unsubscribe), then return the
@@ -51,7 +51,7 @@ describe('heap growth', () => {
     }
 
     forceGC();
-    const after   = captureHeapBytes();
+    const after = captureHeapBytes();
     const growthMB = measureGrowthMB(before, after);
 
     // GC is non-deterministic; allow the threshold to absorb minor variation
@@ -70,7 +70,7 @@ describe('heap growth', () => {
     }
 
     forceGC();
-    const after    = captureHeapBytes();
+    const after = captureHeapBytes();
     const growthMB = measureGrowthMB(before, after);
 
     // Holding 100 stores in memory is still < 5 MB
@@ -87,9 +87,11 @@ describe('heap growth', () => {
 
 describe('store listener cleanup', () => {
   it('removes the listener from the store when unsubscribe is called', () => {
-    const store  = createStore();
+    const store = createStore();
     let callCount = 0;
-    const unsub  = store.subscribe(() => { callCount++; });
+    const unsub = store.subscribe(() => {
+      callCount++;
+    });
 
     // Trigger a state change
     store.dispatch({ type: 'SET_VIEWPORT', viewportStart: 0n, scale: store.getState().scale });
@@ -104,10 +106,15 @@ describe('store listener cleanup', () => {
   });
 
   it('multiple subscriptions can be independently unsubscribed', () => {
-    const store  = createStore();
-    let a = 0, b = 0;
-    const unsubA = store.subscribe(() => { a++; });
-    const unsubB = store.subscribe(() => { b++; });
+    const store = createStore();
+    let a = 0,
+      b = 0;
+    const unsubA = store.subscribe(() => {
+      a++;
+    });
+    const unsubB = store.subscribe(() => {
+      b++;
+    });
 
     store.dispatch({ type: 'SET_VIEWPORT', viewportStart: 0n, scale: store.getState().scale });
     expect(a).toBeGreaterThan(0);
@@ -116,7 +123,7 @@ describe('store listener cleanup', () => {
     unsubA();
     const prevA = a;
     store.dispatch({ type: 'SET_VIEWPORT', viewportStart: 100n, scale: store.getState().scale });
-    expect(a).toBe(prevA);  // A stopped
+    expect(a).toBe(prevA); // A stopped
     expect(b).toBeGreaterThan(prevA); // B still fires
 
     unsubB();
@@ -168,13 +175,13 @@ describe('memory-profiler utilities', () => {
 
   it('measureGrowthMB computes correct MiB delta', () => {
     const before = 10 * 1024 * 1024; // 10 MiB
-    const after  = 15 * 1024 * 1024; // 15 MiB
+    const after = 15 * 1024 * 1024; // 15 MiB
     expect(measureGrowthMB(before, after)).toBeCloseTo(5, 1);
   });
 
   it('measureGrowthMB can be negative (GC reclaimed memory)', () => {
     const before = 20 * 1024 * 1024;
-    const after  = 15 * 1024 * 1024;
+    const after = 15 * 1024 * 1024;
     expect(measureGrowthMB(before, after)).toBeCloseTo(-5, 1);
   });
 

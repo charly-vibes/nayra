@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { RationalScale } from '../../src/core/scale.js';
 import { BILLION_YEARS, YEAR } from '../../src/core/time.js';
 
@@ -38,7 +38,7 @@ describe('RationalScale', () => {
 
     it('handles deep time without precision loss', () => {
       const scale = RationalScale.fromSecondsPerPixel(Number(YEAR));
-      const fourPointFiveBillionYears = 4n * BILLION_YEARS + (BILLION_YEARS / 2n);
+      const fourPointFiveBillionYears = 4n * BILLION_YEARS + BILLION_YEARS / 2n;
       const px = scale.timeToPx(fourPointFiveBillionYears);
       expect(px).toBeCloseTo(4.5e9, -6);
     });

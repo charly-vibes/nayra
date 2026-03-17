@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { createFocusManager } from '../../src/interaction/focus-manager.js';
-import { createStore } from '../../src/core/store.js';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { RationalScale } from '../../src/core/scale.js';
+import { createStore } from '../../src/core/store.js';
+import { createFocusManager } from '../../src/interaction/focus-manager.js';
 
 describe('FocusManager', () => {
   let store;

@@ -1,11 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
+  DEFAULT_CONFIG,
+  getDynamicLaneConfig,
+  getLaneAtY,
+  getLaneBounds,
   getLaneY,
   getTotalHeight,
-  getLaneBounds,
-  getLaneAtY,
-  getDynamicLaneConfig,
-  DEFAULT_CONFIG,
 } from '../../src/layout/lane-positioning.js';
 
 describe('lane-positioning', () => {
@@ -176,7 +176,7 @@ describe('lane-positioning', () => {
 
     it('returns null for Y outside all lanes', () => {
       const axisY = 300;
-      const veryHighY = 0;  // Way above all lanes
+      const veryHighY = 0; // Way above all lanes
       const lane = getLaneAtY(veryHighY, axisY, 10);
 
       expect(lane).toBeNull();
@@ -184,7 +184,7 @@ describe('lane-positioning', () => {
 
     it('returns null for Y below axis', () => {
       const axisY = 300;
-      const belowY = 400;  // Below axis (lanes are above)
+      const belowY = 400; // Below axis (lanes are above)
       const lane = getLaneAtY(belowY, axisY, 10);
 
       expect(lane).toBeNull();

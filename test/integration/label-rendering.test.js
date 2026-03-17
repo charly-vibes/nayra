@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { createStore } from '../../src/core/store.js';
-import { init, destroy, draw } from '../../src/rendering/renderer.js';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { RationalScale } from '../../src/core/scale.js';
+import { createStore } from '../../src/core/store.js';
+import { destroy, draw, init } from '../../src/rendering/renderer.js';
 
 describe('Label Rendering Integration', () => {
   let canvas;
@@ -48,7 +48,7 @@ describe('Label Rendering Integration', () => {
     // Set a zoom level where events are visible (1 second per pixel)
     store.dispatch({
       type: 'SET_ZOOM',
-      scale: RationalScale.fromSecondsPerPixel(1)
+      scale: RationalScale.fromSecondsPerPixel(1),
     });
 
     store.dispatch({
@@ -62,9 +62,7 @@ describe('Label Rendering Integration', () => {
     draw(store.getState());
 
     // Should render both labels (non-overlapping)
-    const labelCalls = fillTextSpy.mock.calls.filter(
-      (call) => call[0] === 'Event 1' || call[0] === 'Event 2'
-    );
+    const labelCalls = fillTextSpy.mock.calls.filter((call) => call[0] === 'Event 1' || call[0] === 'Event 2');
     expect(labelCalls.length).toBeGreaterThan(0);
   });
 
@@ -74,17 +72,13 @@ describe('Label Rendering Integration', () => {
 
     store.dispatch({
       type: 'SET_EVENTS',
-      events: [
-        { id: 'e1', label: 'Narrow Event', start: 0n, end: 10n },
-      ],
+      events: [{ id: 'e1', label: 'Narrow Event', start: 0n, end: 10n }],
     });
 
     draw(store.getState());
 
     // Should not render label for narrow event
-    const labelCalls = fillTextSpy.mock.calls.filter(
-      (call) => call[0] === 'Narrow Event'
-    );
+    const labelCalls = fillTextSpy.mock.calls.filter((call) => call[0] === 'Narrow Event');
     expect(labelCalls.length).toBe(0);
   });
 
@@ -106,7 +100,7 @@ describe('Label Rendering Integration', () => {
     // Set a zoom level where events are visible (1 second per pixel)
     store.dispatch({
       type: 'SET_ZOOM',
-      scale: RationalScale.fromSecondsPerPixel(1)
+      scale: RationalScale.fromSecondsPerPixel(1),
     });
 
     // Create events that will overlap on screen
@@ -121,12 +115,8 @@ describe('Label Rendering Integration', () => {
     draw(store.getState());
 
     // Check which labels were rendered
-    const wideCalls = fillTextSpy.mock.calls.filter(
-      (call) => call[0] === 'Wide Event'
-    );
-    const narrowCalls = fillTextSpy.mock.calls.filter(
-      (call) => call[0] === 'Narrow Event'
-    );
+    const wideCalls = fillTextSpy.mock.calls.filter((call) => call[0] === 'Wide Event');
+    const _narrowCalls = fillTextSpy.mock.calls.filter((call) => call[0] === 'Narrow Event');
 
     // Wide event should be rendered, narrow might not be (depends on collision)
     expect(wideCalls.length).toBeGreaterThan(0);
@@ -157,14 +147,12 @@ describe('Label Rendering Integration', () => {
   it('should update labels on zoom', () => {
     store.dispatch({
       type: 'SET_EVENTS',
-      events: [
-        { id: 'e1', label: 'Event 1', start: 0n, end: 100n },
-      ],
+      events: [{ id: 'e1', label: 'Event 1', start: 0n, end: 100n }],
     });
 
     // Draw at initial zoom
     draw(store.getState());
-    const initialCalls = fillTextSpy.mock.calls.length;
+    const _initialCalls = fillTextSpy.mock.calls.length;
 
     // Zoom in
     fillTextSpy.mockClear();
@@ -179,7 +167,7 @@ describe('Label Rendering Integration', () => {
     // Set a zoom level where events are visible (1 second per pixel)
     store.dispatch({
       type: 'SET_ZOOM',
-      scale: RationalScale.fromSecondsPerPixel(1)
+      scale: RationalScale.fromSecondsPerPixel(1),
     });
 
     // Create many events in same lane with labels that will overlap
@@ -198,8 +186,8 @@ describe('Label Rendering Integration', () => {
     draw(store.getState());
 
     // Should render some labels but not all (collision detection)
-    const eventLabelCalls = fillTextSpy.mock.calls.filter((call) =>
-      typeof call[0] === 'string' && call[0].startsWith('Event ')
+    const eventLabelCalls = fillTextSpy.mock.calls.filter(
+      (call) => typeof call[0] === 'string' && call[0].startsWith('Event '),
     );
 
     // With 60px spacing and ~60px label width, labels overlap

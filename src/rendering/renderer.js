@@ -1,37 +1,33 @@
-import { projectToScreen, isVisible, YEAR, MILLION_YEARS, BILLION_YEARS } from '../core/time.js';
-import { lightenColor } from './colors.js';
+import { BILLION_YEARS, isVisible, MILLION_YEARS, projectToScreen, YEAR } from '../core/time.js';
+import { clusterEvents } from '../layout/event-clustering.js';
 import { assignLanes } from '../layout/greedy-interval-coloring.js';
-import { getLaneY, DEFAULT_CONFIG as LANE_CONFIG, getDynamicLaneConfig } from '../layout/lane-positioning.js';
-import { SpatialHash } from '../layout/spatial-hash.js';
 import { detectLabelCollisions, renderLabel } from '../layout/label-collision.js';
+import { getDynamicLaneConfig, getLaneY, DEFAULT_CONFIG as LANE_CONFIG } from '../layout/lane-positioning.js';
+import {
+  calculateLayout as calculateLayoutWorker,
+  getWorkerThreshold,
+  initWorker,
+  terminateWorker,
+} from '../layout/layout-worker-manager.js';
+import { SpatialHash } from '../layout/spatial-hash.js';
+import { lightenColor } from './colors.js';
+import { applyDpiScaling, getLogicalSize } from './dpi-scaling.js';
+import { drawEventShapeIndicator, getShapeIndicatorLabelOffset } from './event-shapes.js';
 import {
   determineLOD,
   filterEventsByLOD,
-  shouldShowLabels,
-  shouldRenderAsPoint,
   getMinEventWidth,
-  LOD_MICRO,
   LOD_MACRO,
+  LOD_MICRO,
+  shouldRenderAsPoint,
+  shouldShowLabels,
 } from './lod.js';
-import { clusterEvents, isPointInCluster } from '../layout/event-clustering.js';
-import {
-  calculateLayout as calculateLayoutWorker,
-  initWorker,
-  terminateWorker,
-  getWorkerThreshold,
-} from '../layout/layout-worker-manager.js';
-import {
-  getEventSearchState,
-  getSearchAlpha,
-  renderHighlightedLabel,
-} from './search-highlight.js';
-import { drawEventShapeIndicator, getShapeIndicatorLabelOffset } from './event-shapes.js';
-import { applyDpiScaling, getLogicalSize } from './dpi-scaling.js';
+import { getEventSearchState, getSearchAlpha, renderHighlightedLabel } from './search-highlight.js';
 
 let ctx = null;
 let canvas = null;
 let resizeObserver = null;
-let lastFrameTime = performance.now();
+let _lastFrameTime = performance.now();
 let fps = 0;
 let frameCount = 0;
 let fpsUpdateTime = 0;
@@ -40,7 +36,7 @@ let fpsUpdateTime = 0;
 let laneAssignments = new Map(); // eventId -> lane number
 let laneCount = 0;
 let currentLaneConfig = { ...LANE_CONFIG }; // dynamic config updated each frame
-let spatialHash = new SpatialHash();
+const spatialHash = new SpatialHash();
 let layoutRevision = -1; // Track when layout needs recalculation
 let currentLOD = LOD_MICRO; // Current level of detail
 let clusters = []; // Current event clusters (for macro zoom)
@@ -48,13 +44,12 @@ let pendingLayoutRevision = -1; // Track pending async layout calculation
 let isLayoutPending = false; // Flag to prevent duplicate layout requests
 
 export const AXIS_BOTTOM_MARGIN = 60;
-export function getAxisY(height) { return height - AXIS_BOTTOM_MARGIN; }
+export function getAxisY(height) {
+  return height - AXIS_BOTTOM_MARGIN;
+}
 
 export const EVENT_HEIGHT = 20;
-export const EVENT_COLORS = [
-  '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4',
-  '#ffeaa7', '#dfe6e9', '#fd79a8', '#a29bfe',
-];
+export const EVENT_COLORS = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dfe6e9', '#fd79a8', '#a29bfe'];
 
 export function init(canvasElement, dispatch) {
   canvas = canvasElement;
@@ -182,10 +177,14 @@ function calculateLayout(state, axisY, viewportStart, scale, width) {
   pendingLayoutRevision = targetRevision;
 
   // Kick off async calculation
-  calculateLayoutWorker(state.events, {
-    start: viewportStart,
-    end: viewportStart + scale.pxToTime(width),
-  }, scale.getSecondsPerPixel())
+  calculateLayoutWorker(
+    state.events,
+    {
+      start: viewportStart,
+      end: viewportStart + scale.pxToTime(width),
+    },
+    scale.getSecondsPerPixel(),
+  )
     .then((result) => {
       // Only apply result if it's still relevant (revision hasn't changed)
       if (pendingLayoutRevision === targetRevision && layoutRevision !== targetRevision) {
@@ -281,13 +280,7 @@ export function draw(state) {
 
   // Calculate layout (only if state changed)
   // For macro zoom with clustering, we still need layout for individual events within clusters
-  calculateLayout(
-    { ...state, events: lodFilteredEvents },
-    axisY,
-    state.viewportStart,
-    state.scale,
-    width
-  );
+  calculateLayout({ ...state, events: lodFilteredEvents }, axisY, state.viewportStart, state.scale, width);
 
   // Update dynamic lane config based on current lane count and canvas height
   currentLaneConfig = getDynamicLaneConfig(axisY, laneCount);
@@ -353,7 +346,7 @@ export function draw(state) {
               eventData.bounds.width,
               eventData.bounds.height,
               state.searchQuery,
-              symbolOffset
+              symbolOffset,
             );
           } else {
             renderLabel(
@@ -363,7 +356,7 @@ export function draw(state) {
               eventData.bounds.y,
               eventData.bounds.width,
               eventData.bounds.height,
-              symbolOffset
+              symbolOffset,
             );
           }
         }
@@ -432,7 +425,7 @@ function drawEvent(event, state, axisY, canvasWidth, lod, searchResultSet = null
   if (x > canvasWidth || x + displayWidth < 0) return null;
 
   const isHovered = state.hoveredEventId === event.id;
-  const isSelected = state.selectedEventIds && state.selectedEventIds.has(event.id);
+  const isSelected = state.selectedEventIds?.has(event.id);
   const isFocused = state.focusedEventId === event.id;
 
   const searchState = getEventSearchState(event.id, searchResultSet);
@@ -456,19 +449,9 @@ function drawEvent(event, state, axisY, canvasWidth, lod, searchResultSet = null
     ctx.strokeStyle = strokeStyle.color;
     ctx.lineWidth = strokeStyle.lineWidth;
     if (isSelected) {
-      ctx.strokeRect(
-        x - pointSize / 2 - 1,
-        y + (eventHeight - pointSize) / 2 - 1,
-        pointSize + 2,
-        pointSize + 2
-      );
+      ctx.strokeRect(x - pointSize / 2 - 1, y + (eventHeight - pointSize) / 2 - 1, pointSize + 2, pointSize + 2);
     } else {
-      ctx.strokeRect(
-        x - pointSize / 2,
-        y + (eventHeight - pointSize) / 2,
-        pointSize,
-        pointSize
-      );
+      ctx.strokeRect(x - pointSize / 2, y + (eventHeight - pointSize) / 2, pointSize, pointSize);
     }
   } else {
     // Render as a duration bar
@@ -489,9 +472,7 @@ function drawEvent(event, state, axisY, canvasWidth, lod, searchResultSet = null
   ctx.globalAlpha = 1.0;
 
   // Calculate label x offset to avoid overlapping the shape indicator
-  const symbolOffset = renderAsPoint
-    ? 0
-    : getShapeIndicatorLabelOffset(displayWidth, eventHeight);
+  const symbolOffset = renderAsPoint ? 0 : getShapeIndicatorLabelOffset(displayWidth, eventHeight);
 
   // Return bounds for label collision detection (includes symbolOffset for text positioning)
   return { x, y, width: displayWidth, height: eventHeight, symbolOffset };
@@ -501,7 +482,7 @@ export function hashCode(str) {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
+    hash = (hash << 5) - hash + char;
     hash = hash & hash;
   }
   return Math.abs(hash);
@@ -512,7 +493,7 @@ export function getEventColor(eventId) {
   return EVENT_COLORS[colorIndex];
 }
 
-export function getEventFillColor(eventId, isHovered, isSelected) {
+export function getEventFillColor(eventId, isHovered, _isSelected) {
   const baseColor = getEventColor(eventId);
   if (isHovered) {
     return lightenColor(baseColor, 0.2);
@@ -551,10 +532,10 @@ function updateFPS(now) {
     frameCount = 0;
     fpsUpdateTime = now;
   }
-  lastFrameTime = now;
+  _lastFrameTime = now;
 }
 
-function drawFPS(canvasWidth) {
+function drawFPS(_canvasWidth) {
   const text = `${fps} FPS`;
   ctx.font = '12px monospace';
   ctx.fillStyle = fps >= 55 ? '#4ecdc4' : fps >= 30 ? '#ffeaa7' : '#ff6b6b';
@@ -612,7 +593,7 @@ export function formatTime(timeValue, unit, interval) {
     const gaAbs = timeValue < 0n ? -timeValue : timeValue;
     const gaWhole = gaAbs / BILLION_YEARS;
     const gaRemainder = gaAbs % BILLION_YEARS;
-    const decimal = Number(gaRemainder * 10n / BILLION_YEARS);
+    const decimal = Number((gaRemainder * 10n) / BILLION_YEARS);
     const gaNum = Number(gaWhole) + decimal / 10;
     if (timeValue <= 0n) {
       return `${gaNum.toFixed(1)} Bya`;
@@ -627,7 +608,7 @@ export function formatTime(timeValue, unit, interval) {
     const maInt = Number(maWhole);
     if (timeValue <= 0n) {
       if (maInt === 0) {
-        const tenths = Number(maRemainder * 10n / MILLION_YEARS);
+        const tenths = Number((maRemainder * 10n) / MILLION_YEARS);
         return `0.${tenths} Mya`;
       }
       return `${maInt} Mya`;

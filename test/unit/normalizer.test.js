@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { normalize } from '../../src/data/normalizer.js';
 
 describe('Normalizer', () => {
@@ -50,17 +50,19 @@ describe('Normalizer', () => {
     });
 
     it('preserves all other event properties', () => {
-      const events = [{
-        id: 'full',
-        start: '1969',
-        label: 'Moon Landing',
-        description: 'Apollo 11',
-        category: 'space',
-        tags: ['apollo', 'nasa'],
-        priority: 1,
-        url: 'https://nasa.gov',
-        metadata: { mission: 'Apollo 11' },
-      }];
+      const events = [
+        {
+          id: 'full',
+          start: '1969',
+          label: 'Moon Landing',
+          description: 'Apollo 11',
+          category: 'space',
+          tags: ['apollo', 'nasa'],
+          priority: 1,
+          url: 'https://nasa.gov',
+          metadata: { mission: 'Apollo 11' },
+        },
+      ];
       const result = normalize(events);
 
       expect(result.valid).toHaveLength(1);

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { assignLanes } from '../../src/layout/greedy-interval-coloring.js';
 
 describe('assignLanes - Greedy Interval Coloring', () => {
@@ -16,9 +16,7 @@ describe('assignLanes - Greedy Interval Coloring', () => {
     });
 
     it('assigns single event to lane 0', () => {
-      const events = [
-        { id: 'e1', start: 0n, end: 100n },
-      ];
+      const events = [{ id: 'e1', start: 0n, end: 100n }];
       const result = assignLanes(events);
       expect(result.layouts.get('e1')).toBe(0);
       expect(result.laneCount).toBe(1);
@@ -160,9 +158,7 @@ describe('assignLanes - Greedy Interval Coloring', () => {
 
   describe('point events (no end time)', () => {
     it('places point event in lane 0', () => {
-      const events = [
-        { id: 'p1', start: 0n, end: undefined },
-      ];
+      const events = [{ id: 'p1', start: 0n, end: undefined }];
       const result = assignLanes(events);
 
       expect(result.layouts.get('p1')).toBe(0);

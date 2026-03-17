@@ -30,9 +30,7 @@ export function createAriaAnnouncer(elementOrAnnouncer, options = {}) {
     if (count === 0) {
       message = query ? `No results found for '${query}'` : 'No results';
     } else {
-      message = query
-        ? `${count} result${plural} found for '${query}'`
-        : `${count} result${plural} found`;
+      message = query ? `${count} result${plural} found for '${query}'` : `${count} result${plural} found`;
     }
     announcer.announce(message);
   }
@@ -56,8 +54,7 @@ export function createAriaAnnouncer(elementOrAnnouncer, options = {}) {
    * @param {number} count - Number of matching events after filter
    */
   function announceFilterChange(count) {
-    const result =
-      count === 0 ? 'no results' : `${count} result${count !== 1 ? 's' : ''}`;
+    const result = count === 0 ? 'no results' : `${count} result${count !== 1 ? 's' : ''}`;
     announcer.announce(`Category filter applied, ${result}`);
   }
 

@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { isEventInViewport, calculatePanToEvent, initAutoPan } from '../../src/viewport/pan.js';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { RationalScale } from '../../src/core/scale.js';
 import { createStore } from '../../src/core/store.js';
+import { calculatePanToEvent, initAutoPan, isEventInViewport } from '../../src/viewport/pan.js';
 
 describe('Viewport Pan', () => {
   describe('isEventInViewport', () => {

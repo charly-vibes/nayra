@@ -1,12 +1,12 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { createStore } from '../../src/core/store.js';
-import { init, destroy, draw } from '../../src/rendering/renderer.js';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { RationalScale } from '../../src/core/scale.js';
+import { createStore } from '../../src/core/store.js';
+import { destroy, draw, init } from '../../src/rendering/renderer.js';
 
 describe('Render Loop Integration', () => {
   let canvas;
   let store;
-  let ctx;
+  let _ctx;
 
   beforeEach(() => {
     canvas = document.createElement('canvas');

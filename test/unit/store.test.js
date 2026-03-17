@@ -1,7 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
-import { createStore } from '../../src/core/store.js';
+import { describe, expect, it, vi } from 'vitest';
 import { RationalScale } from '../../src/core/scale.js';
-import { YEAR } from '../../src/core/time.js';
+import { createStore } from '../../src/core/store.js';
 
 describe('Store', () => {
   describe('initialization', () => {

@@ -1,8 +1,8 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { applyDpiScaling, getLogicalSize, getDevicePixelRatio } from '../../src/rendering/dpi-scaling.js';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { applyDpiScaling, getDevicePixelRatio, getLogicalSize } from '../../src/rendering/dpi-scaling.js';
 
 describe('dpi-scaling', () => {
   let canvas, ctx;

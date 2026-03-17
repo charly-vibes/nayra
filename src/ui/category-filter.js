@@ -100,8 +100,11 @@ export function createCategoryFilter(container, { onToggle, onSetMode, onClear }
   closeBtn.type = 'button';
   closeBtn.setAttribute('aria-label', 'Close filter panel');
   closeBtn.textContent = '×';
-  closeBtn.style.cssText = 'background:none;border:none;color:#8888aa;cursor:pointer;font-size:16px;line-height:1;padding:0;';
-  closeBtn.addEventListener('click', () => { panel.style.display = 'none'; });
+  closeBtn.style.cssText =
+    'background:none;border:none;color:#8888aa;cursor:pointer;font-size:16px;line-height:1;padding:0;';
+  closeBtn.addEventListener('click', () => {
+    panel.style.display = 'none';
+  });
 
   headerRow.appendChild(heading);
   headerRow.appendChild(closeBtn);

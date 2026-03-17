@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { validate } from '../../src/data/validator.js';
 
 describe('Schema Validator', () => {
@@ -14,20 +14,22 @@ describe('Schema Validator', () => {
       });
 
       it('accepts an event with all optional fields', () => {
-        const events = [{
-          id: 'full-event',
-          start: '2024-01-15',
-          end: '2024-01-20',
-          label: 'Full Event',
-          description: 'A complete event',
-          category: 'science',
-          tags: ['physics', 'discovery'],
-          priority: 1,
-          precision: 'day',
-          url: 'https://example.com',
-          source: 'wikidata:Q12345',
-          metadata: { custom: 'value' },
-        }];
+        const events = [
+          {
+            id: 'full-event',
+            start: '2024-01-15',
+            end: '2024-01-20',
+            label: 'Full Event',
+            description: 'A complete event',
+            category: 'science',
+            tags: ['physics', 'discovery'],
+            priority: 1,
+            precision: 'day',
+            url: 'https://example.com',
+            source: 'wikidata:Q12345',
+            metadata: { custom: 'value' },
+          },
+        ];
 
         const result = validate(events);
 

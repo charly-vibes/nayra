@@ -1,20 +1,20 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { DAY, YEAR } from '../../src/core/time.js';
 import {
   determineLOD,
   filterEventsByLOD,
-  shouldShowLabels,
-  shouldShowFullLabels,
-  getMinEventWidth,
-  shouldRenderAsPoint,
   getEventPriority,
-  LOD_MICRO,
-  LOD_MESO,
+  getMinEventWidth,
   LOD_MACRO,
+  LOD_MESO,
+  LOD_MICRO,
+  PRIORITY_HIGH,
   PRIORITY_LOW,
   PRIORITY_MEDIUM,
-  PRIORITY_HIGH,
+  shouldRenderAsPoint,
+  shouldShowFullLabels,
+  shouldShowLabels,
 } from '../../src/rendering/lod.js';
-import { DAY, YEAR } from '../../src/core/time.js';
 
 describe('LOD System', () => {
   describe('determineLOD', () => {
@@ -99,7 +99,7 @@ describe('LOD System', () => {
     it('should show medium and high priority events at MESO level', () => {
       const filtered = filterEventsByLOD(events, LOD_MESO);
       expect(filtered).toHaveLength(3);
-      expect(filtered.map(e => e.id)).toEqual(['2', '3', '4']);
+      expect(filtered.map((e) => e.id)).toEqual(['2', '3', '4']);
     });
 
     it('should show only high priority events at MACRO level', () => {

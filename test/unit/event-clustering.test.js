@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest';
-import { clusterEvents, getClusterExpansionFactor, isPointInCluster } from '../../src/layout/event-clustering.js';
+import { describe, expect, it } from 'vitest';
 import { RationalScale } from '../../src/core/scale.js';
 import { YEAR } from '../../src/core/time.js';
+import { clusterEvents, getClusterExpansionFactor, isPointInCluster } from '../../src/layout/event-clustering.js';
 
 describe('|unit| event-clustering', () => {
   describe('clusterEvents', () => {
@@ -16,9 +16,7 @@ describe('|unit| event-clustering', () => {
     });
 
     it('returns single event for one event', () => {
-      const events = [
-        { id: 'e1', start: 0n, end: 100n },
-      ];
+      const events = [{ id: 'e1', start: 0n, end: 100n }];
       const viewportStart = 0n;
       const scale = RationalScale.fromSecondsPerPixel(Number(YEAR));
 

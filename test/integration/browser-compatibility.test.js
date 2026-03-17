@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { detectFeatures, REQUIRED_FEATURES } from '../../src/utils/feature-detection.js';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { prefersHighContrast } from '../../src/rendering/event-shapes.js';
+import { detectFeatures, REQUIRED_FEATURES } from '../../src/utils/feature-detection.js';
 
 /**
  * Integration tests for browser compatibility requirements.
@@ -8,7 +8,6 @@ import { prefersHighContrast } from '../../src/rendering/event-shapes.js';
  * and spec compliance per openspec/specs/browser-compatibility/spec.md.
  */
 describe('browser-compatibility spec compliance', () => {
-
   // ── Feature Detection ───────────────────────────────────────────────────
 
   describe('Feature Detection (spec: Startup feature detection)', () => {
@@ -112,21 +111,19 @@ describe('browser-compatibility spec compliance', () => {
     });
 
     it('prefers-reduced-motion is detectable via matchMedia', () => {
-      window.matchMedia = vi.fn(query => ({
+      window.matchMedia = vi.fn((query) => ({
         matches: query.includes('reduce'),
       }));
-      const prefersReduced = window.matchMedia &&
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const prefersReduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
       expect(prefersReduced).toBe(true);
     });
 
     it('prefers-color-scheme is queryable', () => {
-      window.matchMedia = vi.fn(query => ({
+      window.matchMedia = vi.fn((query) => ({
         matches: query.includes('dark'),
         media: query,
       }));
-      const prefersDark = window.matchMedia &&
-        window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
       expect(prefersDark).toBe(true);
     });
   });

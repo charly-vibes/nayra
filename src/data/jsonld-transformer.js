@@ -45,7 +45,7 @@ function extractId(node) {
     return node['@id'];
   }
   // Then try schema:identifier
-  const identifier = node['identifier'] || node['schema:identifier'];
+  const identifier = node.identifier || node['schema:identifier'];
   if (identifier) {
     return extractValue(identifier);
   }
@@ -58,8 +58,8 @@ function extractId(node) {
  */
 function transformEventWithError(node, index) {
   const id = extractId(node);
-  const label = extractValue(node['name'] || node['schema:name']);
-  const startDate = extractValue(node['startDate'] || node['schema:startDate']);
+  const label = extractValue(node.name || node['schema:name']);
+  const startDate = extractValue(node.startDate || node['schema:startDate']);
   const eventId = id || `index:${index}`;
 
   if (!id) {
@@ -104,17 +104,17 @@ function transformEventWithError(node, index) {
     start: startDate,
   };
 
-  const description = extractValue(node['description'] || node['schema:description']);
+  const description = extractValue(node.description || node['schema:description']);
   if (description) {
     event.description = description;
   }
 
-  const endDate = extractValue(node['endDate'] || node['schema:endDate']);
+  const endDate = extractValue(node.endDate || node['schema:endDate']);
   if (endDate) {
     event.end = endDate;
   }
 
-  const url = extractValue(node['url'] || node['schema:url']);
+  const url = extractValue(node.url || node['schema:url']);
   if (url) {
     event.url = url;
   }
@@ -134,16 +134,12 @@ function transformEvent(node) {
  * Check if a node is a Schema.org Event type
  */
 function isEventType(node) {
-  const type = node['@type'] || node['type'];
+  const type = node['@type'] || node.type;
   if (!type) {
     return false;
   }
   const types = Array.isArray(type) ? type : [type];
-  return types.some(t =>
-    t === 'Event' ||
-    t === 'schema:Event' ||
-    t === 'https://schema.org/Event'
-  );
+  return types.some((t) => t === 'Event' || t === 'schema:Event' || t === 'https://schema.org/Event');
 }
 
 /**

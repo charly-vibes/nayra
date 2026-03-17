@@ -42,21 +42,21 @@ test-all: test test-e2e
 
 # === Lint and Format Commands ===
 
-# Run linter (ESLint)
+# Run linter and formatter check (Biome)
 lint:
-    @command -v npx >/dev/null 2>&1 && npx eslint src/ test/ || echo "⚠️  ESLint not installed, skipping"
+    npx biome check .
 
-# Auto-fix lint issues
+# Auto-fix lint and format issues
 lint-fix:
-    @command -v npx >/dev/null 2>&1 && npx eslint src/ test/ --fix || echo "⚠️  ESLint not installed, skipping"
-
-# Format all JavaScript files (Prettier)
-fmt:
-    @command -v npx >/dev/null 2>&1 && npx prettier --write "src/**/*.js" "test/**/*.js" "*.html" "*.css" || echo "⚠️  Prettier not installed, skipping"
+    npx biome check --write .
 
 # Check formatting (no changes)
 fmt-check:
-    @command -v npx >/dev/null 2>&1 && npx prettier --check "src/**/*.js" "test/**/*.js" "*.html" "*.css" || echo "⚠️  Prettier not installed, skipping"
+    npx biome format .
+
+# Auto-format all files
+fmt:
+    npx biome format --write .
 
 # === Build Commands ===
 
@@ -111,6 +111,7 @@ setup:
     npm install
     @echo "Installing development tools..."
     @command -v just >/dev/null 2>&1 || echo "⚠️  just not installed. See https://github.com/casey/just"
+    @command -v lefthook >/dev/null 2>&1 && lefthook install || echo "⚠️  lefthook not installed. Install with: brew install lefthook"
     @echo "✅ Development environment ready"
     @echo ""
     @echo "Run 'just dev' to start the development server"

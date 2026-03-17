@@ -27,11 +27,11 @@ export function bench(fn, { warmup = 5, iterations = 30 } = {}) {
 
   times.sort((a, b) => a - b);
 
-  const mean   = times.reduce((s, t) => s + t, 0) / times.length;
-  const p50    = times[Math.floor(times.length * 0.50)];
-  const p95    = times[Math.floor(times.length * 0.95)];
+  const mean = times.reduce((s, t) => s + t, 0) / times.length;
+  const p50 = times[Math.floor(times.length * 0.5)];
+  const p95 = times[Math.floor(times.length * 0.95)];
   const stddev = Math.sqrt(times.reduce((s, t) => s + (t - mean) ** 2, 0) / times.length);
-  const cv     = mean > 0 ? (stddev / mean) * 100 : 0;
+  const cv = mean > 0 ? (stddev / mean) * 100 : 0;
 
   return {
     mean,

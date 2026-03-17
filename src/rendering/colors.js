@@ -1,9 +1,13 @@
 export function lightenColor(hex, amount) {
   const cleanHex = hex.replace('#', '');
 
-  const fullHex = cleanHex.length === 3
-    ? cleanHex.split('').map(c => c + c).join('')
-    : cleanHex;
+  const fullHex =
+    cleanHex.length === 3
+      ? cleanHex
+          .split('')
+          .map((c) => c + c)
+          .join('')
+      : cleanHex;
 
   const r = parseInt(fullHex.slice(0, 2), 16);
   const g = parseInt(fullHex.slice(2, 4), 16);

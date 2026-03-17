@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { filterEvents, createDebouncedSearch } from '../../src/core/search-engine.js';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { createDebouncedSearch, filterEvents } from '../../src/core/search-engine.js';
 
 describe('filterEvents', () => {
   const events = [
@@ -58,9 +58,7 @@ describe('filterEvents', () => {
     });
 
     it('does not duplicate events that match both title and description', () => {
-      const dupeEvents = [
-        { id: 'e1', title: 'Apollo Mission', description: 'The Apollo program' },
-      ];
+      const dupeEvents = [{ id: 'e1', title: 'Apollo Mission', description: 'The Apollo program' }];
       const results = filterEvents(dupeEvents, 'Apollo');
       expect(results).toEqual(['e1']);
     });
@@ -87,23 +85,17 @@ describe('filterEvents', () => {
 
   describe('missing fields', () => {
     it('handles events with no description', () => {
-      const sparseEvents = [
-        { id: 'e1', title: 'Some Event' },
-      ];
+      const sparseEvents = [{ id: 'e1', title: 'Some Event' }];
       expect(filterEvents(sparseEvents, 'Some')).toContain('e1');
     });
 
     it('handles events with null description', () => {
-      const sparseEvents = [
-        { id: 'e2', title: 'Other Event', description: null },
-      ];
+      const sparseEvents = [{ id: 'e2', title: 'Other Event', description: null }];
       expect(filterEvents(sparseEvents, 'Other')).toContain('e2');
     });
 
     it('handles events with undefined title', () => {
-      const sparseEvents = [
-        { id: 'e1', description: 'A description only event' },
-      ];
+      const sparseEvents = [{ id: 'e1', description: 'A description only event' }];
       expect(filterEvents(sparseEvents, 'description only')).toContain('e1');
     });
   });

@@ -21,14 +21,11 @@
 // process.env.NODE_ENV is replaced with the string 'production'.
 // ---------------------------------------------------------------------------
 
-const IS_DEV = (
-  typeof process === 'undefined' ||
-  process.env?.NODE_ENV !== 'production'
-);
+const IS_DEV = typeof process === 'undefined' || process.env?.NODE_ENV !== 'production';
 
 // Thresholds matching the 60 FPS budget
-const FRAME_BUDGET_MS  = 1000 / 60; // 16.67 ms
-const WARN_FRAME_MS    = FRAME_BUDGET_MS;      // yellow
+const FRAME_BUDGET_MS = 1000 / 60; // 16.67 ms
+const WARN_FRAME_MS = FRAME_BUDGET_MS; // yellow
 const CRITICAL_FRAME_MS = FRAME_BUDGET_MS * 2; // red (≈33ms)
 
 const UPDATE_INTERVAL_MS = 100;
@@ -82,10 +79,10 @@ function ensureStyles(doc) {
  * @param {number}      [opts.updateIntervalMs=100]
  * @returns {{ toggle: () => void, recordFrame: (metrics: object) => void, destroy: () => void, isVisible: () => boolean }}
  */
-export function createPerformanceOverlay(container, {
-  document: doc = globalThis.document,
-  updateIntervalMs = UPDATE_INTERVAL_MS,
-} = {}) {
+export function createPerformanceOverlay(
+  container,
+  { document: doc = globalThis.document, updateIntervalMs = UPDATE_INTERVAL_MS } = {},
+) {
   // Production no-op
   if (!IS_DEV) {
     return { toggle: () => {}, recordFrame: () => {}, destroy: () => {}, isVisible: () => false };
@@ -100,12 +97,12 @@ export function createPerformanceOverlay(container, {
   container.appendChild(el);
 
   // Internal state
-  let visible      = false;
-  let frameCount   = 0;
+  let visible = false;
+  let frameCount = 0;
   let lastFpsReset = performance.now();
-  let fps          = 0;
-  let lastFrameMs  = 0;
-  let intervalId   = null;
+  let fps = 0;
+  let lastFrameMs = 0;
+  let intervalId = null;
 
   // ---------------------------------------------------------------------------
   // Frame data ingestion (called by the render loop via endFrame())
@@ -122,20 +119,18 @@ export function createPerformanceOverlay(container, {
   // ---------------------------------------------------------------------------
 
   function update() {
-    const now     = performance.now();
+    const now = performance.now();
     const elapsed = now - lastFpsReset;
 
     if (elapsed >= 1000) {
-      fps          = Math.round((frameCount * 1000) / elapsed);
-      frameCount   = 0;
+      fps = Math.round((frameCount * 1000) / elapsed);
+      frameCount = 0;
       lastFpsReset = now;
     }
 
     const heapMB = getHeapMB();
 
-    const ftClass  = lastFrameMs >= CRITICAL_FRAME_MS ? 'bad'
-                   : lastFrameMs >= WARN_FRAME_MS     ? 'warn'
-                   : 'ok';
+    const ftClass = lastFrameMs >= CRITICAL_FRAME_MS ? 'bad' : lastFrameMs >= WARN_FRAME_MS ? 'warn' : 'ok';
     const fpsClass = fps < 30 ? 'bad' : fps < 55 ? 'warn' : 'ok';
 
     el.innerHTML =
@@ -158,8 +153,8 @@ export function createPerformanceOverlay(container, {
   // ---------------------------------------------------------------------------
 
   function show() {
-    visible     = true;
-    frameCount  = 0;
+    visible = true;
+    frameCount = 0;
     lastFpsReset = performance.now();
     el.style.display = 'block';
     intervalId = setInterval(update, updateIntervalMs);
@@ -168,7 +163,10 @@ export function createPerformanceOverlay(container, {
   function hide() {
     visible = false;
     el.style.display = 'none';
-    if (intervalId !== null) { clearInterval(intervalId); intervalId = null; }
+    if (intervalId !== null) {
+      clearInterval(intervalId);
+      intervalId = null;
+    }
   }
 
   function toggle() {

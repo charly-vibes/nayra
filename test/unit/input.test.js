@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { YEAR } from '../../src/core/time.js';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { RationalScale } from '../../src/core/scale.js';
-import { initInput } from '../../src/interaction/input.js';
 import { createStore } from '../../src/core/store.js';
+import { YEAR } from '../../src/core/time.js';
+import { initInput } from '../../src/interaction/input.js';
 import { getAxisY } from '../../src/rendering/renderer.js';
 
 function createMockCanvas() {
@@ -180,10 +180,7 @@ describe('Input', () => {
       const eventY = getAxisY(400);
 
       canvas.dispatchEvent('pointerdown', createMockPointerEvent(eventX, eventY, { buttons: 1, timeStamp: 10 }));
-      canvas.dispatchEvent(
-        'pointerup',
-        createMockPointerEvent(eventX, eventY, { ctrlKey: true, timeStamp: 20 })
-      );
+      canvas.dispatchEvent('pointerup', createMockPointerEvent(eventX, eventY, { ctrlKey: true, timeStamp: 20 }));
 
       const newState = store.getState();
       expect(newState.selectedEventIds.has('evt-1')).toBe(true);
@@ -280,7 +277,10 @@ describe('Input', () => {
     });
 
     it('calls setPointerCapture on pointerdown', () => {
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(100, 200, { pointerId: 42, buttons: 1, timeStamp: 10 }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(100, 200, { pointerId: 42, buttons: 1, timeStamp: 10 }),
+      );
 
       expect(canvas.setPointerCapture).toHaveBeenCalledWith(42);
     });
@@ -293,19 +293,43 @@ describe('Input', () => {
       const initialState = store.getState();
       const initialSpp = initialState.scale.getSecondsPerPixel();
 
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(100, 200, {
-        pointerId: 1, buttons: 1, pointerType: 'touch', timeStamp: 10,
-      }));
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(200, 200, {
-        pointerId: 2, buttons: 1, pointerType: 'touch', timeStamp: 20,
-      }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(100, 200, {
+          pointerId: 1,
+          buttons: 1,
+          pointerType: 'touch',
+          timeStamp: 10,
+        }),
+      );
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(200, 200, {
+          pointerId: 2,
+          buttons: 1,
+          pointerType: 'touch',
+          timeStamp: 20,
+        }),
+      );
 
-      canvas.dispatchEvent('pointermove', createMockPointerEvent(50, 200, {
-        pointerId: 1, buttons: 1, pointerType: 'touch', timeStamp: 30,
-      }));
-      canvas.dispatchEvent('pointermove', createMockPointerEvent(250, 200, {
-        pointerId: 2, buttons: 1, pointerType: 'touch', timeStamp: 30,
-      }));
+      canvas.dispatchEvent(
+        'pointermove',
+        createMockPointerEvent(50, 200, {
+          pointerId: 1,
+          buttons: 1,
+          pointerType: 'touch',
+          timeStamp: 30,
+        }),
+      );
+      canvas.dispatchEvent(
+        'pointermove',
+        createMockPointerEvent(250, 200, {
+          pointerId: 2,
+          buttons: 1,
+          pointerType: 'touch',
+          timeStamp: 30,
+        }),
+      );
 
       const newState = store.getState();
       const newSpp = newState.scale.getSecondsPerPixel();
@@ -313,18 +337,40 @@ describe('Input', () => {
     });
 
     it('pinch-to-zoom does not trigger selection', () => {
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(100, 200, {
-        pointerId: 1, buttons: 1, pointerType: 'touch', timeStamp: 10,
-      }));
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(200, 200, {
-        pointerId: 2, buttons: 1, pointerType: 'touch', timeStamp: 20,
-      }));
-      canvas.dispatchEvent('pointerup', createMockPointerEvent(200, 200, {
-        pointerId: 2, pointerType: 'touch', timeStamp: 30,
-      }));
-      canvas.dispatchEvent('pointerup', createMockPointerEvent(100, 200, {
-        pointerId: 1, pointerType: 'touch', timeStamp: 40,
-      }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(100, 200, {
+          pointerId: 1,
+          buttons: 1,
+          pointerType: 'touch',
+          timeStamp: 10,
+        }),
+      );
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(200, 200, {
+          pointerId: 2,
+          buttons: 1,
+          pointerType: 'touch',
+          timeStamp: 20,
+        }),
+      );
+      canvas.dispatchEvent(
+        'pointerup',
+        createMockPointerEvent(200, 200, {
+          pointerId: 2,
+          pointerType: 'touch',
+          timeStamp: 30,
+        }),
+      );
+      canvas.dispatchEvent(
+        'pointerup',
+        createMockPointerEvent(100, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          timeStamp: 40,
+        }),
+      );
 
       expect(store.getState().selectedEventIds.size).toBe(0);
     });
@@ -336,7 +382,10 @@ describe('Input', () => {
 
       canvas.dispatchEvent('pointerdown', createMockPointerEvent(eventX, eventY, { buttons: 1, timeStamp: 10 }));
       canvas.dispatchEvent('pointerup', createMockPointerEvent(eventX, eventY, { timeStamp: 20 }));
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(eventX + 5, eventY + 5, { buttons: 1, timeStamp: 200 }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(eventX + 5, eventY + 5, { buttons: 1, timeStamp: 200 }),
+      );
       canvas.dispatchEvent('pointerup', createMockPointerEvent(eventX + 5, eventY + 5, { timeStamp: 220 }));
 
       const newSpp = store.getState().scale.getSecondsPerPixel();
@@ -349,20 +398,29 @@ describe('Input', () => {
       destroy();
       destroy = initInput(canvas, store, { onLongPress });
 
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(100, 200, {
-        buttons: 1,
-        pointerType: 'touch',
-        timeStamp: 10,
-      }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(100, 200, {
+          buttons: 1,
+          pointerType: 'touch',
+          timeStamp: 10,
+        }),
+      );
       vi.advanceTimersByTime(500);
-      canvas.dispatchEvent('pointermove', createMockPointerEvent(100, 200, {
-        pointerType: 'touch',
-        timeStamp: 510,
-      }));
-      canvas.dispatchEvent('pointerup', createMockPointerEvent(100, 200, {
-        pointerType: 'touch',
-        timeStamp: 600,
-      }));
+      canvas.dispatchEvent(
+        'pointermove',
+        createMockPointerEvent(100, 200, {
+          pointerType: 'touch',
+          timeStamp: 510,
+        }),
+      );
+      canvas.dispatchEvent(
+        'pointerup',
+        createMockPointerEvent(100, 200, {
+          pointerType: 'touch',
+          timeStamp: 600,
+        }),
+      );
 
       expect(onLongPress).toHaveBeenCalledTimes(1);
       expect(store.getState().selectedEventIds.size).toBe(0);
@@ -477,7 +535,7 @@ describe('Input', () => {
     });
 
     it('Home key is not affected by Tab handler', () => {
-      const event = triggerKeyDown('Home');
+      const _event = triggerKeyDown('Home');
       // Home key should still work for jumpToToday, not call focus methods
       expect(mockFocusManager.focusNext).not.toHaveBeenCalled();
       expect(mockFocusManager.focusPrevious).not.toHaveBeenCalled();

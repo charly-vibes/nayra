@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 /**
  * Spec compliance E2E tests for browser-compatibility requirements.
@@ -10,9 +10,7 @@ test.describe('Browser compatibility spec compliance', () => {
   });
 
   test('prefers-reduced-motion is queryable', async ({ page }) => {
-    const supported = await page.evaluate(
-      () => typeof window.matchMedia === 'function'
-    );
+    const supported = await page.evaluate(() => typeof window.matchMedia === 'function');
     expect(supported).toBe(true);
   });
 
@@ -33,16 +31,12 @@ test.describe('Browser compatibility spec compliance', () => {
   });
 
   test('requestAnimationFrame is available', async ({ page }) => {
-    const available = await page.evaluate(
-      () => typeof requestAnimationFrame === 'function'
-    );
+    const available = await page.evaluate(() => typeof requestAnimationFrame === 'function');
     expect(available).toBe(true);
   });
 
   test('ResizeObserver is available', async ({ page }) => {
-    const available = await page.evaluate(
-      () => typeof ResizeObserver === 'function'
-    );
+    const available = await page.evaluate(() => typeof ResizeObserver === 'function');
     expect(available).toBe(true);
   });
 

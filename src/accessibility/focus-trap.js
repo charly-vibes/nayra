@@ -33,7 +33,7 @@ export function createFocusTrap(modalElement, { onEscape } = {}) {
 
   function getFocusableElements() {
     return Array.from(modalElement.querySelectorAll(FOCUSABLE_SELECTOR)).filter(
-      (el) => !el.closest('[hidden]') && getComputedStyle(el).display !== 'none'
+      (el) => !el.closest('[hidden]') && getComputedStyle(el).display !== 'none',
     );
   }
 

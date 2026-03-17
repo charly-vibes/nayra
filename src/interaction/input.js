@@ -1,9 +1,9 @@
+import { zoomToEvent } from '../core/navigation.js';
 import { RationalScale } from '../core/scale.js';
 import { YEAR } from '../core/time.js';
-import { zoomToEvent } from '../core/navigation.js';
-import { findEventAtPoint } from './hit-detection.js';
-import { GestureRecognizer } from './gestures.js';
 import { initAutoPan } from '../viewport/pan.js';
+import { GestureRecognizer } from './gestures.js';
+import { findEventAtPoint } from './hit-detection.js';
 
 const MIN_SECONDS_PER_PIXEL = 0.001;
 const CLICK_THRESHOLD = 3;
@@ -33,8 +33,8 @@ export const KEYBOARD_SHORTCUTS = {
   '+': 'zoomIn',
   '=': 'zoomIn',
   '-': 'zoomOut',
-  '0': 'fitToContent',
-  '1': 'resetZoom',
+  0: 'fitToContent',
+  1: 'resetZoom',
 };
 
 export function jumpToToday(canvasWidth, scale = DEFAULT_SCALE) {
@@ -136,7 +136,7 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
   }
 
   function prefersReducedMotion() {
-    return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   }
 
   function recordSample(pointerId, x, timestamp) {
@@ -193,7 +193,7 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
   function getSelectedEventCenterPx(state, canvasWidth) {
     if (state.selectedEventIds.size !== 1) return null;
     const [selectedId] = state.selectedEventIds;
-    const event = state.events.find(e => e.id === selectedId);
+    const event = state.events.find((e) => e.id === selectedId);
     if (!event) return null;
     const centerTime = event.start + (event.end != null ? event.end - event.start : 0n) / 2n;
     const px = state.scale.timeToPx(centerTime - state.viewportStart);
@@ -256,7 +256,7 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
           if (callbacks.onContextMenu) {
             const state = store.getState();
             const hit = findEventAtPoint(canvasX, canvasY, state.events, state.viewportStart, state.scale, rect.height);
-            const target = (hit && !hit.__cluster) ? hit : null;
+            const target = hit && !hit.__cluster ? hit : null;
             const targetType = target ? 'event' : 'background';
             callbacks.onContextMenu({ x: pointer.x, y: pointer.y, canvasX, canvasY, target, targetType });
           }
@@ -316,21 +316,14 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
     const state = store.getState();
 
     if (!isDragging && e.buttons !== 1 && !hasActiveTouch) {
-      const event = findEventAtPoint(
-        x,
-        y,
-        state.events,
-        state.viewportStart,
-        state.scale,
-        rect.height
-      );
+      const event = findEventAtPoint(x, y, state.events, state.viewportStart, state.scale, rect.height);
       // Don't hover on clusters, only on regular events
-      const eventId = (event && !event.__cluster) ? event.id : null;
+      const eventId = event && !event.__cluster ? event.id : null;
       if (eventId !== state.hoveredEventId) {
         store.dispatch({ type: 'SET_HOVER', eventId });
       }
       canvas.style.cursor = event ? 'pointer' : 'grab';
-      
+
       if (callbacks.onMousePosition) {
         callbacks.onMousePosition(e.clientX, e.clientY);
       }
@@ -343,8 +336,10 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
         isDragging = true;
         canvas.style.cursor = 'grabbing';
       }
-      if (longPressPointerId === e.pointerId &&
-        (Math.abs(dx) > LONG_PRESS_MOVE_THRESHOLD || Math.abs(dy) > LONG_PRESS_MOVE_THRESHOLD)) {
+      if (
+        longPressPointerId === e.pointerId &&
+        (Math.abs(dx) > LONG_PRESS_MOVE_THRESHOLD || Math.abs(dy) > LONG_PRESS_MOVE_THRESHOLD)
+      ) {
         clearLongPress();
       }
       if (isDragging) {
@@ -398,14 +393,7 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
 
     if (!isDragging && !wasLongPressActive) {
       const state = store.getState();
-      const event = findEventAtPoint(
-        x,
-        y,
-        state.events,
-        state.viewportStart,
-        state.scale,
-        rect.height
-      );
+      const event = findEventAtPoint(x, y, state.events, state.viewportStart, state.scale, rect.height);
 
       if (event) {
         // Check if this is a cluster click
@@ -438,8 +426,7 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
       const now = e.timeStamp || performance.now();
       const dx = x - lastTapX;
       const dy = y - lastTapY;
-      if (now - lastTapTime <= DOUBLE_TAP_MAX_DELAY &&
-        Math.hypot(dx, dy) <= DOUBLE_TAP_MAX_DISTANCE) {
+      if (now - lastTapTime <= DOUBLE_TAP_MAX_DELAY && Math.hypot(dx, dy) <= DOUBLE_TAP_MAX_DISTANCE) {
         if (event && !event.__cluster) {
           const { viewportStart, scale } = zoomToEvent(event, rect.width);
           store.dispatch({ type: 'SET_VIEWPORT', viewportStart, scale });
@@ -462,14 +449,7 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
         return;
       }
       const state = store.getState();
-      const hitResult = findEventAtPoint(
-        x,
-        y,
-        state.events,
-        state.viewportStart,
-        state.scale,
-        rect.height
-      );
+      const hitResult = findEventAtPoint(x, y, state.events, state.viewportStart, state.scale, rect.height);
       canvas.style.cursor = hitResult ? 'pointer' : 'grab';
       startMomentum(velocity);
     }
@@ -520,7 +500,7 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
 
     const state = store.getState();
     const hit = findEventAtPoint(x, y, state.events, state.viewportStart, state.scale, rect.height);
-    const target = (hit && !hit.__cluster) ? hit : null;
+    const target = hit && !hit.__cluster ? hit : null;
     const targetType = target ? 'event' : 'background';
 
     callbacks.onContextMenu({ x: e.clientX, y: e.clientY, canvasX: x, canvasY: y, target, targetType });
@@ -620,14 +600,14 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
       }
     } else if (action === 'zoomIn') {
       e.preventDefault();
-      const state = store.getState();
+      const _state = store.getState();
       const rect = canvas.getBoundingClientRect();
       // Zoom at center of viewport
       const centerX = rect.left + rect.width / 2;
       applyZoomAtPosition(centerX, rect, true);
     } else if (action === 'zoomOut') {
       e.preventDefault();
-      const state = store.getState();
+      const _state = store.getState();
       const rect = canvas.getBoundingClientRect();
       // Zoom at center of viewport
       const centerX = rect.left + rect.width / 2;

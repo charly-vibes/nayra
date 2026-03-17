@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { transformJsonLd, transformJsonLdWithReport } from '../../src/data/jsonld-transformer.js';
 
 describe('JSON-LD Transformer', () => {
@@ -8,8 +8,8 @@ describe('JSON-LD Transformer', () => {
         '@context': 'https://schema.org',
         '@type': 'Event',
         '@id': 'event-1',
-        'name': 'Moon Landing',
-        'startDate': '1969-07-20',
+        name: 'Moon Landing',
+        startDate: '1969-07-20',
       };
 
       const result = transformJsonLd(jsonld);
@@ -26,11 +26,11 @@ describe('JSON-LD Transformer', () => {
       const jsonld = {
         '@type': 'Event',
         '@id': 'event-2',
-        'name': 'Fall of Berlin Wall',
-        'startDate': '1989-11-09',
-        'endDate': '1989-11-10',
-        'description': 'The Berlin Wall fell',
-        'url': 'https://example.com/berlin-wall',
+        name: 'Fall of Berlin Wall',
+        startDate: '1989-11-09',
+        endDate: '1989-11-10',
+        description: 'The Berlin Wall fell',
+        url: 'https://example.com/berlin-wall',
       };
 
       const result = transformJsonLd(jsonld);
@@ -53,14 +53,14 @@ describe('JSON-LD Transformer', () => {
           {
             '@type': 'Event',
             '@id': 'event-1',
-            'name': 'Event One',
-            'startDate': '2020-01-01',
+            name: 'Event One',
+            startDate: '2020-01-01',
           },
           {
             '@type': 'Event',
             '@id': 'event-2',
-            'name': 'Event Two',
-            'startDate': '2021-01-01',
+            name: 'Event Two',
+            startDate: '2021-01-01',
           },
         ],
       };
@@ -77,14 +77,14 @@ describe('JSON-LD Transformer', () => {
         {
           '@type': 'Event',
           '@id': 'arr-1',
-          'name': 'Array Event 1',
-          'startDate': '2020-01-01',
+          name: 'Array Event 1',
+          startDate: '2020-01-01',
         },
         {
           '@type': 'Event',
           '@id': 'arr-2',
-          'name': 'Array Event 2',
-          'startDate': '2021-01-01',
+          name: 'Array Event 2',
+          startDate: '2021-01-01',
         },
       ];
 
@@ -119,8 +119,8 @@ describe('JSON-LD Transformer', () => {
       const jsonld = {
         '@type': 'https://schema.org/Event',
         '@id': 'url-type-1',
-        'name': 'URL Type Event',
-        'startDate': '2023-01-01',
+        name: 'URL Type Event',
+        startDate: '2023-01-01',
       };
 
       const result = transformJsonLd(jsonld);
@@ -133,8 +133,8 @@ describe('JSON-LD Transformer', () => {
       const jsonld = {
         '@type': 'Event',
         '@id': 'value-obj-1',
-        'name': { '@value': 'Value Object Event' },
-        'startDate': { '@value': '2023-06-01' },
+        name: { '@value': 'Value Object Event' },
+        startDate: { '@value': '2023-06-01' },
       };
 
       const result = transformJsonLd(jsonld);
@@ -147,9 +147,9 @@ describe('JSON-LD Transformer', () => {
     it('uses schema:identifier as fallback for id', () => {
       const jsonld = {
         '@type': 'Event',
-        'identifier': 'identifier-id',
-        'name': 'Identifier Event',
-        'startDate': '2023-07-01',
+        identifier: 'identifier-id',
+        name: 'Identifier Event',
+        startDate: '2023-07-01',
       };
 
       const result = transformJsonLd(jsonld);
@@ -163,23 +163,23 @@ describe('JSON-LD Transformer', () => {
         {
           '@type': 'Event',
           '@id': 'valid-1',
-          'name': 'Valid Event',
-          'startDate': '2020-01-01',
+          name: 'Valid Event',
+          startDate: '2020-01-01',
         },
         {
           '@type': 'Event',
           '@id': 'missing-name',
-          'startDate': '2020-02-01',
+          startDate: '2020-02-01',
         },
         {
           '@type': 'Event',
           '@id': 'missing-date',
-          'name': 'No Date',
+          name: 'No Date',
         },
         {
           '@type': 'Event',
-          'name': 'No ID',
-          'startDate': '2020-03-01',
+          name: 'No ID',
+          startDate: '2020-03-01',
         },
       ];
 
@@ -195,18 +195,18 @@ describe('JSON-LD Transformer', () => {
           {
             '@type': 'Event',
             '@id': 'event-1',
-            'name': 'Real Event',
-            'startDate': '2020-01-01',
+            name: 'Real Event',
+            startDate: '2020-01-01',
           },
           {
             '@type': 'Person',
             '@id': 'person-1',
-            'name': 'John Doe',
+            name: 'John Doe',
           },
           {
             '@type': 'Place',
             '@id': 'place-1',
-            'name': 'Some Place',
+            name: 'Some Place',
           },
         ],
       };
@@ -221,7 +221,7 @@ describe('JSON-LD Transformer', () => {
       const jsonld = {
         '@type': 'Person',
         '@id': 'person-1',
-        'name': 'John Doe',
+        name: 'John Doe',
       };
 
       const result = transformJsonLd(jsonld);
@@ -238,8 +238,8 @@ describe('JSON-LD Transformer', () => {
       const jsonld = {
         '@type': ['Event', 'SocialEvent'],
         '@id': 'multi-type-1',
-        'name': 'Multi-Type Event',
-        'startDate': '2024-01-01',
+        name: 'Multi-Type Event',
+        startDate: '2024-01-01',
       };
 
       const result = transformJsonLd(jsonld);
@@ -251,12 +251,14 @@ describe('JSON-LD Transformer', () => {
 
   describe('transformJsonLdWithReport', () => {
     it('returns valid events and empty errors for valid data', () => {
-      const jsonld = [{
-        '@type': 'Event',
-        '@id': 'event-1',
-        'name': 'Valid Event',
-        'startDate': '2020-01-01',
-      }];
+      const jsonld = [
+        {
+          '@type': 'Event',
+          '@id': 'event-1',
+          name: 'Valid Event',
+          startDate: '2020-01-01',
+        },
+      ];
 
       const result = transformJsonLdWithReport(jsonld);
 
@@ -266,11 +268,13 @@ describe('JSON-LD Transformer', () => {
     });
 
     it('reports missing id field', () => {
-      const jsonld = [{
-        '@type': 'Event',
-        'name': 'No ID Event',
-        'startDate': '2020-01-01',
-      }];
+      const jsonld = [
+        {
+          '@type': 'Event',
+          name: 'No ID Event',
+          startDate: '2020-01-01',
+        },
+      ];
 
       const result = transformJsonLdWithReport(jsonld);
 
@@ -281,11 +285,13 @@ describe('JSON-LD Transformer', () => {
     });
 
     it('reports missing name field', () => {
-      const jsonld = [{
-        '@type': 'Event',
-        '@id': 'event-1',
-        'startDate': '2020-01-01',
-      }];
+      const jsonld = [
+        {
+          '@type': 'Event',
+          '@id': 'event-1',
+          startDate: '2020-01-01',
+        },
+      ];
 
       const result = transformJsonLdWithReport(jsonld);
 
@@ -295,11 +301,13 @@ describe('JSON-LD Transformer', () => {
     });
 
     it('reports missing startDate field', () => {
-      const jsonld = [{
-        '@type': 'Event',
-        '@id': 'event-1',
-        'name': 'No Date Event',
-      }];
+      const jsonld = [
+        {
+          '@type': 'Event',
+          '@id': 'event-1',
+          name: 'No Date Event',
+        },
+      ];
 
       const result = transformJsonLdWithReport(jsonld);
 
@@ -313,12 +321,12 @@ describe('JSON-LD Transformer', () => {
         {
           '@type': 'Event',
           '@id': 'known-id',
-          'startDate': '2020-01-01',
+          startDate: '2020-01-01',
         },
         {
           '@type': 'Event',
-          'name': 'No ID',
-          'startDate': '2020-01-01',
+          name: 'No ID',
+          startDate: '2020-01-01',
         },
       ];
 
@@ -333,19 +341,19 @@ describe('JSON-LD Transformer', () => {
         {
           '@type': 'Event',
           '@id': 'valid-1',
-          'name': 'Valid',
-          'startDate': '2020-01-01',
+          name: 'Valid',
+          startDate: '2020-01-01',
         },
         {
           '@type': 'Event',
           '@id': 'invalid-1',
-          'startDate': '2020-01-01',
+          startDate: '2020-01-01',
         },
         {
           '@type': 'Event',
           '@id': 'valid-2',
-          'name': 'Also Valid',
-          'startDate': '2021-01-01',
+          name: 'Also Valid',
+          startDate: '2021-01-01',
         },
       ];
 
@@ -357,14 +365,15 @@ describe('JSON-LD Transformer', () => {
     });
 
     it('throws in strict mode on validation errors', () => {
-      const jsonld = [{
-        '@type': 'Event',
-        '@id': 'event-1',
-        'startDate': '2020-01-01',
-      }];
+      const jsonld = [
+        {
+          '@type': 'Event',
+          '@id': 'event-1',
+          startDate: '2020-01-01',
+        },
+      ];
 
-      expect(() => transformJsonLdWithReport(jsonld, { strict: true }))
-        .toThrow('Missing required field: name');
+      expect(() => transformJsonLdWithReport(jsonld, { strict: true })).toThrow('Missing required field: name');
     });
   });
 });

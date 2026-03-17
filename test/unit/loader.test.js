@@ -1,15 +1,13 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { loadFromUrl, loadFromFile, loadExample, detectFormat } from '../../src/data/loader.js';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { detectFormat, loadExample, loadFromFile, loadFromUrl } from '../../src/data/loader.js';
 
 describe('loader', () => {
   describe('detectFormat', () => {
     it('detects Wikidata SPARQL format', () => {
       const data = {
         results: {
-          bindings: [
-            { item: { value: 'http://www.wikidata.org/entity/Q1' } }
-          ]
-        }
+          bindings: [{ item: { value: 'http://www.wikidata.org/entity/Q1' } }],
+        },
       };
       expect(detectFormat(data)).toBe('wikidata');
     });
@@ -18,24 +16,20 @@ describe('loader', () => {
       const data = {
         '@context': 'https://schema.org',
         '@type': 'Event',
-        name: 'Test Event'
+        name: 'Test Event',
       };
       expect(detectFormat(data)).toBe('jsonld');
     });
 
     it('detects JSON-LD with @graph', () => {
       const data = {
-        '@graph': [
-          { '@type': 'Event', name: 'Test' }
-        ]
+        '@graph': [{ '@type': 'Event', name: 'Test' }],
       };
       expect(detectFormat(data)).toBe('jsonld');
     });
 
     it('detects plain array format', () => {
-      const data = [
-        { id: 'event-1', label: 'Event 1', start: '2020-01-01' }
-      ];
+      const data = [{ id: 'event-1', label: 'Event 1', start: '2020-01-01' }];
       expect(detectFormat(data)).toBe('plain');
     });
 
@@ -55,12 +49,10 @@ describe('loader', () => {
     });
 
     it('fetches JSON and returns normalized events', async () => {
-      const mockData = [
-        { id: 'e1', label: 'Event 1', start: '2020-01-01' }
-      ];
+      const mockData = [{ id: 'e1', label: 'Event 1', start: '2020-01-01' }];
       global.fetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockData)
+        json: () => Promise.resolve(mockData),
       });
 
       const result = await loadFromUrl('https://example.com/events.json');
@@ -85,7 +77,7 @@ describe('loader', () => {
       global.fetch.mockResolvedValue({
         ok: false,
         status: 404,
-        statusText: 'Not Found'
+        statusText: 'Not Found',
       });
 
       const result = await loadFromUrl('https://example.com/events.json');
@@ -102,14 +94,14 @@ describe('loader', () => {
             {
               item: { value: 'http://www.wikidata.org/entity/Q1' },
               itemLabel: { value: 'Test Item' },
-              startTime: { value: '2020-01-01T00:00:00Z' }
-            }
-          ]
-        }
+              startTime: { value: '2020-01-01T00:00:00Z' },
+            },
+          ],
+        },
       };
       global.fetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockData)
+        json: () => Promise.resolve(mockData),
       });
 
       const result = await loadFromUrl('https://query.wikidata.org/sparql');
@@ -126,13 +118,13 @@ describe('loader', () => {
             '@type': 'Event',
             '@id': 'event-1',
             name: 'Test Event',
-            startDate: '2020-01-01'
-          }
-        ]
+            startDate: '2020-01-01',
+          },
+        ],
       };
       global.fetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockData)
+        json: () => Promise.resolve(mockData),
       });
 
       const result = await loadFromUrl('https://example.com/events.jsonld');
@@ -145,9 +137,7 @@ describe('loader', () => {
 
   describe('loadFromFile', () => {
     it('reads File object and returns normalized events', async () => {
-      const mockData = [
-        { id: 'e1', label: 'Event 1', start: '2020-01-01' }
-      ];
+      const mockData = [{ id: 'e1', label: 'Event 1', start: '2020-01-01' }];
       const file = new File([JSON.stringify(mockData)], 'events.json', { type: 'application/json' });
 
       const result = await loadFromFile(file);
@@ -169,7 +159,7 @@ describe('loader', () => {
 
     it('handles File read errors', async () => {
       const file = {
-        text: () => Promise.reject(new Error('Read error'))
+        text: () => Promise.reject(new Error('Read error')),
       };
 
       const result = await loadFromFile(file);
@@ -190,12 +180,10 @@ describe('loader', () => {
     });
 
     it('loads example by name from examples directory', async () => {
-      const mockData = [
-        { id: 'e1', label: 'Space Event', start: '1957-10-04' }
-      ];
+      const mockData = [{ id: 'e1', label: 'Space Event', start: '1957-10-04' }];
       global.fetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockData)
+        json: () => Promise.resolve(mockData),
       });
 
       const result = await loadExample('space-exploration');
@@ -208,7 +196,7 @@ describe('loader', () => {
       global.fetch.mockResolvedValue({
         ok: false,
         status: 404,
-        statusText: 'Not Found'
+        statusText: 'Not Found',
       });
 
       const result = await loadExample('nonexistent');

@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createZoomControls } from '../../src/ui/zoom-controls.js';
 
 describe('Zoom Controls', () => {
@@ -20,7 +20,7 @@ describe('Zoom Controls', () => {
   });
 
   afterEach(() => {
-    if (container && container.parentElement) {
+    if (container?.parentElement) {
       container.parentElement.removeChild(container);
     }
   });
@@ -109,7 +109,7 @@ describe('Zoom Controls', () => {
     const controls = createZoomControls(container, callbacks);
     const buttons = controls.element.querySelectorAll('button');
 
-    const mockEvent = { stopPropagation: vi.fn() };
+    const _mockEvent = { stopPropagation: vi.fn() };
     buttons[0].dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
     // Event should not propagate to parent
@@ -132,7 +132,7 @@ describe('Zoom Controls', () => {
     expect(children.length).toBe(5);
 
     // Find separator (div that's not a button)
-    const separator = children.find(el => el.tagName === 'DIV' && !el.querySelector('button'));
+    const separator = children.find((el) => el.tagName === 'DIV' && !el.querySelector('button'));
     expect(separator).toBeDefined();
   });
 });

@@ -1,9 +1,9 @@
 import { projectToScreen } from '../core/time.js';
-import { getClusters, getAxisY, getCurrentLaneConfig } from '../rendering/renderer.js';
+import { isPointInCluster } from '../layout/event-clustering.js';
 import { assignLanes } from '../layout/greedy-interval-coloring.js';
 import { getLaneY } from '../layout/lane-positioning.js';
 import { SpatialHash } from '../layout/spatial-hash.js';
-import { isPointInCluster } from '../layout/event-clustering.js';
+import { getAxisY, getClusters, getCurrentLaneConfig } from '../rendering/renderer.js';
 
 // Lane-aware hit detection
 export function findEventAtPoint(x, y, events, viewportStart, scale, canvasHeight) {
@@ -52,8 +52,7 @@ export function findEventAtPoint(x, y, events, viewportStart, scale, canvasHeigh
     const eventY = getLaneY(lane, axisY, laneConfig);
 
     // Check if point is within this event's bounds (inclusive boundaries)
-    if (x >= eventX && x <= eventX + eventWidth &&
-        y >= eventY && y < eventY + eventHeight) {
+    if (x >= eventX && x <= eventX + eventWidth && y >= eventY && y < eventY + eventHeight) {
       return event;
     }
   }

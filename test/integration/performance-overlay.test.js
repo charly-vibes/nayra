@@ -5,7 +5,7 @@
  * These tests run in jsdom which provides the DOM environment.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createPerformanceOverlay } from '../../src/ui/performance-overlay.js';
 
 // ---------------------------------------------------------------------------
@@ -72,7 +72,9 @@ describe('createPerformanceOverlay', () => {
 // ---------------------------------------------------------------------------
 
 describe('toggle()', () => {
-  beforeEach(() => { overlay = createPerformanceOverlay(container); });
+  beforeEach(() => {
+    overlay = createPerformanceOverlay(container);
+  });
 
   it('shows the overlay on first call', () => {
     overlay.toggle();
@@ -95,30 +97,52 @@ describe('toggle()', () => {
 // ---------------------------------------------------------------------------
 
 describe('Ctrl+Shift+P keyboard shortcut', () => {
-  beforeEach(() => { overlay = createPerformanceOverlay(container); });
+  beforeEach(() => {
+    overlay = createPerformanceOverlay(container);
+  });
 
   it('toggles the overlay on Ctrl+Shift+P', () => {
     expect(overlay.isVisible()).toBe(false);
-    document.dispatchEvent(new KeyboardEvent('keydown', {
-      key: 'P', ctrlKey: true, shiftKey: true, bubbles: true,
-    }));
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'P',
+        ctrlKey: true,
+        shiftKey: true,
+        bubbles: true,
+      }),
+    );
     expect(overlay.isVisible()).toBe(true);
   });
 
   it('hides the overlay on second Ctrl+Shift+P', () => {
-    document.dispatchEvent(new KeyboardEvent('keydown', {
-      key: 'P', ctrlKey: true, shiftKey: true, bubbles: true,
-    }));
-    document.dispatchEvent(new KeyboardEvent('keydown', {
-      key: 'P', ctrlKey: true, shiftKey: true, bubbles: true,
-    }));
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'P',
+        ctrlKey: true,
+        shiftKey: true,
+        bubbles: true,
+      }),
+    );
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'P',
+        ctrlKey: true,
+        shiftKey: true,
+        bubbles: true,
+      }),
+    );
     expect(overlay.isVisible()).toBe(false);
   });
 
   it('does not toggle on Ctrl+P without Shift', () => {
-    document.dispatchEvent(new KeyboardEvent('keydown', {
-      key: 'P', ctrlKey: true, shiftKey: false, bubbles: true,
-    }));
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'P',
+        ctrlKey: true,
+        shiftKey: false,
+        bubbles: true,
+      }),
+    );
     expect(overlay.isVisible()).toBe(false);
   });
 });
@@ -128,7 +152,9 @@ describe('Ctrl+Shift+P keyboard shortcut', () => {
 // ---------------------------------------------------------------------------
 
 describe('recordFrame()', () => {
-  beforeEach(() => { overlay = createPerformanceOverlay(container, { updateIntervalMs: 50 }); });
+  beforeEach(() => {
+    overlay = createPerformanceOverlay(container, { updateIntervalMs: 50 });
+  });
 
   it('does not throw when overlay is hidden', () => {
     expect(() => overlay.recordFrame({ frameTime: 12 })).not.toThrow();
@@ -205,9 +231,14 @@ describe('destroy()', () => {
   it('stops responding to keyboard shortcuts after destroy', () => {
     overlay = createPerformanceOverlay(container);
     overlay.destroy();
-    document.dispatchEvent(new KeyboardEvent('keydown', {
-      key: 'P', ctrlKey: true, shiftKey: true, bubbles: true,
-    }));
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'P',
+        ctrlKey: true,
+        shiftKey: true,
+        bubbles: true,
+      }),
+    );
     // Overlay element is gone; just verifying no error is thrown
     overlay = null;
   });

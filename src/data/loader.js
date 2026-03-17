@@ -1,7 +1,7 @@
-import { validate } from './validator.js';
-import { normalize } from './normalizer.js';
-import { transformWikidata } from './wikidata-transformer.js';
 import { transformJsonLd } from './jsonld-transformer.js';
+import { normalize } from './normalizer.js';
+import { validate } from './validator.js';
+import { transformWikidata } from './wikidata-transformer.js';
 
 export function detectFormat(data) {
   if (data?.results?.bindings && Array.isArray(data.results.bindings)) {
@@ -76,9 +76,7 @@ export async function loadFromFile(file) {
     const data = JSON.parse(text);
     return processPipeline(data);
   } catch (error) {
-    const message = error instanceof SyntaxError
-      ? `JSON parse error: ${error.message}`
-      : error.message;
+    const message = error instanceof SyntaxError ? `JSON parse error: ${error.message}` : error.message;
 
     return {
       events: [],

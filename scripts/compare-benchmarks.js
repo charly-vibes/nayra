@@ -14,7 +14,7 @@
  *   node scripts/compare-benchmarks.js ... > report.md
  */
 
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 
 // ---------------------------------------------------------------------------
 // Public API (also used by regression.test.js)
@@ -45,7 +45,7 @@ export function normalizeResults(raw) {
  * @returns {Array<{key, status, change, baseline, current}>}
  *   status: 'ok' | 'improvement' | 'regression' | 'missing'
  */
-export function compareBenchmarks(baseline, current, threshold = 0.10) {
+export function compareBenchmarks(baseline, current, threshold = 0.1) {
   const comparisons = [];
 
   for (const [key, baseStats] of Object.entries(baseline.benchmarks ?? {})) {
@@ -90,13 +90,9 @@ export function formatMarkdownReport(comparisons) {
     if (c.status === 'missing') {
       return `| \`${c.key}\` | ${c.baseline.toFixed(3)}ms | — | ⚠️ missing |`;
     }
-    const pct  = (c.change * 100).toFixed(1);
+    const pct = (c.change * 100).toFixed(1);
     const sign = c.change > 0 ? '+' : '';
-    const icon = c.status === 'regression'
-      ? '🔴'
-      : c.status === 'improvement'
-        ? '🟢'
-        : '✅';
+    const icon = c.status === 'regression' ? '🔴' : c.status === 'improvement' ? '🟢' : '✅';
     return `| \`${c.key}\` | ${c.baseline.toFixed(3)}ms | ${c.current.toFixed(3)}ms | ${icon} ${sign}${pct}% |`;
   });
 
@@ -115,16 +111,16 @@ function parseArgs(argv) {
   const args = {};
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--baseline') args.baseline = argv[++i];
-    if (argv[i] === '--current')  args.current  = argv[++i];
+    if (argv[i] === '--current') args.current = argv[++i];
     if (argv[i] === '--threshold') args.threshold = parseFloat(argv[++i]);
   }
   return args;
 }
 
 // Only run CLI logic when executed directly (not imported by tests)
-if (process.argv[1] && process.argv[1].endsWith('compare-benchmarks.js')) {
-  const args    = parseArgs(process.argv.slice(2));
-  const threshold = args.threshold ?? 0.10;
+if (process.argv[1]?.endsWith('compare-benchmarks.js')) {
+  const args = parseArgs(process.argv.slice(2));
+  const threshold = args.threshold ?? 0.1;
 
   if (!args.baseline || !args.current) {
     console.error('Usage: compare-benchmarks.js --baseline <file> --current <file> [--threshold 0.10]');
@@ -132,21 +128,23 @@ if (process.argv[1] && process.argv[1].endsWith('compare-benchmarks.js')) {
   }
 
   const baselineRaw = JSON.parse(readFileSync(args.baseline, 'utf8'));
-  const currentRaw  = JSON.parse(readFileSync(args.current,  'utf8'));
+  const currentRaw = JSON.parse(readFileSync(args.current, 'utf8'));
 
   // Support both baseline format (already normalised) and raw results format
   const baselineNorm = baselineRaw.benchmarks ? baselineRaw : normalizeResults(baselineRaw);
-  const currentNorm  = currentRaw.benchmarks  ? currentRaw  : normalizeResults(currentRaw);
+  const currentNorm = currentRaw.benchmarks ? currentRaw : normalizeResults(currentRaw);
 
   const comparisons = compareBenchmarks(baselineNorm, currentNorm, threshold);
-  const report      = formatMarkdownReport(comparisons);
+  const report = formatMarkdownReport(comparisons);
 
   const regressions = comparisons.filter((c) => c.status === 'regression');
   const improvements = comparisons.filter((c) => c.status === 'improvement');
 
   console.log(report);
   console.log('');
-  console.log(`Benchmarks: ${comparisons.length} total, ${regressions.length} regressions, ${improvements.length} improvements`);
+  console.log(
+    `Benchmarks: ${comparisons.length} total, ${regressions.length} regressions, ${improvements.length} improvements`,
+  );
 
   if (hasRegression(comparisons)) {
     console.error('\n❌ Performance regression detected (>10% degradation in p50)');

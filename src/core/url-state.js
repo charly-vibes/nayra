@@ -148,9 +148,7 @@ export function decodeSearchState(hash) {
 
     const searchQuery = params.q || '';
 
-    const selectedCategories = params.cats
-      ? params.cats.split(',').filter(Boolean)
-      : [];
+    const selectedCategories = params.cats ? params.cats.split(',').filter(Boolean) : [];
 
     const filterMode = params.mode === 'AND' ? 'AND' : 'OR';
 

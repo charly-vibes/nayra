@@ -6,7 +6,7 @@
  * hidden, and resumed when it becomes visible.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createIdleDetector } from '../../src/core/idle-detection.js';
 
 // ---------------------------------------------------------------------------
@@ -17,8 +17,12 @@ function makeDocStub() {
   let hidden = false;
   const listeners = {};
   return {
-    get hidden() { return hidden; },
-    set hidden(v) { hidden = v; },
+    get hidden() {
+      return hidden;
+    },
+    set hidden(v) {
+      hidden = v;
+    },
     addEventListener(type, fn) {
       listeners[type] = listeners[type] ?? [];
       listeners[type].push(fn);
@@ -35,9 +39,16 @@ function makeDocStub() {
 function makeWinStub() {
   const listeners = {};
   return {
-    addEventListener(type, fn) { listeners[type] = listeners[type] ?? []; listeners[type].push(fn); },
-    removeEventListener(type, fn) { listeners[type] = (listeners[type] ?? []).filter((f) => f !== fn); },
-    _trigger(type) { for (const fn of listeners[type] ?? []) fn(); },
+    addEventListener(type, fn) {
+      listeners[type] = listeners[type] ?? [];
+      listeners[type].push(fn);
+    },
+    removeEventListener(type, fn) {
+      listeners[type] = (listeners[type] ?? []).filter((f) => f !== fn);
+    },
+    _trigger(type) {
+      for (const fn of listeners[type] ?? []) fn();
+    },
   };
 }
 
@@ -50,8 +61,8 @@ function makeWinStub() {
  * Tracks how many frames were requested and whether it's running.
  */
 function makeRenderLoop() {
-  let running   = false;
-  let rafId     = 0;
+  let running = false;
+  let rafId = 0;
   let frameCount = 0;
 
   const callbacks = new Map();
@@ -79,7 +90,7 @@ function makeRenderLoop() {
   function start() {
     if (running) return;
     running = true;
-    rafId   = mockRaf(tick);
+    rafId = mockRaf(tick);
   }
 
   function stop() {
@@ -99,8 +110,8 @@ let doc, win, loop, detector;
 
 beforeEach(() => {
   vi.useFakeTimers();
-  doc  = makeDocStub();
-  win  = makeWinStub();
+  doc = makeDocStub();
+  win = makeWinStub();
   loop = makeRenderLoop();
 });
 
@@ -113,10 +124,10 @@ describe('render loop pauses on background tab', () => {
   it('stops the render loop when the tab is hidden', () => {
     detector = createIdleDetector({
       idleTimeoutMs: 5000,
-      onIdle:   () => loop.stop(),
+      onIdle: () => loop.stop(),
       onActive: () => loop.start(),
       document: doc,
-      window:   win,
+      window: win,
     });
 
     loop.start();
@@ -130,10 +141,10 @@ describe('render loop pauses on background tab', () => {
   it('resumes the render loop when the tab becomes visible', () => {
     detector = createIdleDetector({
       idleTimeoutMs: 5000,
-      onIdle:   () => loop.stop(),
+      onIdle: () => loop.stop(),
       onActive: () => loop.start(),
       document: doc,
-      window:   win,
+      window: win,
     });
 
     doc.hidden = true;
@@ -150,10 +161,10 @@ describe('render loop pauses on idle timeout', () => {
   it('stops the render loop after 5 s of inactivity', () => {
     detector = createIdleDetector({
       idleTimeoutMs: 5000,
-      onIdle:   () => loop.stop(),
+      onIdle: () => loop.stop(),
       onActive: () => loop.start(),
       document: doc,
-      window:   win,
+      window: win,
     });
 
     loop.start();
@@ -164,17 +175,17 @@ describe('render loop pauses on idle timeout', () => {
   it('resumes the render loop on interaction after idle', () => {
     detector = createIdleDetector({
       idleTimeoutMs: 5000,
-      onIdle:   () => loop.stop(),
+      onIdle: () => loop.stop(),
       onActive: () => loop.start(),
       document: doc,
-      window:   win,
+      window: win,
     });
 
     loop.start();
     vi.advanceTimersByTime(5100); // idle
     expect(loop.isRunning()).toBe(false);
 
-    win._trigger('mousemove');    // interact
+    win._trigger('mousemove'); // interact
     expect(loop.isRunning()).toBe(true);
   });
 });
@@ -184,13 +195,16 @@ describe('combined: hidden tab + idle', () => {
     let idleCount = 0;
     detector = createIdleDetector({
       idleTimeoutMs: 5000,
-      onIdle:   () => { idleCount++; loop.stop(); },
+      onIdle: () => {
+        idleCount++;
+        loop.stop();
+      },
       onActive: () => loop.start(),
       document: doc,
-      window:   win,
+      window: win,
     });
 
-    vi.advanceTimersByTime(5100);   // idle from timeout
+    vi.advanceTimersByTime(5100); // idle from timeout
     expect(idleCount).toBe(1);
 
     doc.hidden = true;

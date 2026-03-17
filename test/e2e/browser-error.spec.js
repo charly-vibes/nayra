@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Browser Error UI', () => {
   test('no error screen shown in supported browser', async ({ page }) => {

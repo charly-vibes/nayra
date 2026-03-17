@@ -25,7 +25,7 @@ export function hashString(str) {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
+    hash = (hash << 5) - hash + char;
     hash = hash & hash;
   }
   return Math.abs(hash);
@@ -182,7 +182,9 @@ export function getShapeLegend(events) {
  * @returns {boolean}
  */
 export function prefersHighContrast() {
-  return typeof window !== 'undefined' &&
+  return (
+    typeof window !== 'undefined' &&
     typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-contrast: more)').matches;
+    window.matchMedia('(prefers-contrast: more)').matches
+  );
 }

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Timeline Application', () => {
   test.beforeEach(async ({ page }) => {
@@ -67,9 +67,7 @@ test.describe('Timeline Application', () => {
     const canvas = page.locator('#timeline-canvas');
 
     const canvasWidth = await canvas.evaluate((el) => el.width);
-    const cssWidth = await canvas.evaluate(
-      (el) => el.getBoundingClientRect().width
-    );
+    const cssWidth = await canvas.evaluate((el) => el.getBoundingClientRect().width);
 
     expect(canvasWidth).toBeCloseTo(cssWidth * dpr, 0);
   });

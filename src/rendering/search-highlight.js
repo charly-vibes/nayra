@@ -45,10 +45,7 @@ export function getMatchSpans(text, query) {
  */
 export function getEventSearchState(eventId, searchResultIds) {
   if (searchResultIds === null || searchResultIds === undefined) return 'none';
-  const found =
-    searchResultIds instanceof Set
-      ? searchResultIds.has(eventId)
-      : searchResultIds.includes(eventId);
+  const found = searchResultIds instanceof Set ? searchResultIds.has(eventId) : searchResultIds.includes(eventId);
   return found ? 'match' : 'dim';
 }
 
@@ -109,12 +106,7 @@ export function renderHighlightedLabel(ctx, text, x, y, maxWidth, eventHeight, h
       const prefixWidth = ctx.measureText(prefix).width;
       const matchWidth = ctx.measureText(match).width;
       const highlightH = eventHeight * 0.8;
-      ctx.fillRect(
-        textX + prefixWidth,
-        y + (eventHeight - highlightH) / 2,
-        matchWidth,
-        highlightH
-      );
+      ctx.fillRect(textX + prefixWidth, y + (eventHeight - highlightH) / 2, matchWidth, highlightH);
     }
 
     // Draw label text on top

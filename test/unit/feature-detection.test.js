@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { detectFeatures, REQUIRED_FEATURES } from '../../src/utils/feature-detection.js';
 
 describe('feature-detection', () => {
@@ -89,16 +89,16 @@ describe('feature-detection', () => {
     it('returns missing list when a required feature is absent', () => {
       globalThis.BigInt = undefined;
       const result = detectFeatures();
-      const missing = Object.values(result).filter(f => f.required && !f.supported);
+      const missing = Object.values(result).filter((f) => f.required && !f.supported);
       expect(missing.length).toBeGreaterThan(0);
-      expect(missing.some(f => f.name === 'bigint')).toBe(true);
+      expect(missing.some((f) => f.name === 'bigint')).toBe(true);
     });
 
     it('returns no missing features when all are supported', () => {
       globalThis.indexedDB = { open: vi.fn() };
       globalThis.document = { createElement: () => ({ getContext: () => ({}) }) };
       const result = detectFeatures();
-      const missing = Object.values(result).filter(f => f.required && !f.supported);
+      const missing = Object.values(result).filter((f) => f.required && !f.supported);
       expect(missing.length).toBe(0);
       delete globalThis.document;
     });

@@ -52,12 +52,13 @@ export function createSearchBar(container, onSubmitOrOptions) {
 
   // Navigation bar (shown when there are active search results)
   let hasResults = false;
-  const navigation = (onNext || onPrev)
-    ? createSearchNavigation(element, {
-        onNext: onNext || (() => {}),
-        onPrev: onPrev || (() => {}),
-      })
-    : null;
+  const navigation =
+    onNext || onPrev
+      ? createSearchNavigation(element, {
+          onNext: onNext || (() => {}),
+          onPrev: onPrev || (() => {}),
+        })
+      : null;
 
   // Filter count badge + clear-all row
   const filterRow = document.createElement('div');
@@ -87,9 +88,7 @@ export function createSearchBar(container, onSubmitOrOptions) {
     font-family: monospace;
   `;
 
-  const onClearAll = onSubmitOrOptions && typeof onSubmitOrOptions === 'object'
-    ? onSubmitOrOptions.onClearAll
-    : null;
+  const onClearAll = onSubmitOrOptions && typeof onSubmitOrOptions === 'object' ? onSubmitOrOptions.onClearAll : null;
 
   if (onClearAll) {
     clearAllBtn.addEventListener('click', () => {

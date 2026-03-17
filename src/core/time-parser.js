@@ -1,26 +1,37 @@
-import { YEAR, MILLION_YEARS, BILLION_YEARS, DAY } from './time.js';
+import { BILLION_YEARS, DAY, MILLION_YEARS, YEAR } from './time.js';
 
 const MONTH = 30n * DAY;
 
 const MONTH_NAMES = {
-  jan: 0, january: 0,
-  feb: 1, february: 1,
-  mar: 2, march: 2,
-  apr: 3, april: 3,
+  jan: 0,
+  january: 0,
+  feb: 1,
+  february: 1,
+  mar: 2,
+  march: 2,
+  apr: 3,
+  april: 3,
   may: 4,
-  jun: 5, june: 5,
-  jul: 6, july: 6,
-  aug: 7, august: 7,
-  sep: 8, september: 8,
-  oct: 9, october: 9,
-  nov: 10, november: 10,
-  dec: 11, december: 11,
+  jun: 5,
+  june: 5,
+  jul: 6,
+  july: 6,
+  aug: 7,
+  august: 7,
+  sep: 8,
+  september: 8,
+  oct: 9,
+  october: 9,
+  nov: 10,
+  november: 10,
+  dec: 11,
+  december: 11,
 };
 
 const NAMED_EVENTS = {
   'big bang': { time: -13_800_000_000n * YEAR, span: BILLION_YEARS },
   'earth formation': { time: -4_500_000_000n * YEAR, span: BILLION_YEARS },
-  'earth': { time: -4_500_000_000n * YEAR, span: BILLION_YEARS },
+  earth: { time: -4_500_000_000n * YEAR, span: BILLION_YEARS },
 };
 
 export const SUPPORTED_FORMATS = [
@@ -45,7 +56,7 @@ function yearToSeconds(year) {
       date.setUTCFullYear(year);
     }
     const ms = date.getTime();
-    if (isNaN(ms)) return null;
+    if (Number.isNaN(ms)) return null;
     return BigInt(Math.floor(ms / 1000));
   } else {
     // For BCE years: year -1 = 1 BCE, year -44 = 44 BCE
@@ -56,7 +67,7 @@ function yearToSeconds(year) {
     const date = new Date(Date.UTC(jsYear, 6, 1));
     date.setUTCFullYear(jsYear);
     const ms = date.getTime();
-    if (isNaN(ms)) return null;
+    if (Number.isNaN(ms)) return null;
     return BigInt(Math.floor(ms / 1000));
   }
 }
@@ -133,9 +144,9 @@ export function parseTimeQuery(query) {
   if (isoDatetimeMatch) {
     const dateStr = query.trim();
     // Treat no timezone as UTC
-    const normalizedStr = /Z$|[+-]\d{2}:\d{2}$/.test(dateStr) ? dateStr : dateStr + 'Z';
+    const normalizedStr = /Z$|[+-]\d{2}:\d{2}$/.test(dateStr) ? dateStr : `${dateStr}Z`;
     const date = new Date(normalizedStr);
-    if (!isNaN(date.getTime())) {
+    if (!Number.isNaN(date.getTime())) {
       return {
         success: true,
         time: BigInt(Math.floor(date.getTime() / 1000)),
@@ -159,7 +170,7 @@ export function parseTimeQuery(query) {
   }
 
   // Month-year: YYYY-MM or YYYY/MM
-  const monthYearMatch = trimmed.match(/^(\d{4})[-\/](\d{1,2})$/);
+  const monthYearMatch = trimmed.match(/^(\d{4})[-/](\d{1,2})$/);
   if (monthYearMatch) {
     const year = parseInt(monthYearMatch[1], 10);
     const month = parseInt(monthYearMatch[2], 10) - 1;

@@ -68,9 +68,7 @@ export function filterByCategories(events, selectedCategories, mode = 'OR') {
  * @returns {string[]} New selection array
  */
 export function toggleCategory(current, category) {
-  return current.includes(category)
-    ? current.filter((c) => c !== category)
-    : [...current, category];
+  return current.includes(category) ? current.filter((c) => c !== category) : [...current, category];
 }
 
 /**

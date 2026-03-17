@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { extractCategories, filterByCategories } from '../../src/core/filter-engine.js';
 import { createStore } from '../../src/core/store.js';
 

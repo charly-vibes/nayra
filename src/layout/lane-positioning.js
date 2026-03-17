@@ -10,9 +10,9 @@
  * Configuration for lane positioning
  */
 export const DEFAULT_CONFIG = {
-  laneHeight: 24,        // Height of each lane in pixels
-  laneSpacing: 4,        // Vertical spacing between lanes
-  baselineOffset: 0,     // Offset from timeline axis to first lane
+  laneHeight: 24, // Height of each lane in pixels
+  laneSpacing: 4, // Vertical spacing between lanes
+  baselineOffset: 0, // Offset from timeline axis to first lane
 };
 
 /**
@@ -55,9 +55,9 @@ export function getTotalHeight(laneCount, config = {}) {
   return laneCount * cfg.laneHeight + (laneCount - 1) * cfg.laneSpacing;
 }
 
-const TOP_LANE_PADDING = 40;  // pixels reserved above the topmost lane
-const MAX_LANE_HEIGHT = 120;  // cap so events don't become absurdly tall
-const MIN_LANE_HEIGHT = 20;   // floor so events stay readable
+const TOP_LANE_PADDING = 40; // pixels reserved above the topmost lane
+const MAX_LANE_HEIGHT = 120; // cap so events don't become absurdly tall
+const MIN_LANE_HEIGHT = 20; // floor so events stay readable
 
 /**
  * Compute a lane config that fills the available vertical space.
@@ -78,10 +78,7 @@ export function getDynamicLaneConfig(axisY, laneCount) {
   // Solve: laneHeight * N + laneSpacing * (N-1) = availableHeight
   const laneHeight = Math.max(
     MIN_LANE_HEIGHT,
-    Math.min(
-      MAX_LANE_HEIGHT,
-      Math.floor((availableHeight - laneSpacing * (effectiveLanes - 1)) / effectiveLanes)
-    )
+    Math.min(MAX_LANE_HEIGHT, Math.floor((availableHeight - laneSpacing * (effectiveLanes - 1)) / effectiveLanes)),
   );
 
   return { ...DEFAULT_CONFIG, laneHeight };

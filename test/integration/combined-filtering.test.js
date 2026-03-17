@@ -2,7 +2,7 @@
  * Integration tests for combined text search + category filtering.
  * Verifies that activeFilterIds correctly reflects the intersection of both filters.
  */
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { createStore } from '../../src/core/store.js';
 
 const events = [
@@ -166,9 +166,7 @@ describe('state synchronization', () => {
     store.dispatch({ type: 'TOGGLE_CATEGORY', category: 'Science' });
 
     // Replace events with new set
-    const newEvents = [
-      { id: 'e10', label: 'Nuclear Fission', category: 'Science', tags: [] },
-    ];
+    const newEvents = [{ id: 'e10', label: 'Nuclear Fission', category: 'Science', tags: [] }];
     store.dispatch({ type: 'SET_EVENTS', events: newEvents });
 
     const state = store.getState();

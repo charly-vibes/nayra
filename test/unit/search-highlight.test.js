@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  getMatchSpans,
   getEventSearchState,
+  getMatchSpans,
   getSearchAlpha,
   renderHighlightedLabel,
 } from '../../src/rendering/search-highlight.js';
@@ -86,9 +86,7 @@ describe('getMatchSpans', () => {
     });
 
     it('matches literal parentheses', () => {
-      expect(getMatchSpans('function(args)', 'function(args)')).toEqual([
-        { start: 0, end: 14 },
-      ]);
+      expect(getMatchSpans('function(args)', 'function(args)')).toEqual([{ start: 0, end: 14 }]);
     });
 
     it('matches literal asterisk', () => {

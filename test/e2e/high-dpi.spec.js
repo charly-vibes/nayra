@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 /**
  * High-DPI / device pixel ratio tests.
@@ -39,7 +39,7 @@ test.describe('High-DPI rendering', () => {
 
   test('canvas renders without errors at current DPR', async ({ page }) => {
     const errors = [];
-    page.on('pageerror', e => errors.push(e.message));
+    page.on('pageerror', (e) => errors.push(e.message));
     await page.reload();
     await page.waitForSelector('#timeline-canvas');
     expect(errors).toHaveLength(0);

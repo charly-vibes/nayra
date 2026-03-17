@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createBrowserError } from '../../src/ui/browser-error.js';
 
 describe('browser-error', () => {
@@ -13,7 +13,7 @@ describe('browser-error', () => {
   });
 
   afterEach(() => {
-    if (container && container.parentElement) {
+    if (container?.parentElement) {
       container.parentElement.removeChild(container);
     }
   });

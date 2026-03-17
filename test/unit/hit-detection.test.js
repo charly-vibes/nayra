@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { findEventAtPoint } from '../../src/interaction/hit-detection.js';
+import { describe, expect, it } from 'vitest';
 import { RationalScale } from '../../src/core/scale.js';
+import { findEventAtPoint } from '../../src/interaction/hit-detection.js';
 import { getAxisY } from '../../src/rendering/renderer.js';
 
 const EVENT_HEIGHT = 20;
@@ -64,10 +64,7 @@ describe('findEventAtPoint', () => {
 
   describe('when events overlap', () => {
     it('assigns overlapping events to different lanes', () => {
-      const events = [
-        makeEvent('lane0', 50, 150),
-        makeEvent('lane1', 75, 125),
-      ];
+      const events = [makeEvent('lane0', 50, 150), makeEvent('lane1', 75, 125)];
       // With multilane layout, overlapping events go to different lanes
       // lane0 event is at axisY, lane1 event is above it
       const resultLane0 = findEventAtPoint(100, axisY, events, viewportStart, scale, canvasHeight);
@@ -80,10 +77,7 @@ describe('findEventAtPoint', () => {
     });
 
     it('returns the correct event when clicking on non-overlapping region', () => {
-      const events = [
-        makeEvent('lane0', 50, 150),
-        makeEvent('lane1', 75, 125),
-      ];
+      const events = [makeEvent('lane0', 50, 150), makeEvent('lane1', 75, 125)];
       // Click on the part of lane0 event that doesn't overlap temporally
       const result = findEventAtPoint(52, axisY, events, viewportStart, scale, canvasHeight);
       expect(result.id).toBe('lane0');

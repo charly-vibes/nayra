@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   calculateLayout,
-  initWorker,
-  terminateWorker,
   getWorkerThreshold,
+  initWorker,
   isWorkerReady,
+  terminateWorker,
 } from '../../src/layout/layout-worker-manager.js';
 
 describe('Layout Worker Manager', () => {

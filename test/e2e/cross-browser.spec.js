@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 /**
  * Cross-browser compatibility test suite.
@@ -23,10 +23,10 @@ test.describe('Cross-browser compatibility', () => {
 
   test('application loads without page errors', async ({ page }) => {
     const errors = [];
-    page.on('pageerror', err => errors.push(err.message));
+    page.on('pageerror', (err) => errors.push(err.message));
     await page.reload();
     await page.waitForSelector('#timeline-canvas');
-    const appErrors = errors.filter(e => !e.includes('favicon'));
+    const appErrors = errors.filter((e) => !e.includes('favicon'));
     expect(appErrors).toHaveLength(0);
   });
 
@@ -48,7 +48,10 @@ test.describe('Cross-browser compatibility', () => {
 
   test('required browser APIs are available', async ({ page }) => {
     const apis = await page.evaluate(() => ({
-      canvas: (() => { const c = document.createElement('canvas'); return c.getContext('2d') !== null; })(),
+      canvas: (() => {
+        const c = document.createElement('canvas');
+        return c.getContext('2d') !== null;
+      })(),
       bigint: typeof BigInt !== 'undefined',
       indexeddb: typeof indexedDB !== 'undefined',
       requestAnimationFrame: typeof requestAnimationFrame !== 'undefined',
@@ -62,8 +65,8 @@ test.describe('Cross-browser compatibility', () => {
   });
 
   test('pointer events or mouse events are supported', async ({ page }) => {
-    const supported = await page.evaluate(() =>
-      typeof PointerEvent !== 'undefined' || typeof MouseEvent !== 'undefined'
+    const supported = await page.evaluate(
+      () => typeof PointerEvent !== 'undefined' || typeof MouseEvent !== 'undefined',
     );
     expect(supported).toBe(true);
   });

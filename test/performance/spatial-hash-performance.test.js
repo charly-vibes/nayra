@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { SpatialHash, createSpatialHash } from '../../src/layout/spatial-hash.js';
+import { describe, expect, it } from 'vitest';
+import { createSpatialHash, SpatialHash } from '../../src/layout/spatial-hash.js';
 
 describe('Spatial Hash Performance', () => {
   describe('Rebuild performance', () => {
@@ -13,7 +13,7 @@ describe('Spatial Hash Performance', () => {
       }
 
       const getBounds = (event) => {
-        const idx = parseInt(event.id.slice(1));
+        const idx = parseInt(event.id.slice(1), 10);
         return {
           x: (idx % 100) * 50, // Distribute across screen
           y: Math.floor(idx / 100) * 30,
@@ -45,7 +45,7 @@ describe('Spatial Hash Performance', () => {
         const offset = frame * 10; // Simulate panning
 
         const getBounds = (event) => {
-          const idx = parseInt(event.id.slice(1));
+          const idx = parseInt(event.id.slice(1), 10);
           return {
             x: (idx % 100) * 50 + offset,
             y: Math.floor(idx / 100) * 30,
@@ -81,7 +81,7 @@ describe('Spatial Hash Performance', () => {
       }
 
       const getBounds = (event) => {
-        const idx = parseInt(event.id.slice(1));
+        const idx = parseInt(event.id.slice(1), 10);
         return {
           x: (idx % 100) * 50,
           y: Math.floor(idx / 100) * 30,
@@ -154,7 +154,7 @@ describe('Spatial Hash Performance', () => {
       }
 
       const getBounds = (event) => {
-        const idx = parseInt(event.id.slice(1));
+        const idx = parseInt(event.id.slice(1), 10);
         return {
           x: idx * 100, // 1 million pixels wide
           y: 100,
@@ -192,7 +192,7 @@ describe('Spatial Hash Performance', () => {
       }
 
       const getBounds = (event) => {
-        const idx = parseInt(event.id.slice(1));
+        const idx = parseInt(event.id.slice(1), 10);
         return {
           x: (idx % 100) * 50,
           y: Math.floor(idx / 100) * 30,
@@ -229,19 +229,19 @@ describe('Spatial Hash Performance', () => {
 
       // Log results for comparison
       console.log('\nBucket width optimization results:');
-      results.forEach(r => {
+      results.forEach((r) => {
         console.log(
           `Width ${r.width}px: ` +
-          `rebuild ${r.rebuildTime.toFixed(2)}ms, ` +
-          `query ${r.queryTime.toFixed(4)}ms, ` +
-          `${r.bucketCount} buckets, ` +
-          `avg ${r.avgEventsPerBucket.toFixed(1)} events/bucket, ` +
-          `max ${r.maxEventsPerBucket} events/bucket`
+            `rebuild ${r.rebuildTime.toFixed(2)}ms, ` +
+            `query ${r.queryTime.toFixed(4)}ms, ` +
+            `${r.bucketCount} buckets, ` +
+            `avg ${r.avgEventsPerBucket.toFixed(1)} events/bucket, ` +
+            `max ${r.maxEventsPerBucket} events/bucket`,
         );
       });
 
       // 50px should be competitive
-      const fiftyPxResult = results.find(r => r.width === 50);
+      const fiftyPxResult = results.find((r) => r.width === 50);
       expect(fiftyPxResult.rebuildTime).toBeLessThan(20);
       expect(fiftyPxResult.queryTime).toBeLessThan(1);
     });
@@ -280,9 +280,7 @@ describe('Spatial Hash Performance', () => {
     });
 
     it('should handle very wide events spanning many buckets', () => {
-      const events = [
-        { id: 'wide', label: 'Very Wide Event' },
-      ];
+      const events = [{ id: 'wide', label: 'Very Wide Event' }];
 
       const getBounds = () => ({
         x: 0,
@@ -321,10 +319,10 @@ describe('Spatial Hash Performance', () => {
 
       const getBounds = (event) => {
         if (event.id.startsWith('narrow')) {
-          const idx = parseInt(event.id.split('_')[1]);
+          const idx = parseInt(event.id.split('_')[1], 10);
           return { x: idx * 10, y: 100, width: 8, height: 20 };
         } else {
-          const idx = parseInt(event.id.split('_')[1]);
+          const idx = parseInt(event.id.split('_')[1], 10);
           return { x: idx * 100, y: 100, width: 500, height: 20 };
         }
       };
@@ -352,7 +350,7 @@ describe('Spatial Hash Performance', () => {
       }
 
       const getBounds = (event) => {
-        const idx = parseInt(event.id.slice(1));
+        const idx = parseInt(event.id.slice(1), 10);
         return {
           x: (idx % 1000) * 20,
           y: Math.floor(idx / 1000) * 30,
@@ -372,7 +370,9 @@ describe('Spatial Hash Performance', () => {
       // Rebuild should still be reasonably fast
       expect(rebuildResult.duration).toBeLessThan(100);
 
-      console.log(`Large dataset (${eventCount} events): ${rebuildResult.duration.toFixed(2)}ms, ${stats.bucketCount} buckets`);
+      console.log(
+        `Large dataset (${eventCount} events): ${rebuildResult.duration.toFixed(2)}ms, ${stats.bucketCount} buckets`,
+      );
     });
 
     it('should efficiently handle clear and rebuild cycles', () => {
@@ -387,7 +387,7 @@ describe('Spatial Hash Performance', () => {
       const cycleTimes = [];
       for (let cycle = 0; cycle < 100; cycle++) {
         const getBounds = (event) => {
-          const idx = parseInt(event.id.slice(1));
+          const idx = parseInt(event.id.slice(1), 10);
           return {
             x: (idx % 100) * 50 + cycle * 10,
             y: Math.floor(idx / 100) * 30,
@@ -411,7 +411,9 @@ describe('Spatial Hash Performance', () => {
 
       expect(lastTenAvg).toBeLessThan(firstTenAvg * 1.5); // Allow 50% variance
 
-      console.log(`Rebuild cycles: avg ${avgTime.toFixed(2)}ms, first 10: ${firstTenAvg.toFixed(2)}ms, last 10: ${lastTenAvg.toFixed(2)}ms`);
+      console.log(
+        `Rebuild cycles: avg ${avgTime.toFixed(2)}ms, first 10: ${firstTenAvg.toFixed(2)}ms, last 10: ${lastTenAvg.toFixed(2)}ms`,
+      );
     });
   });
 });

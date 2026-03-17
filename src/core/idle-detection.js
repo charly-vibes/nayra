@@ -45,13 +45,13 @@ const INTERACTION_EVENTS = ['mousemove', 'mousedown', 'keydown', 'touchstart', '
  */
 export function createIdleDetector({
   idleTimeoutMs = 5000,
-  onIdle        = () => {},
-  onActive      = () => {},
+  onIdle = () => {},
+  onActive = () => {},
   document: doc = globalThis.document,
-  window: win   = globalThis.window ?? globalThis,
+  window: win = globalThis.window ?? globalThis,
 } = {}) {
-  let idle      = false;
-  let timerId   = null;
+  let idle = false;
+  let timerId = null;
 
   // ---------------------------------------------------------------------------
   // Idle / active transitions
@@ -86,7 +86,10 @@ export function createIdleDetector({
   function onVisibilityChange() {
     if (doc.hidden) {
       // Immediately pause when the tab goes to the background
-      if (timerId !== null) { clearTimeout(timerId); timerId = null; }
+      if (timerId !== null) {
+        clearTimeout(timerId);
+        timerId = null;
+      }
       enterIdle();
     } else {
       // Tab is visible again — resume and restart the idle timer
@@ -117,7 +120,10 @@ export function createIdleDetector({
   // ---------------------------------------------------------------------------
 
   function destroy() {
-    if (timerId !== null) { clearTimeout(timerId); timerId = null; }
+    if (timerId !== null) {
+      clearTimeout(timerId);
+      timerId = null;
+    }
     for (const type of INTERACTION_EVENTS) {
       win.removeEventListener(type, onInteraction);
     }

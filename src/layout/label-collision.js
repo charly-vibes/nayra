@@ -17,7 +17,7 @@ const MIN_EVENT_WIDTH_FOR_LABEL = 30; // Minimum event width to show label
  * @param {number} zoomLevel - Current zoom level (seconds per pixel)
  * @returns {number} - Priority value (higher = more important)
  */
-export function calculateLabelPriority(event, eventWidth, zoomLevel) {
+export function calculateLabelPriority(event, eventWidth, _zoomLevel) {
   let priority = 0;
 
   // Wider events have higher priority (more screen space = more important at this zoom)
@@ -58,12 +58,7 @@ export function measureLabel(ctx, text) {
  * @returns {boolean} - True if labels overlap
  */
 export function labelsOverlap(a, b) {
-  return !(
-    a.x + a.width <= b.x ||
-    b.x + b.width <= a.x ||
-    a.y + a.height <= b.y ||
-    b.y + b.height <= a.y
-  );
+  return !(a.x + a.width <= b.x || b.x + b.width <= a.x || a.y + a.height <= b.y || b.y + b.height <= a.y);
 }
 
 /**

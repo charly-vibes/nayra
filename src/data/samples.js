@@ -1,7 +1,7 @@
-import { YEAR, MILLION_YEARS, BILLION_YEARS } from '../core/time.js';
+import { BILLION_YEARS, MILLION_YEARS, YEAR } from '../core/time.js';
 
-const UNIX_EPOCH = 0n;
-const YEAR_2000 = 946684800n;
+const _UNIX_EPOCH = 0n;
+const _YEAR_2000 = 946684800n;
 const EARTH_FORMATION = -4_500_000_000n * YEAR;
 const BIG_BANG = -13_800_000_000n * YEAR;
 
@@ -12,11 +12,11 @@ const PRIORITY_HIGH = 2;
 
 export function generateSampleEvents() {
   const events = [];
-  
+
   events.push(...generateRecentEvents(50));
   events.push(...generateGeologicalEvents(25));
   events.push(...generateCosmologicalEvents(25));
-  
+
   return events;
 }
 

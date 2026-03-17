@@ -1,7 +1,7 @@
+import { computeActiveFilter, filterByCategories, toggleCategory } from './filter-engine.js';
 import { RationalScale } from './scale.js';
-import { YEAR } from './time.js';
 import { filterEvents } from './search-engine.js';
-import { filterByCategories, toggleCategory, computeActiveFilter } from './filter-engine.js';
+import { YEAR } from './time.js';
 
 export function createStore(initialState = {}) {
   let state = {
@@ -71,9 +71,7 @@ function reduce(state, action) {
       return { ...state, canvasWidth: action.width };
 
     case 'SET_EVENTS': {
-      const sorted = [...action.events].sort((a, b) =>
-        a.start < b.start ? -1 : a.start > b.start ? 1 : 0
-      );
+      const sorted = [...action.events].sort((a, b) => (a.start < b.start ? -1 : a.start > b.start ? 1 : 0));
       const searchResultIds = state.searchQuery ? filterEvents(sorted, state.searchQuery) : null;
       const categoryFilterIds =
         state.selectedCategories.length > 0
@@ -155,9 +153,7 @@ function reduce(state, action) {
       const { searchQuery = '', selectedCategories = [], filterMode = 'OR' } = action;
       const searchResultIds = filterEvents(state.events, searchQuery);
       const categoryFilterIds =
-        selectedCategories.length > 0
-          ? filterByCategories(state.events, selectedCategories, filterMode)
-          : null;
+        selectedCategories.length > 0 ? filterByCategories(state.events, selectedCategories, filterMode) : null;
       return {
         ...state,
         searchQuery,

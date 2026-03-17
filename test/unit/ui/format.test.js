@@ -1,7 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { formatTimeRange } from '../../../src/ui/format.js';
-import { YEAR, MILLION_YEARS, BILLION_YEARS } from '../../../src/core/time.js';
+import { describe, expect, it } from 'vitest';
 import { parseTimeQuery } from '../../../src/core/time-parser.js';
+import { formatTimeRange } from '../../../src/ui/format.js';
 
 function parseTime(query) {
   const result = parseTimeQuery(query);

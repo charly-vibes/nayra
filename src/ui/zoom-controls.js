@@ -87,7 +87,7 @@ export function createZoomControls(container, { onZoomIn, onZoomOut, onFitToCont
 
   // Add hover effects
   const buttons = [zoomInBtn, zoomOutBtn, fitBtn, resetBtn, filterBtn];
-  buttons.forEach(btn => {
+  buttons.forEach((btn) => {
     btn.addEventListener('pointerenter', () => {
       btn.style.background = '#3a3a4e';
     });

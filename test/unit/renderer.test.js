@@ -1,16 +1,16 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { BILLION_YEARS, MILLION_YEARS, YEAR } from '../../src/core/time.js';
 import {
-  hashCode,
-  getEventColor,
   cullEvents,
-  getGridInterval,
-  formatTime,
-  EVENT_HEIGHT,
   EVENT_COLORS,
+  EVENT_HEIGHT,
+  formatTime,
+  getEventColor,
   getEventFillColor,
   getEventStrokeStyle,
+  getGridInterval,
+  hashCode,
 } from '../../src/rendering/renderer.js';
-import { YEAR, MILLION_YEARS, BILLION_YEARS } from '../../src/core/time.js';
 
 describe('Renderer', () => {
   describe('constants', () => {

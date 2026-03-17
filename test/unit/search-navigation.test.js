@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { computeNextIndex, computePrevIndex, computePanToEvent } from '../../src/ui/search-navigation.js';
-import { createStore } from '../../src/core/store.js';
+import { describe, expect, it } from 'vitest';
 import { RationalScale } from '../../src/core/scale.js';
+import { createStore } from '../../src/core/store.js';
 import { YEAR } from '../../src/core/time.js';
+import { computeNextIndex, computePanToEvent, computePrevIndex } from '../../src/ui/search-navigation.js';
 
 // --- Pure navigation index logic ---
 
@@ -84,10 +84,13 @@ describe('computePanToEvent', () => {
 describe('NEXT_RESULT action', () => {
   it('advances currentResultIndex', () => {
     const store = createStore();
-    store.dispatch({ type: 'SET_EVENTS', events: [
-      { id: 'e1', start: 0n, title: 'Moon' },
-      { id: 'e2', start: 1n, title: 'Moon Landing' },
-    ]});
+    store.dispatch({
+      type: 'SET_EVENTS',
+      events: [
+        { id: 'e1', start: 0n, title: 'Moon' },
+        { id: 'e2', start: 1n, title: 'Moon Landing' },
+      ],
+    });
     store.dispatch({ type: 'SEARCH_EVENTS', query: 'Moon' });
     // Should start at index 0
     expect(store.getState().currentResultIndex).toBe(0);
@@ -98,10 +101,13 @@ describe('NEXT_RESULT action', () => {
 
   it('wraps around to 0 after the last result', () => {
     const store = createStore();
-    store.dispatch({ type: 'SET_EVENTS', events: [
-      { id: 'e1', start: 0n, title: 'Apollo' },
-      { id: 'e2', start: 1n, title: 'Apollo 11' },
-    ]});
+    store.dispatch({
+      type: 'SET_EVENTS',
+      events: [
+        { id: 'e1', start: 0n, title: 'Apollo' },
+        { id: 'e2', start: 1n, title: 'Apollo 11' },
+      ],
+    });
     store.dispatch({ type: 'SEARCH_EVENTS', query: 'Apollo' });
     store.dispatch({ type: 'NEXT_RESULT' }); // -> 1
     store.dispatch({ type: 'NEXT_RESULT' }); // -> 0 (wrap)
@@ -119,10 +125,13 @@ describe('NEXT_RESULT action', () => {
 describe('PREV_RESULT action', () => {
   it('goes back to the previous result', () => {
     const store = createStore();
-    store.dispatch({ type: 'SET_EVENTS', events: [
-      { id: 'e1', start: 0n, title: 'Apollo' },
-      { id: 'e2', start: 1n, title: 'Apollo 11' },
-    ]});
+    store.dispatch({
+      type: 'SET_EVENTS',
+      events: [
+        { id: 'e1', start: 0n, title: 'Apollo' },
+        { id: 'e2', start: 1n, title: 'Apollo 11' },
+      ],
+    });
     store.dispatch({ type: 'SEARCH_EVENTS', query: 'Apollo' });
     store.dispatch({ type: 'NEXT_RESULT' }); // -> 1
     store.dispatch({ type: 'PREV_RESULT' }); // -> 0
@@ -131,10 +140,13 @@ describe('PREV_RESULT action', () => {
 
   it('wraps from 0 to the last result', () => {
     const store = createStore();
-    store.dispatch({ type: 'SET_EVENTS', events: [
-      { id: 'e1', start: 0n, title: 'Apollo' },
-      { id: 'e2', start: 1n, title: 'Apollo 11' },
-    ]});
+    store.dispatch({
+      type: 'SET_EVENTS',
+      events: [
+        { id: 'e1', start: 0n, title: 'Apollo' },
+        { id: 'e2', start: 1n, title: 'Apollo 11' },
+      ],
+    });
     store.dispatch({ type: 'SEARCH_EVENTS', query: 'Apollo' });
     store.dispatch({ type: 'PREV_RESULT' }); // 0 -> 1 (wrap)
     expect(store.getState().currentResultIndex).toBe(1);
@@ -144,11 +156,14 @@ describe('PREV_RESULT action', () => {
 describe('JUMP_TO_RESULT action', () => {
   it('jumps to a specific result index', () => {
     const store = createStore();
-    store.dispatch({ type: 'SET_EVENTS', events: [
-      { id: 'e1', start: 0n, title: 'Apollo' },
-      { id: 'e2', start: 1n, title: 'Apollo 11' },
-      { id: 'e3', start: 2n, title: 'Apollo 13' },
-    ]});
+    store.dispatch({
+      type: 'SET_EVENTS',
+      events: [
+        { id: 'e1', start: 0n, title: 'Apollo' },
+        { id: 'e2', start: 1n, title: 'Apollo 11' },
+        { id: 'e3', start: 2n, title: 'Apollo 13' },
+      ],
+    });
     store.dispatch({ type: 'SEARCH_EVENTS', query: 'Apollo' });
     store.dispatch({ type: 'JUMP_TO_RESULT', index: 2 });
     expect(store.getState().currentResultIndex).toBe(2);
@@ -156,9 +171,7 @@ describe('JUMP_TO_RESULT action', () => {
 
   it('clamps index to valid range', () => {
     const store = createStore();
-    store.dispatch({ type: 'SET_EVENTS', events: [
-      { id: 'e1', start: 0n, title: 'Apollo' },
-    ]});
+    store.dispatch({ type: 'SET_EVENTS', events: [{ id: 'e1', start: 0n, title: 'Apollo' }] });
     store.dispatch({ type: 'SEARCH_EVENTS', query: 'Apollo' });
     store.dispatch({ type: 'JUMP_TO_RESULT', index: 999 });
     expect(store.getState().currentResultIndex).toBe(0); // only 1 result, clamped to 0
@@ -168,10 +181,13 @@ describe('JUMP_TO_RESULT action', () => {
 describe('result count accuracy', () => {
   it('resets currentResultIndex when new search starts', () => {
     const store = createStore();
-    store.dispatch({ type: 'SET_EVENTS', events: [
-      { id: 'e1', start: 0n, title: 'Apollo' },
-      { id: 'e2', start: 1n, title: 'Apollo 11' },
-    ]});
+    store.dispatch({
+      type: 'SET_EVENTS',
+      events: [
+        { id: 'e1', start: 0n, title: 'Apollo' },
+        { id: 'e2', start: 1n, title: 'Apollo 11' },
+      ],
+    });
     store.dispatch({ type: 'SEARCH_EVENTS', query: 'Apollo' });
     store.dispatch({ type: 'NEXT_RESULT' }); // -> 1
     store.dispatch({ type: 'SEARCH_EVENTS', query: 'Moon' }); // new search
@@ -180,11 +196,14 @@ describe('result count accuracy', () => {
 
   it('tracks total results via searchResultIds length', () => {
     const store = createStore();
-    store.dispatch({ type: 'SET_EVENTS', events: [
-      { id: 'e1', start: 0n, title: 'Apollo' },
-      { id: 'e2', start: 1n, title: 'Apollo 11' },
-      { id: 'e3', start: 2n, title: 'Moon' },
-    ]});
+    store.dispatch({
+      type: 'SET_EVENTS',
+      events: [
+        { id: 'e1', start: 0n, title: 'Apollo' },
+        { id: 'e2', start: 1n, title: 'Apollo 11' },
+        { id: 'e3', start: 2n, title: 'Moon' },
+      ],
+    });
     store.dispatch({ type: 'SEARCH_EVENTS', query: 'Apollo' });
     const state = store.getState();
     expect(state.searchResultIds).toHaveLength(2);

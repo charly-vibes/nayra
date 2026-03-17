@@ -108,8 +108,7 @@ export function createBrowserError(container, missingFeatures) {
 
   const suggestion = document.createElement('p');
   applyStyles(suggestion, { color: '#b0b0c8', fontSize: '0.9rem', lineHeight: '1.5' });
-  suggestion.textContent =
-    'Please upgrade to a modern browser such as ';
+  suggestion.textContent = 'Please upgrade to a modern browser such as ';
 
   const browsers = document.createElement('strong');
   browsers.textContent = 'Chrome 90+, Firefox 90+, or Safari 14+';

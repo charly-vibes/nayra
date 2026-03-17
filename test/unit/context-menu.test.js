@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { initInput } from '../../src/interaction/input.js';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createStore } from '../../src/core/store.js';
+import { initInput } from '../../src/interaction/input.js';
 
 // --- DOM mock helpers ---
 
@@ -15,7 +15,10 @@ function createMockElement(tagName = 'div') {
     innerHTML: '',
     dataset: {},
     children,
-    appendChild: vi.fn((child) => { children.push(child); return child; }),
+    appendChild: vi.fn((child) => {
+      children.push(child);
+      return child;
+    }),
     removeChild: vi.fn((child) => {
       const idx = children.indexOf(child);
       if (idx !== -1) children.splice(idx, 1);
@@ -114,9 +117,7 @@ describe('contextmenu event detection (input.js)', () => {
     const event = createContextMenuEvent(150, 250);
     capturedHandler(event);
 
-    expect(onContextMenu).toHaveBeenCalledWith(
-      expect.objectContaining({ x: 150, y: 250 })
-    );
+    expect(onContextMenu).toHaveBeenCalledWith(expect.objectContaining({ x: 150, y: 250 }));
   });
 
   it('does not throw if onContextMenu callback is absent', () => {
@@ -171,9 +172,7 @@ describe('contextmenu event detection (input.js)', () => {
     const event = createContextMenuEvent(150, 250);
     capturedHandler(event);
 
-    expect(onContextMenu).toHaveBeenCalledWith(
-      expect.objectContaining({ targetType: 'background' })
-    );
+    expect(onContextMenu).toHaveBeenCalledWith(expect.objectContaining({ targetType: 'background' }));
   });
 
   it('removes contextmenu listener on destroy', () => {
@@ -343,7 +342,7 @@ describe('ContextMenu keyboard navigation', () => {
     docListeners = {};
     vi.stubGlobal('document', {
       createElement: vi.fn((tag) => createMockElement(tag)),
-      addEventListener: vi.fn((type, handler, opts) => {
+      addEventListener: vi.fn((type, handler, _opts) => {
         docListeners[type] = docListeners[type] || [];
         docListeners[type].push(handler);
       }),
@@ -362,7 +361,7 @@ describe('ContextMenu keyboard navigation', () => {
 
   function fireKey(key) {
     const event = { key, preventDefault: vi.fn() };
-    (docListeners['keydown'] || []).forEach((h) => h(event));
+    (docListeners.keydown || []).forEach((h) => h(event));
     return event;
   }
 
@@ -438,11 +437,7 @@ describe('ContextMenu keyboard navigation', () => {
 
   it('skips separator items during ArrowDown navigation', () => {
     const menu = createContextMenu(container);
-    menu.show(100, 100, [
-      { label: 'A', action: vi.fn() },
-      { separator: true },
-      { label: 'C', action: vi.fn() },
-    ]);
+    menu.show(100, 100, [{ label: 'A', action: vi.fn() }, { separator: true }, { label: 'C', action: vi.fn() }]);
     menu.focusItem(0);
     fireKey('ArrowDown');
     expect(menu.getFocusedIndex()).toBe(2);
@@ -478,7 +473,7 @@ describe('buildEventActions', () => {
   it('includes a Zoom to Event action', () => {
     const event = { id: 'ev1', start: 0n, end: 1000n };
     const actions = buildEventActions(event, store);
-    const zoom = actions.find((a) => a.label && a.label.includes('Zoom'));
+    const zoom = actions.find((a) => a.label?.includes('Zoom'));
     expect(zoom).toBeDefined();
     expect(zoom.action).toBeTypeOf('function');
   });
@@ -486,18 +481,16 @@ describe('buildEventActions', () => {
   it('Zoom action dispatches SET_VIEWPORT', () => {
     const event = { id: 'ev1', start: 0n, end: BigInt(86400) };
     const actions = buildEventActions(event, store);
-    const zoom = actions.find((a) => a.label && a.label.includes('Zoom'));
+    const zoom = actions.find((a) => a.label?.includes('Zoom'));
     const dispatchSpy = vi.spyOn(store, 'dispatch');
     zoom.action();
-    expect(dispatchSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'SET_VIEWPORT' })
-    );
+    expect(dispatchSpy).toHaveBeenCalledWith(expect.objectContaining({ type: 'SET_VIEWPORT' }));
   });
 
   it('includes a Show Details action', () => {
     const event = { id: 'ev1', start: 0n, end: 1000n };
     const actions = buildEventActions(event, store);
-    const details = actions.find((a) => a.label && a.label.includes('Details'));
+    const details = actions.find((a) => a.label?.includes('Details'));
     expect(details).toBeDefined();
     expect(details.action).toBeTypeOf('function');
   });
@@ -505,7 +498,7 @@ describe('buildEventActions', () => {
   it('Show Details action dispatches SELECT_EVENT', () => {
     const event = { id: 'ev1', start: 0n, end: 1000n };
     const actions = buildEventActions(event, store);
-    const details = actions.find((a) => a.label && a.label.includes('Details'));
+    const details = actions.find((a) => a.label?.includes('Details'));
     const dispatchSpy = vi.spyOn(store, 'dispatch');
     details.action();
     expect(dispatchSpy).toHaveBeenCalledWith({ type: 'SELECT_EVENT', eventId: 'ev1' });
@@ -515,7 +508,7 @@ describe('buildEventActions', () => {
     const event = { id: 'ev1', start: 0n, end: 1000n };
     const onShowDetails = vi.fn();
     const actions = buildEventActions(event, store, { onShowDetails });
-    const details = actions.find((a) => a.label && a.label.includes('Details'));
+    const details = actions.find((a) => a.label?.includes('Details'));
     details.action();
     expect(onShowDetails).toHaveBeenCalledWith(event);
   });
@@ -523,7 +516,7 @@ describe('buildEventActions', () => {
   it('includes a Copy Link action', () => {
     const event = { id: 'ev1', start: 0n, end: 1000n };
     const actions = buildEventActions(event, store);
-    const copy = actions.find((a) => a.label && a.label.includes('Copy'));
+    const copy = actions.find((a) => a.label?.includes('Copy'));
     expect(copy).toBeDefined();
     expect(copy.action).toBeTypeOf('function');
   });
@@ -531,7 +524,7 @@ describe('buildEventActions', () => {
   it('Copy Link action writes to clipboard', async () => {
     const event = { id: 'ev1', start: 0n, end: 1000n };
     const actions = buildEventActions(event, store);
-    const copy = actions.find((a) => a.label && a.label.includes('Copy'));
+    const copy = actions.find((a) => a.label?.includes('Copy'));
     await copy.action();
     expect(navigator.clipboard.writeText).toHaveBeenCalled();
     const url = navigator.clipboard.writeText.mock.calls[0][0];
@@ -572,19 +565,21 @@ describe('Long-press fires onContextMenu (input.js)', () => {
     initInput(canvas, store, { onContextMenu });
 
     // Fire a touch pointer down
-    const pointerdown = canvas._listeners['pointerdown'] || [];
-    pointerdown.forEach((h) => h({
-      button: 0,
-      clientX: 100,
-      clientY: 200,
-      pointerId: 1,
-      pointerType: 'touch',
-      buttons: 1,
-      ctrlKey: false,
-      metaKey: false,
-      timeStamp: 0,
-      preventDefault: vi.fn(),
-    }));
+    const pointerdown = canvas._listeners.pointerdown || [];
+    pointerdown.forEach((h) =>
+      h({
+        button: 0,
+        clientX: 100,
+        clientY: 200,
+        pointerId: 1,
+        pointerType: 'touch',
+        buttons: 1,
+        ctrlKey: false,
+        metaKey: false,
+        timeStamp: 0,
+        preventDefault: vi.fn(),
+      }),
+    );
 
     vi.advanceTimersByTime(500);
 
@@ -597,33 +592,37 @@ describe('Long-press fires onContextMenu (input.js)', () => {
     const onContextMenu = vi.fn();
     initInput(canvas, store, { onContextMenu });
 
-    const pointerdown = canvas._listeners['pointerdown'] || [];
-    pointerdown.forEach((h) => h({
-      button: 0,
-      clientX: 100,
-      clientY: 200,
-      pointerId: 1,
-      pointerType: 'touch',
-      buttons: 1,
-      ctrlKey: false,
-      metaKey: false,
-      timeStamp: 0,
-      preventDefault: vi.fn(),
-    }));
+    const pointerdown = canvas._listeners.pointerdown || [];
+    pointerdown.forEach((h) =>
+      h({
+        button: 0,
+        clientX: 100,
+        clientY: 200,
+        pointerId: 1,
+        pointerType: 'touch',
+        buttons: 1,
+        ctrlKey: false,
+        metaKey: false,
+        timeStamp: 0,
+        preventDefault: vi.fn(),
+      }),
+    );
 
     // Simulate a large move (> LONG_PRESS_MOVE_THRESHOLD=10)
-    const pointermove = canvas._listeners['pointermove'] || [];
-    pointermove.forEach((h) => h({
-      clientX: 120,
-      clientY: 220,
-      pointerId: 1,
-      pointerType: 'touch',
-      buttons: 1,
-      ctrlKey: false,
-      metaKey: false,
-      timeStamp: 100,
-      preventDefault: vi.fn(),
-    }));
+    const pointermove = canvas._listeners.pointermove || [];
+    pointermove.forEach((h) =>
+      h({
+        clientX: 120,
+        clientY: 220,
+        pointerId: 1,
+        pointerType: 'touch',
+        buttons: 1,
+        ctrlKey: false,
+        metaKey: false,
+        timeStamp: 100,
+        preventDefault: vi.fn(),
+      }),
+    );
 
     vi.advanceTimersByTime(500);
 

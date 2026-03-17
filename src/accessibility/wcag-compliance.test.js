@@ -11,7 +11,7 @@
  * - Focus management (2.4.3)
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // ─── Contrast ratio helpers ────────────────────────────────────────────────
 
@@ -20,9 +20,13 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
  */
 function hexToRgb(hex) {
   const clean = hex.replace('#', '');
-  const full = clean.length === 3
-    ? clean.split('').map((c) => c + c).join('')
-    : clean;
+  const full =
+    clean.length === 3
+      ? clean
+          .split('')
+          .map((c) => c + c)
+          .join('')
+      : clean;
   return {
     r: parseInt(full.slice(0, 2), 16),
     g: parseInt(full.slice(2, 4), 16),
@@ -216,7 +220,7 @@ describe('WCAG 2.1.1 Keyboard — focus trap', () => {
   let modal;
 
   afterEach(() => {
-    if (modal && modal.parentNode) document.body.removeChild(modal);
+    if (modal?.parentNode) document.body.removeChild(modal);
   });
 
   it('focus trap keeps Tab within modal (circular)', async () => {

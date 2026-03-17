@@ -1,11 +1,11 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { assignLanes } from '../../src/layout/greedy-interval-coloring.js';
-import { SpatialHash } from '../../src/layout/spatial-hash.js';
-import { getLaneY, getLaneBounds, DEFAULT_CONFIG } from '../../src/layout/lane-positioning.js';
-import { detectLabelCollisions } from '../../src/layout/label-collision.js';
-import { clusterEvents } from '../../src/layout/event-clustering.js';
+import { describe, expect, it } from 'vitest';
 import { RationalScale } from '../../src/core/scale.js';
-import { projectToScreen, YEAR } from '../../src/core/time.js';
+import { projectToScreen } from '../../src/core/time.js';
+import { clusterEvents } from '../../src/layout/event-clustering.js';
+import { assignLanes } from '../../src/layout/greedy-interval-coloring.js';
+import { detectLabelCollisions } from '../../src/layout/label-collision.js';
+import { DEFAULT_CONFIG, getLaneY } from '../../src/layout/lane-positioning.js';
+import { SpatialHash } from '../../src/layout/spatial-hash.js';
 
 describe('Event Layout Integration', () => {
   describe('End-to-end layout pipeline', () => {
@@ -39,12 +39,10 @@ describe('Event Layout Integration', () => {
       const scale = RationalScale.fromSecondsPerPixel(1);
       const axisY = 300;
 
-      const positionedEvents = events.map(event => {
+      const positionedEvents = events.map((event) => {
         const lane = laneResult.layouts.get(event.id);
         const screenX = projectToScreen(event.start, viewportStart, scale);
-        const screenWidth = event.end !== undefined
-          ? projectToScreen(event.end, viewportStart, scale) - screenX
-          : 8; // Point event width
+        const screenWidth = event.end !== undefined ? projectToScreen(event.end, viewportStart, scale) - screenX : 8; // Point event width
 
         const laneY = getLaneY(lane, axisY);
 
@@ -63,13 +61,7 @@ describe('Event Layout Integration', () => {
       // Step 4: Build spatial hash
       const spatialHash = new SpatialHash(50);
       for (const event of positionedEvents) {
-        spatialHash.insert(
-          event,
-          event.bounds.x,
-          event.bounds.y,
-          event.bounds.width,
-          event.bounds.height
-        );
+        spatialHash.insert(event, event.bounds.x, event.bounds.y, event.bounds.width, event.bounds.height);
       }
 
       // Step 5: Test hit detection
@@ -86,7 +78,9 @@ describe('Event Layout Integration', () => {
       expect(visibleLabels.size).toBeGreaterThan(0);
       expect(visibleLabels.size).toBeLessThanOrEqual(7);
 
-      console.log(`Layout pipeline: ${events.length} events, ${laneResult.laneCount} lanes, ${visibleLabels.size} visible labels`);
+      console.log(
+        `Layout pipeline: ${events.length} events, ${laneResult.laneCount} lanes, ${visibleLabels.size} visible labels`,
+      );
     });
 
     it('should integrate lane positioning with spatial hash queries', () => {
@@ -111,7 +105,7 @@ describe('Event Layout Integration', () => {
       const scale = RationalScale.fromSecondsPerPixel(1);
 
       // Position events
-      const positionedEvents = events.map(event => {
+      const positionedEvents = events.map((event) => {
         const lane = laneResult.layouts.get(event.id);
         const screenX = projectToScreen(event.start, viewportStart, scale);
         const screenWidth = projectToScreen(event.end, viewportStart, scale) - screenX;
@@ -140,7 +134,7 @@ describe('Event Layout Integration', () => {
 
         const hits = hash.query(midX, midY);
         expect(hits.length).toBeGreaterThan(0);
-        expect(hits.some(h => h.id === event.id)).toBe(true);
+        expect(hits.some((h) => h.id === event.id)).toBe(true);
       }
     });
 
@@ -160,9 +154,7 @@ describe('Event Layout Integration', () => {
       // Filter to visible events in viewport
       const viewport1Start = -1000n;
       const viewport1End = 500n;
-      const visibleEvents1 = events.filter(
-        e => !(e.end < viewport1Start || e.start > viewport1End)
-      );
+      const visibleEvents1 = events.filter((e) => !(e.end < viewport1Start || e.start > viewport1End));
 
       // Layout visible events
       const result2 = assignLanes(visibleEvents1);
@@ -171,9 +163,7 @@ describe('Event Layout Integration', () => {
       // Pan to different viewport
       const viewport2Start = 0n;
       const viewport2End = 1500n;
-      const visibleEvents2 = events.filter(
-        e => !(e.end < viewport2Start || e.start > viewport2End)
-      );
+      const visibleEvents2 = events.filter((e) => !(e.end < viewport2Start || e.start > viewport2End));
 
       // Layout new visible events
       const result3 = assignLanes(visibleEvents2);
@@ -197,14 +187,14 @@ describe('Event Layout Integration', () => {
       const macroClusters = clusterEvents(events, 0n, macroScale);
 
       expect(macroClusters.length).toBeLessThan(events.length);
-      const clusterCount = macroClusters.filter(c => c.type === 'cluster').length;
+      const clusterCount = macroClusters.filter((c) => c.type === 'cluster').length;
       expect(clusterCount).toBeGreaterThan(0);
 
       // Micro zoom - events should be separate
       const microScale = RationalScale.fromSecondsPerPixel(0.1);
       const microClusters = clusterEvents(events, 0n, microScale);
 
-      const individualCount = microClusters.filter(c => c.type === 'event').length;
+      const individualCount = microClusters.filter((c) => c.type === 'event').length;
       expect(individualCount).toBeGreaterThan(clusterCount);
     });
 
@@ -228,13 +218,7 @@ describe('Event Layout Integration', () => {
       for (const cluster of clusters) {
         if (cluster.type === 'cluster') {
           // Add cluster marker to spatial hash
-          hash.insert(
-            cluster,
-            cluster.centerX - 10,
-            200 - 10,
-            20,
-            20
-          );
+          hash.insert(cluster, cluster.centerX - 10, 200 - 10, 20, 20);
         }
       }
 
@@ -267,7 +251,7 @@ describe('Event Layout Integration', () => {
       const axisY = 300;
 
       // Position events
-      const positionedEvents = events.map(event => {
+      const positionedEvents = events.map((event) => {
         const lane = laneResult.layouts.get(event.id);
         const screenX = projectToScreen(event.start, viewportStart, scale);
         const screenWidth = projectToScreen(event.end, viewportStart, scale) - screenX;
@@ -292,7 +276,7 @@ describe('Event Layout Integration', () => {
       const visibleLabels = detectLabelCollisions(positionedEvents, mockCtx, 1);
 
       // Verify labels don't overlap
-      const visibleEvents = positionedEvents.filter(e => visibleLabels.has(e.id));
+      const visibleEvents = positionedEvents.filter((e) => visibleLabels.has(e.id));
       for (let i = 0; i < visibleEvents.length; i++) {
         for (let j = i + 1; j < visibleEvents.length; j++) {
           const e1 = visibleEvents[i];
@@ -356,7 +340,7 @@ describe('Event Layout Integration', () => {
       const scale = RationalScale.fromSecondsPerPixel(100);
       const axisY = 400;
 
-      const positionedEvents = events.map(event => {
+      const positionedEvents = events.map((event) => {
         const lane = laneResult.layouts.get(event.id);
         const screenX = projectToScreen(event.start, viewportStart, scale);
         const screenWidth = projectToScreen(event.end, viewportStart, scale) - screenX;
@@ -376,16 +360,18 @@ describe('Event Layout Integration', () => {
 
       // Step 3: Build spatial hash
       const hash = new SpatialHash();
-      const rebuildResult = hash.rebuild(
-        positionedEvents,
-        e => ({ x: e.bounds.x, y: e.bounds.y, width: e.bounds.width, height: e.bounds.height })
-      );
+      const rebuildResult = hash.rebuild(positionedEvents, (e) => ({
+        x: e.bounds.x,
+        y: e.bounds.y,
+        width: e.bounds.width,
+        height: e.bounds.height,
+      }));
 
       // Step 4: Detect label collisions
       const mockCtx = {
         measureText: (text) => ({ width: text.length * 7 }),
       };
-      const visibleLabels = detectLabelCollisions(positionedEvents, mockCtx, 100);
+      const _visibleLabels = detectLabelCollisions(positionedEvents, mockCtx, 100);
 
       const totalDuration = performance.now() - startTime;
 
@@ -397,7 +383,9 @@ describe('Event Layout Integration', () => {
       // Total pipeline should complete quickly
       expect(totalDuration).toBeLessThan(50);
 
-      console.log(`Full pipeline for 1000 events: ${totalDuration.toFixed(2)}ms (${rebuildResult.duration.toFixed(2)}ms for spatial hash)`);
+      console.log(
+        `Full pipeline for 1000 events: ${totalDuration.toFixed(2)}ms (${rebuildResult.duration.toFixed(2)}ms for spatial hash)`,
+      );
     });
 
     it('should handle viewport pan without frame drops', () => {
@@ -422,7 +410,7 @@ describe('Event Layout Integration', () => {
 
         const frameStart = performance.now();
 
-        const positionedEvents = events.map(event => {
+        const positionedEvents = events.map((event) => {
           const lane = laneResult.layouts.get(event.id);
           const screenX = projectToScreen(event.start, viewportStart, scale);
           const screenWidth = projectToScreen(event.end, viewportStart, scale) - screenX;
@@ -435,11 +423,10 @@ describe('Event Layout Integration', () => {
         });
 
         const hash = new SpatialHash();
-        hash.rebuild(positionedEvents, e => e.bounds);
+        hash.rebuild(positionedEvents, (e) => e.bounds);
 
         const frameDuration = performance.now() - frameStart;
         updateTimes.push(frameDuration);
-
       }
 
       const avgTime = updateTimes.reduce((a, b) => a + b, 0) / updateTimes.length;
@@ -455,13 +442,25 @@ describe('Event Layout Integration', () => {
 
       const events = [
         // Eras (very long events)
-        { id: 'paleozoic', label: 'Paleozoic Era', start: -541n * MILLION_YEARS, end: -252n * MILLION_YEARS, priority: 3 },
+        {
+          id: 'paleozoic',
+          label: 'Paleozoic Era',
+          start: -541n * MILLION_YEARS,
+          end: -252n * MILLION_YEARS,
+          priority: 3,
+        },
         { id: 'mesozoic', label: 'Mesozoic Era', start: -252n * MILLION_YEARS, end: -66n * MILLION_YEARS, priority: 3 },
         { id: 'cenozoic', label: 'Cenozoic Era', start: -66n * MILLION_YEARS, end: 0n, priority: 3 },
 
         // Periods (nested within eras)
         { id: 'cambrian', label: 'Cambrian', start: -541n * MILLION_YEARS, end: -485n * MILLION_YEARS, priority: 2 },
-        { id: 'ordovician', label: 'Ordovician', start: -485n * MILLION_YEARS, end: -444n * MILLION_YEARS, priority: 2 },
+        {
+          id: 'ordovician',
+          label: 'Ordovician',
+          start: -485n * MILLION_YEARS,
+          end: -444n * MILLION_YEARS,
+          priority: 2,
+        },
         { id: 'triassic', label: 'Triassic', start: -252n * MILLION_YEARS, end: -201n * MILLION_YEARS, priority: 2 },
         { id: 'jurassic', label: 'Jurassic', start: -201n * MILLION_YEARS, end: -145n * MILLION_YEARS, priority: 2 },
         { id: 'cretaceous', label: 'Cretaceous', start: -145n * MILLION_YEARS, end: -66n * MILLION_YEARS, priority: 2 },

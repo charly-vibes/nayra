@@ -1,5 +1,5 @@
-import { EXAMPLES } from '../data/examples.js';
 import { createFocusTrap } from '../accessibility/focus-trap.js';
+import { EXAMPLES } from '../data/examples.js';
 
 const TABS = [
   { id: 'shortcuts', label: 'Shortcuts' },
@@ -310,7 +310,7 @@ function buildExamplesContent() {
       <div style="color: #ffffff; font-weight: 500; margin-bottom: 4px;">${ex.label}</div>
       <div style="color: #8a8aaa; font-size: 13px;">${ex.desc}</div>
     </li>
-  `
+  `,
   ).join('');
 
   return `

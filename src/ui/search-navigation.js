@@ -36,9 +36,7 @@ export function computePrevIndex(current, total) {
  */
 export function computePanToEvent(event, canvasWidth, scale) {
   const center =
-    event.end !== undefined && event.end > event.start
-      ? event.start + (event.end - event.start) / 2n
-      : event.start;
+    event.end !== undefined && event.end > event.start ? event.start + (event.end - event.start) / 2n : event.start;
 
   const halfWidthTime = scale.pxToTime(canvasWidth / 2);
   return center - halfWidthTime;

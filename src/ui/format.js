@@ -1,4 +1,4 @@
-import { YEAR, MILLION_YEARS, BILLION_YEARS } from '../core/time.js';
+import { BILLION_YEARS, MILLION_YEARS, YEAR } from '../core/time.js';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -30,7 +30,7 @@ function formatMa(timeValue) {
 
 function formatYear(timeValue, precision) {
   const secondsFromEpoch = Number(timeValue);
-  
+
   if (!Number.isFinite(secondsFromEpoch) || Math.abs(secondsFromEpoch) > 8.64e15 / 1000) {
     const yearsFromEpoch = Number(timeValue / YEAR);
     const year = 1970 + yearsFromEpoch;
@@ -39,21 +39,21 @@ function formatYear(timeValue, precision) {
     }
     return String(year);
   }
-  
+
   const date = new Date(secondsFromEpoch * 1000);
   const year = date.getUTCFullYear();
-  
+
   if (precision === 'day') {
     const month = MONTHS[date.getUTCMonth()];
     const day = date.getUTCDate();
     return `${month} ${day}, ${year}`;
   }
-  
+
   if (precision === 'month') {
     const month = MONTHS[date.getUTCMonth()];
     return `${month} ${year}`;
   }
-  
+
   if (year < 1) {
     return `${1 - year} BCE`;
   }
@@ -61,15 +61,16 @@ function formatYear(timeValue, precision) {
 }
 
 function needsCirca(precision) {
-  return precision === 'decade' || precision === 'century' || 
-         precision === 'million_years' || precision === 'billion_years';
+  return (
+    precision === 'decade' || precision === 'century' || precision === 'million_years' || precision === 'billion_years'
+  );
 }
 
 export function formatTimeRange(event) {
   const { start, end, precision } = event;
   const scale = getTimeScale(start);
   const prefix = needsCirca(precision) ? 'c. ' : '';
-  
+
   if (scale === 'Ga') {
     if (end !== undefined) {
       const startGa = formatGa(start);
@@ -80,7 +81,7 @@ export function formatTimeRange(event) {
     }
     return `${formatGa(start)} Ga`;
   }
-  
+
   if (scale === 'Ma') {
     if (end !== undefined) {
       const startMa = formatMa(start);
@@ -91,7 +92,7 @@ export function formatTimeRange(event) {
     }
     return `${formatMa(start)} Ma`;
   }
-  
+
   if (end !== undefined) {
     const startYear = timeToYear(start);
     const endYear = timeToYear(end);
@@ -99,6 +100,6 @@ export function formatTimeRange(event) {
       return `${prefix}${startYear} – ${endYear}`;
     }
   }
-  
+
   return `${prefix}${formatYear(start, precision)}`;
 }

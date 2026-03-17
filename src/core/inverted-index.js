@@ -25,7 +25,10 @@ const MIN_TOKEN_LEN = 2;
  */
 function tokenize(text) {
   if (!text) return [];
-  return text.toLowerCase().split(/[^a-z0-9]+/).filter((t) => t.length >= MIN_TOKEN_LEN);
+  return text
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((t) => t.length >= MIN_TOKEN_LEN);
 }
 
 export class InvertedIndex {

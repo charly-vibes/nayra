@@ -9,7 +9,7 @@
  *   - 4.1.2 Name, Role, Value (Level A)
  */
 
-import { buildEventAriaLabel, buildEventAriaDescription } from './aria-labels.js';
+import { buildEventAriaDescription, buildEventAriaLabel } from './aria-labels.js';
 
 /**
  * Create a DOM-sync instance that maintains a hidden accessible list of events.

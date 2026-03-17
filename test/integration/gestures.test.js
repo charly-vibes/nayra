@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { createStore } from '../../src/core/store.js';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { RationalScale } from '../../src/core/scale.js';
+import { createStore } from '../../src/core/store.js';
 import { initInput } from '../../src/interaction/input.js';
 import { getAxisY } from '../../src/rendering/renderer.js';
 import './setup.js';
@@ -110,17 +110,23 @@ describe('Pointer Gesture Integration', () => {
       const eventX = 100;
       const eventY = getAxisY(400);
 
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(eventX, eventY, {
-        pointerId: 1,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 10,
-      }));
-      canvas.dispatchEvent('pointerup', createMockPointerEvent(eventX, eventY, {
-        pointerId: 1,
-        pointerType: 'touch',
-        timeStamp: 20,
-      }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(eventX, eventY, {
+          pointerId: 1,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 10,
+        }),
+      );
+      canvas.dispatchEvent(
+        'pointerup',
+        createMockPointerEvent(eventX, eventY, {
+          pointerId: 1,
+          pointerType: 'touch',
+          timeStamp: 20,
+        }),
+      );
 
       const state = store.getState();
       expect(state.selectedEventIds.has('evt-1')).toBe(true);
@@ -131,17 +137,23 @@ describe('Pointer Gesture Integration', () => {
       store.dispatch({ type: 'SELECT_EVENT', eventId: 'evt-1' });
       expect(store.getState().selectedEventIds.size).toBe(1);
 
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(500, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 10,
-      }));
-      canvas.dispatchEvent('pointerup', createMockPointerEvent(500, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        timeStamp: 20,
-      }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(500, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 10,
+        }),
+      );
+      canvas.dispatchEvent(
+        'pointerup',
+        createMockPointerEvent(500, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          timeStamp: 20,
+        }),
+      );
 
       const state = store.getState();
       expect(state.selectedEventIds.size).toBe(0);
@@ -150,23 +162,32 @@ describe('Pointer Gesture Integration', () => {
     it('drag pans the viewport', () => {
       const initialViewport = store.getState().viewportStart;
 
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(400, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 10,
-      }));
-      canvas.dispatchEvent('pointermove', createMockPointerEvent(300, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 20,
-      }));
-      canvas.dispatchEvent('pointerup', createMockPointerEvent(300, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        timeStamp: 30,
-      }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(400, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 10,
+        }),
+      );
+      canvas.dispatchEvent(
+        'pointermove',
+        createMockPointerEvent(300, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 20,
+        }),
+      );
+      canvas.dispatchEvent(
+        'pointerup',
+        createMockPointerEvent(300, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          timeStamp: 30,
+        }),
+      );
 
       const finalViewport = store.getState().viewportStart;
       expect(finalViewport).not.toBe(initialViewport);
@@ -178,30 +199,42 @@ describe('Pointer Gesture Integration', () => {
       const tapY = 200;
 
       // First tap
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(tapX, tapY, {
-        pointerId: 1,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 10,
-      }));
-      canvas.dispatchEvent('pointerup', createMockPointerEvent(tapX, tapY, {
-        pointerId: 1,
-        pointerType: 'touch',
-        timeStamp: 20,
-      }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(tapX, tapY, {
+          pointerId: 1,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 10,
+        }),
+      );
+      canvas.dispatchEvent(
+        'pointerup',
+        createMockPointerEvent(tapX, tapY, {
+          pointerId: 1,
+          pointerType: 'touch',
+          timeStamp: 20,
+        }),
+      );
 
       // Second tap (within double-tap threshold)
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(tapX + 2, tapY + 2, {
-        pointerId: 1,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 200,
-      }));
-      canvas.dispatchEvent('pointerup', createMockPointerEvent(tapX + 2, tapY + 2, {
-        pointerId: 1,
-        pointerType: 'touch',
-        timeStamp: 210,
-      }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(tapX + 2, tapY + 2, {
+          pointerId: 1,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 200,
+        }),
+      );
+      canvas.dispatchEvent(
+        'pointerup',
+        createMockPointerEvent(tapX + 2, tapY + 2, {
+          pointerId: 1,
+          pointerType: 'touch',
+          timeStamp: 210,
+        }),
+      );
 
       const finalSpp = store.getState().scale.getSecondsPerPixel();
       expect(finalSpp).toBeLessThan(initialSpp);
@@ -213,25 +246,34 @@ describe('Pointer Gesture Integration', () => {
       destroy();
       destroy = initInput(canvas, store, { onLongPress });
 
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(100, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 10,
-      }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(100, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 10,
+        }),
+      );
 
       vi.advanceTimersByTime(500);
 
-      canvas.dispatchEvent('pointermove', createMockPointerEvent(100, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        timeStamp: 510,
-      }));
-      canvas.dispatchEvent('pointerup', createMockPointerEvent(100, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        timeStamp: 600,
-      }));
+      canvas.dispatchEvent(
+        'pointermove',
+        createMockPointerEvent(100, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          timeStamp: 510,
+        }),
+      );
+      canvas.dispatchEvent(
+        'pointerup',
+        createMockPointerEvent(100, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          timeStamp: 600,
+        }),
+      );
 
       expect(onLongPress).toHaveBeenCalledTimes(1);
       expect(store.getState().selectedEventIds.size).toBe(0);
@@ -245,34 +287,46 @@ describe('Pointer Gesture Integration', () => {
       const initialSpp = store.getState().scale.getSecondsPerPixel();
 
       // First finger down
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(100, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 10,
-      }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(100, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 10,
+        }),
+      );
 
       // Second finger down (100px apart)
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(200, 200, {
-        pointerId: 2,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 20,
-      }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(200, 200, {
+          pointerId: 2,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 20,
+        }),
+      );
 
       // Move fingers apart to 200px
-      canvas.dispatchEvent('pointermove', createMockPointerEvent(50, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 30,
-      }));
-      canvas.dispatchEvent('pointermove', createMockPointerEvent(250, 200, {
-        pointerId: 2,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 30,
-      }));
+      canvas.dispatchEvent(
+        'pointermove',
+        createMockPointerEvent(50, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 30,
+        }),
+      );
+      canvas.dispatchEvent(
+        'pointermove',
+        createMockPointerEvent(250, 200, {
+          pointerId: 2,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 30,
+        }),
+      );
 
       const finalSpp = store.getState().scale.getSecondsPerPixel();
       expect(finalSpp).toBeLessThan(initialSpp);
@@ -282,34 +336,46 @@ describe('Pointer Gesture Integration', () => {
       const initialSpp = store.getState().scale.getSecondsPerPixel();
 
       // First finger down
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(0, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 10,
-      }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(0, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 10,
+        }),
+      );
 
       // Second finger down (200px apart)
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(200, 200, {
-        pointerId: 2,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 20,
-      }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(200, 200, {
+          pointerId: 2,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 20,
+        }),
+      );
 
       // Move fingers together to 100px
-      canvas.dispatchEvent('pointermove', createMockPointerEvent(50, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 30,
-      }));
-      canvas.dispatchEvent('pointermove', createMockPointerEvent(150, 200, {
-        pointerId: 2,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 30,
-      }));
+      canvas.dispatchEvent(
+        'pointermove',
+        createMockPointerEvent(50, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 30,
+        }),
+      );
+      canvas.dispatchEvent(
+        'pointermove',
+        createMockPointerEvent(150, 200, {
+          pointerId: 2,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 30,
+        }),
+      );
 
       const finalSpp = store.getState().scale.getSecondsPerPixel();
       expect(finalSpp).toBeGreaterThan(initialSpp);
@@ -317,32 +383,44 @@ describe('Pointer Gesture Integration', () => {
 
     it('pinch gesture does not trigger selection on release', () => {
       // First finger down
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(100, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 10,
-      }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(100, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 10,
+        }),
+      );
 
       // Second finger down
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(200, 200, {
-        pointerId: 2,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 20,
-      }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(200, 200, {
+          pointerId: 2,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 20,
+        }),
+      );
 
       // Release both fingers
-      canvas.dispatchEvent('pointerup', createMockPointerEvent(200, 200, {
-        pointerId: 2,
-        pointerType: 'touch',
-        timeStamp: 30,
-      }));
-      canvas.dispatchEvent('pointerup', createMockPointerEvent(100, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        timeStamp: 40,
-      }));
+      canvas.dispatchEvent(
+        'pointerup',
+        createMockPointerEvent(200, 200, {
+          pointerId: 2,
+          pointerType: 'touch',
+          timeStamp: 30,
+        }),
+      );
+      canvas.dispatchEvent(
+        'pointerup',
+        createMockPointerEvent(100, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          timeStamp: 40,
+        }),
+      );
 
       const state = store.getState();
       expect(state.selectedEventIds.size).toBe(0);
@@ -350,37 +428,49 @@ describe('Pointer Gesture Integration', () => {
 
     it('maintains midpoint during pinch for smooth zoom', () => {
       // First finger down at 100, 200
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(100, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 10,
-      }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(100, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 10,
+        }),
+      );
 
       // Second finger down at 200, 200 (midpoint at 150)
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(200, 200, {
-        pointerId: 2,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 20,
-      }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(200, 200, {
+          pointerId: 2,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 20,
+        }),
+      );
 
       const initialState = store.getState();
       const initialTime = initialState.viewportStart + initialState.scale.pxToTime(150);
 
       // Zoom by moving fingers apart while keeping midpoint at 150
-      canvas.dispatchEvent('pointermove', createMockPointerEvent(50, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 30,
-      }));
-      canvas.dispatchEvent('pointermove', createMockPointerEvent(250, 200, {
-        pointerId: 2,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 30,
-      }));
+      canvas.dispatchEvent(
+        'pointermove',
+        createMockPointerEvent(50, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 30,
+        }),
+      );
+      canvas.dispatchEvent(
+        'pointermove',
+        createMockPointerEvent(250, 200, {
+          pointerId: 2,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 30,
+        }),
+      );
 
       const finalState = store.getState();
       const finalTime = finalState.viewportStart + finalState.scale.pxToTime(150);
@@ -398,25 +488,34 @@ describe('Pointer Gesture Integration', () => {
 
     it('cancels gestures on pointercancel', () => {
       // Start a drag
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(100, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 10,
-      }));
-      canvas.dispatchEvent('pointermove', createMockPointerEvent(150, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 20,
-      }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(100, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 10,
+        }),
+      );
+      canvas.dispatchEvent(
+        'pointermove',
+        createMockPointerEvent(150, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 20,
+        }),
+      );
 
       // Cancel gesture
-      canvas.dispatchEvent('pointercancel', createMockPointerEvent(150, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        timeStamp: 30,
-      }));
+      canvas.dispatchEvent(
+        'pointercancel',
+        createMockPointerEvent(150, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          timeStamp: 30,
+        }),
+      );
 
       const state = store.getState();
       expect(state.hoveredEventId).toBe(null);
@@ -426,36 +525,48 @@ describe('Pointer Gesture Integration', () => {
       const initialViewport = store.getState().viewportStart;
 
       // Start touch gesture
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(100, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 10,
-      }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(100, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 10,
+        }),
+      );
 
       // Try mouse event (should be ignored)
-      canvas.dispatchEvent('pointermove', createMockPointerEvent(200, 200, {
-        pointerId: 999,
-        pointerType: 'mouse',
-        timeStamp: 20,
-      }));
+      canvas.dispatchEvent(
+        'pointermove',
+        createMockPointerEvent(200, 200, {
+          pointerId: 999,
+          pointerType: 'mouse',
+          timeStamp: 20,
+        }),
+      );
 
       const midViewport = store.getState().viewportStart;
       expect(midViewport).toBe(initialViewport);
 
       // Complete touch gesture
-      canvas.dispatchEvent('pointerup', createMockPointerEvent(100, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        timeStamp: 30,
-      }));
+      canvas.dispatchEvent(
+        'pointerup',
+        createMockPointerEvent(100, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          timeStamp: 30,
+        }),
+      );
 
       // Now mouse should work again
-      canvas.dispatchEvent('pointermove', createMockPointerEvent(200, 200, {
-        pointerId: 999,
-        pointerType: 'mouse',
-        timeStamp: 40,
-      }));
+      canvas.dispatchEvent(
+        'pointermove',
+        createMockPointerEvent(200, 200, {
+          pointerId: 999,
+          pointerType: 'mouse',
+          timeStamp: 40,
+        }),
+      );
 
       // Mouse hover should work now (verify by checking cursor style)
       expect(canvas.style.cursor).toBeDefined();
@@ -488,23 +599,32 @@ describe('Pointer Gesture Integration', () => {
       });
 
       // Fast drag
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(100, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 10,
-      }));
-      canvas.dispatchEvent('pointermove', createMockPointerEvent(200, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 40,
-      }));
-      canvas.dispatchEvent('pointerup', createMockPointerEvent(200, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        timeStamp: 70,
-      }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(100, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 10,
+        }),
+      );
+      canvas.dispatchEvent(
+        'pointermove',
+        createMockPointerEvent(200, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 40,
+        }),
+      );
+      canvas.dispatchEvent(
+        'pointerup',
+        createMockPointerEvent(200, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          timeStamp: 70,
+        }),
+      );
 
       expect(rafSpy).toHaveBeenCalled();
       rafSpy.mockRestore();
@@ -514,31 +634,43 @@ describe('Pointer Gesture Integration', () => {
       const cancelSpy = vi.spyOn(globalThis, 'cancelAnimationFrame');
 
       // Start momentum (fast drag and release)
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(100, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 10,
-      }));
-      canvas.dispatchEvent('pointermove', createMockPointerEvent(200, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 40,
-      }));
-      canvas.dispatchEvent('pointerup', createMockPointerEvent(200, 200, {
-        pointerId: 1,
-        pointerType: 'touch',
-        timeStamp: 70,
-      }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(100, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 10,
+        }),
+      );
+      canvas.dispatchEvent(
+        'pointermove',
+        createMockPointerEvent(200, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 40,
+        }),
+      );
+      canvas.dispatchEvent(
+        'pointerup',
+        createMockPointerEvent(200, 200, {
+          pointerId: 1,
+          pointerType: 'touch',
+          timeStamp: 70,
+        }),
+      );
 
       // New touch should cancel momentum
-      canvas.dispatchEvent('pointerdown', createMockPointerEvent(300, 200, {
-        pointerId: 2,
-        pointerType: 'touch',
-        buttons: 1,
-        timeStamp: 100,
-      }));
+      canvas.dispatchEvent(
+        'pointerdown',
+        createMockPointerEvent(300, 200, {
+          pointerId: 2,
+          pointerType: 'touch',
+          buttons: 1,
+          timeStamp: 100,
+        }),
+      );
 
       // Verify cancelAnimationFrame was called
       expect(cancelSpy).toHaveBeenCalled();

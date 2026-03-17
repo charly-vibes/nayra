@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createEventPanel } from '../../src/ui/event-panel.js';
 
 describe('createEventPanel', () => {
@@ -154,20 +154,20 @@ describe('createEventPanel', () => {
     it('Escape key hides panel and calls onClose', () => {
       panel = createEventPanel(container, { onClose });
       panel.show();
-      
+
       const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
       document.dispatchEvent(event);
-      
+
       expect(panel.isVisible()).toBe(false);
       expect(onClose).toHaveBeenCalledTimes(1);
     });
 
     it('Escape does nothing when panel is hidden', () => {
       panel = createEventPanel(container, { onClose });
-      
+
       const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
       document.dispatchEvent(event);
-      
+
       expect(onClose).not.toHaveBeenCalled();
     });
   });
@@ -176,10 +176,10 @@ describe('createEventPanel', () => {
     it('clicking backdrop closes panel and calls onClose', () => {
       panel = createEventPanel(container, { onClose });
       panel.show();
-      
+
       const overlay = container.querySelector('.event-panel-overlay');
       overlay.click();
-      
+
       expect(panel.isVisible()).toBe(false);
       expect(onClose).toHaveBeenCalledTimes(1);
     });
@@ -187,10 +187,10 @@ describe('createEventPanel', () => {
     it('clicking panel content does not close', () => {
       panel = createEventPanel(container, { onClose });
       panel.show();
-      
+
       const panelEl = container.querySelector('.event-panel');
       panelEl.click();
-      
+
       expect(panel.isVisible()).toBe(true);
       expect(onClose).not.toHaveBeenCalled();
     });
@@ -209,10 +209,10 @@ describe('createEventPanel', () => {
       panel.show();
       panel.destroy();
       panel = null;
-      
+
       const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
       document.dispatchEvent(event);
-      
+
       expect(onClose).not.toHaveBeenCalled();
     });
   });

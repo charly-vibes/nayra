@@ -70,7 +70,7 @@ export function invalidateSearchIndex() {
 export function createDebouncedSearch(fn, delay = 150) {
   let timer = null;
 
-  const debounced = function (...args) {
+  const debounced = (...args) => {
     if (timer !== null) clearTimeout(timer);
     timer = setTimeout(() => {
       timer = null;
@@ -78,7 +78,7 @@ export function createDebouncedSearch(fn, delay = 150) {
     }, delay);
   };
 
-  debounced.cancel = function () {
+  debounced.cancel = () => {
     if (timer !== null) {
       clearTimeout(timer);
       timer = null;

@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { YEAR, MILLION_YEARS, BILLION_YEARS } from '../../src/core/time.js';
+import { describe, expect, it } from 'vitest';
+import { BILLION_YEARS, MILLION_YEARS, YEAR } from '../../src/core/time.js';
 
 describe('TimeParser', () => {
   describe('parseTimeQuery', () => {

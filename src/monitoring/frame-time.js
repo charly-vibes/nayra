@@ -60,11 +60,11 @@ export function endFrame(frameId) {
 }
 
 function _collectMetrics(frameId) {
-  const frameEntries  = performance.getEntriesByName(`frame-${frameId}`);
+  const frameEntries = performance.getEntriesByName(`frame-${frameId}`);
   const renderEntries = performance.getEntriesByName(`render-${frameId}`);
   const layoutEntries = performance.getEntriesByName(`layout-${frameId}`);
 
-  const frameTime  = frameEntries[0]?.duration  ?? 0;
+  const frameTime = frameEntries[0]?.duration ?? 0;
   const renderTime = renderEntries[0]?.duration ?? 0;
   const layoutTime = layoutEntries[0]?.duration ?? 0;
 

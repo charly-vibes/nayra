@@ -49,10 +49,7 @@ export default defineConfig({
       {
         test: {
           name: 'accessibility',
-          include: [
-            'src/accessibility/**/*.test.js',
-            'test/accessibility/**/*.test.js',
-          ],
+          include: ['src/accessibility/**/*.test.js', 'test/accessibility/**/*.test.js'],
           environment: 'jsdom',
         },
       },

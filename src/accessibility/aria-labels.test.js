@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { describe, it, expect } from 'vitest';
-import { buildEventAriaLabel, buildEventAriaDescription, buildClusterAriaLabel } from './aria-labels.js';
-import { YEAR, MILLION_YEARS, BILLION_YEARS } from '../core/time.js';
+import { describe, expect, it } from 'vitest';
+import { MILLION_YEARS, YEAR } from '../core/time.js';
+import { buildClusterAriaLabel, buildEventAriaDescription, buildEventAriaLabel } from './aria-labels.js';
 
 describe('buildEventAriaLabel', () => {
   it('uses title when available', () => {
@@ -47,7 +47,7 @@ describe('buildEventAriaLabel', () => {
     const event = {
       title: 'Cold War',
       start: -(23n * YEAR), // 1947
-      end: 19n * YEAR,      // 1989
+      end: 19n * YEAR, // 1989
     };
     const label = buildEventAriaLabel(event);
     expect(label).toContain('Cold War');

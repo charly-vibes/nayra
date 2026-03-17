@@ -12,7 +12,7 @@ const WORKER_THRESHOLD = 10000; // Use worker for datasets >= this size
 
 let worker = null;
 let requestIdCounter = 0;
-let pendingRequests = new Map(); // requestId -> { resolve, reject }
+const pendingRequests = new Map(); // requestId -> { resolve, reject }
 
 /**
  * Initialize the Web Worker
@@ -53,7 +53,7 @@ export function terminateWorker() {
   }
 
   // Reject all pending requests
-  for (const [requestId, { reject }] of pendingRequests) {
+  for (const [_requestId, { reject }] of pendingRequests) {
     reject(new Error('Worker terminated'));
   }
   pendingRequests.clear();
@@ -89,7 +89,7 @@ function handleWorkerError(error) {
   console.error('Layout worker error:', error);
 
   // Reject all pending requests
-  for (const [requestId, { reject }] of pendingRequests) {
+  for (const [_requestId, { reject }] of pendingRequests) {
     reject(error);
   }
   pendingRequests.clear();

@@ -1,14 +1,14 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Browser Feature Detection', () => {
   test('application loads without feature detection errors in supported browser', async ({ page }) => {
     const errors = [];
-    page.on('pageerror', err => errors.push(err.message));
+    page.on('pageerror', (err) => errors.push(err.message));
 
     await page.goto('/');
     await page.waitForSelector('#timeline-canvas');
 
-    const featureErrors = errors.filter(e => e.includes('requires browser support'));
+    const featureErrors = errors.filter((e) => e.includes('requires browser support'));
     expect(featureErrors).toHaveLength(0);
   });
 

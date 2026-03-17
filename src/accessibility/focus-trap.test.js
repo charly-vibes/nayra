@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createFocusTrap } from './focus-trap.js';
 
 function makeModal(...buttonLabels) {
@@ -21,7 +21,7 @@ describe('createFocusTrap', () => {
   let modal;
 
   afterEach(() => {
-    if (modal && modal.parentNode) {
+    if (modal?.parentNode) {
       document.body.removeChild(modal);
     }
     modal = null;
@@ -81,9 +81,7 @@ describe('createFocusTrap', () => {
 
     const focusSpy = vi.spyOn(buttons[buttons.length - 1], 'focus');
 
-    document.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true })
-    );
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true }));
 
     expect(focusSpy).toHaveBeenCalled();
     trap.deactivate();
@@ -118,7 +116,7 @@ describe('createFocusTrap', () => {
 
   it('does not intercept Tab when inactive', () => {
     modal = makeModal('Button');
-    const trap = createFocusTrap(modal);
+    const _trap = createFocusTrap(modal);
     // Not activated — Tab should not be intercepted
     const buttons = modal.querySelectorAll('button');
     const focusSpy = vi.spyOn(buttons[0], 'focus');

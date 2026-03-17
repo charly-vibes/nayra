@@ -5,15 +5,9 @@
  * The Performance API is fully mocked so tests run fast in Node.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import {
-  FRAME_BUDGET_MS,
-  startFrame,
-  startPhase,
-  endPhase,
-  endFrame,
-} from '../../src/monitoring/frame-time.js';
-import { logSlowFrame, isDevMode } from '../../src/monitoring/performance-logger.js';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { endFrame, endPhase, FRAME_BUDGET_MS, startFrame, startPhase } from '../../src/monitoring/frame-time.js';
+import { isDevMode, logSlowFrame } from '../../src/monitoring/performance-logger.js';
 
 // ---------------------------------------------------------------------------
 // Performance API mock helpers
@@ -25,9 +19,7 @@ function makePerformanceMock(measureDurations = {}) {
 
   return {
     mark: vi.fn((name) => marks.push(name)),
-    measure: vi.fn((name, startMark, endMark) =>
-      measures.push({ name, startMark, endMark }),
-    ),
+    measure: vi.fn((name, startMark, endMark) => measures.push({ name, startMark, endMark })),
     getEntriesByName: vi.fn((name) => {
       if (name in measureDurations) {
         return [{ name, duration: measureDurations[name] }];
@@ -59,7 +51,9 @@ describe('startFrame', () => {
     perfMock = makePerformanceMock();
     global.performance = perfMock;
   });
-  afterEach(() => { delete global.performance; });
+  afterEach(() => {
+    delete global.performance;
+  });
 
   it('calls performance.mark with frame-start-<id>', () => {
     startFrame('f1');
@@ -78,7 +72,9 @@ describe('endFrame', () => {
     perfMock = makePerformanceMock({ 'frame-f1': 10 });
     global.performance = perfMock;
   });
-  afterEach(() => { delete global.performance; });
+  afterEach(() => {
+    delete global.performance;
+  });
 
   it('calls performance.mark with frame-end-<id>', () => {
     endFrame('f1');
@@ -87,11 +83,7 @@ describe('endFrame', () => {
 
   it('calls performance.measure spanning the frame marks', () => {
     endFrame('f1');
-    expect(perfMock.measure).toHaveBeenCalledWith(
-      'frame-f1',
-      'frame-start-f1',
-      'frame-end-f1',
-    );
+    expect(perfMock.measure).toHaveBeenCalledWith('frame-f1', 'frame-start-f1', 'frame-end-f1');
   });
 
   it('returns metrics object with frameId', () => {
@@ -136,7 +128,9 @@ describe('startPhase', () => {
     perfMock = makePerformanceMock();
     global.performance = perfMock;
   });
-  afterEach(() => { delete global.performance; });
+  afterEach(() => {
+    delete global.performance;
+  });
 
   it('calls performance.mark with <phase>-start-<frameId>', () => {
     startPhase('f1', 'render');
@@ -155,7 +149,9 @@ describe('endPhase', () => {
     perfMock = makePerformanceMock();
     global.performance = perfMock;
   });
-  afterEach(() => { delete global.performance; });
+  afterEach(() => {
+    delete global.performance;
+  });
 
   it('calls performance.mark with <phase>-end-<frameId>', () => {
     endPhase('f1', 'render');
@@ -164,20 +160,12 @@ describe('endPhase', () => {
 
   it('calls performance.measure for the phase', () => {
     endPhase('f1', 'render');
-    expect(perfMock.measure).toHaveBeenCalledWith(
-      'render-f1',
-      'render-start-f1',
-      'render-end-f1',
-    );
+    expect(perfMock.measure).toHaveBeenCalledWith('render-f1', 'render-start-f1', 'render-end-f1');
   });
 
   it('measures layout phase with correct marks', () => {
     endPhase('f1', 'layout');
-    expect(perfMock.measure).toHaveBeenCalledWith(
-      'layout-f1',
-      'layout-start-f1',
-      'layout-end-f1',
-    );
+    expect(perfMock.measure).toHaveBeenCalledWith('layout-f1', 'layout-start-f1', 'layout-end-f1');
   });
 });
 
@@ -186,7 +174,9 @@ describe('endPhase', () => {
 // ---------------------------------------------------------------------------
 
 describe('endFrame with phase metrics', () => {
-  afterEach(() => { delete global.performance; });
+  afterEach(() => {
+    delete global.performance;
+  });
 
   it('includes renderTime when render phase was measured', () => {
     global.performance = makePerformanceMock({
@@ -238,7 +228,9 @@ describe('logSlowFrame', () => {
   beforeEach(() => {
     warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
-  afterEach(() => { warnSpy.mockRestore(); });
+  afterEach(() => {
+    warnSpy.mockRestore();
+  });
 
   it('does not log when frame is not slow', () => {
     logSlowFrame({ frameId: 'f1', frameTime: 10, renderTime: 0, layoutTime: 0, isSlowFrame: false }, true);
@@ -276,7 +268,9 @@ describe('logSlowFrame', () => {
 // ---------------------------------------------------------------------------
 
 describe('monitoring overhead', () => {
-  afterEach(() => { delete global.performance; });
+  afterEach(() => {
+    delete global.performance;
+  });
 
   it('startFrame + endFrame overhead is under 0.1ms per frame on average', () => {
     // Use a real-but-minimal performance mock that just accumulates entries
@@ -286,7 +280,7 @@ describe('monitoring overhead', () => {
       measure: (name) => {
         entries.set(name, { name, duration: 5 });
       },
-      getEntriesByName: (name) => entries.has(name) ? [entries.get(name)] : [],
+      getEntriesByName: (name) => (entries.has(name) ? [entries.get(name)] : []),
     };
 
     const ITERATIONS = 500;

@@ -5,7 +5,7 @@
  * and resumes on interaction.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createIdleDetector } from '../../src/core/idle-detection.js';
 
 // ---------------------------------------------------------------------------
@@ -16,8 +16,12 @@ function makeDocStub() {
   let hiddenValue = false;
   const listeners = {};
   return {
-    get hidden() { return hiddenValue; },
-    set hidden(v) { hiddenValue = v; },
+    get hidden() {
+      return hiddenValue;
+    },
+    set hidden(v) {
+      hiddenValue = v;
+    },
     addEventListener(type, fn) {
       listeners[type] = listeners[type] ?? [];
       listeners[type].push(fn);
@@ -37,7 +41,7 @@ function makeDocStub() {
 function makeWinStub() {
   const listeners = {};
   return {
-    addEventListener(type, fn, opts) {
+    addEventListener(type, fn, _opts) {
       listeners[type] = listeners[type] ?? [];
       listeners[type].push(fn);
     },
@@ -61,9 +65,9 @@ let doc, win, idleCalls, activeCalls, detector;
 
 beforeEach(() => {
   vi.useFakeTimers();
-  doc        = makeDocStub();
-  win        = makeWinStub();
-  idleCalls  = 0;
+  doc = makeDocStub();
+  win = makeWinStub();
+  idleCalls = 0;
   activeCalls = 0;
 });
 
@@ -75,10 +79,14 @@ afterEach(() => {
 function makeDetector(extraOpts = {}) {
   return createIdleDetector({
     idleTimeoutMs: 5000,
-    onIdle:   () => { idleCalls++; },
-    onActive: () => { activeCalls++; },
+    onIdle: () => {
+      idleCalls++;
+    },
+    onActive: () => {
+      activeCalls++;
+    },
     document: doc,
-    window:   win,
+    window: win,
     ...extraOpts,
   });
 }
@@ -110,10 +118,10 @@ describe('idle timeout', () => {
   it('resets the timer on interaction, delaying idle entry', () => {
     detector = makeDetector();
     vi.advanceTimersByTime(4000);
-    win._trigger('mousemove');           // interaction at 4 s
-    vi.advanceTimersByTime(4000);        // 4 s after interaction = 8 s total
+    win._trigger('mousemove'); // interaction at 4 s
+    vi.advanceTimersByTime(4000); // 4 s after interaction = 8 s total
     expect(detector.isIdle()).toBe(false);
-    vi.advanceTimersByTime(1100);        // 1.1 s more = idle timer fires
+    vi.advanceTimersByTime(1100); // 1.1 s more = idle timer fires
     expect(detector.isIdle()).toBe(true);
   });
 
@@ -121,8 +129,8 @@ describe('idle timeout', () => {
     detector = makeDetector();
     vi.advanceTimersByTime(5100);
     expect(idleCalls).toBe(1);
-    vi.advanceTimersByTime(5100);        // no interactions → timer already fired
-    expect(idleCalls).toBe(1);           // still 1 — already idle
+    vi.advanceTimersByTime(5100); // no interactions → timer already fired
+    expect(idleCalls).toBe(1); // still 1 — already idle
   });
 });
 
@@ -133,21 +141,21 @@ describe('idle timeout', () => {
 describe('resuming from idle', () => {
   it('calls onActive when interaction occurs while idle', () => {
     detector = makeDetector();
-    vi.advanceTimersByTime(5100);        // enter idle
+    vi.advanceTimersByTime(5100); // enter idle
     expect(detector.isIdle()).toBe(true);
 
-    win._trigger('keydown');             // interact
+    win._trigger('keydown'); // interact
     expect(detector.isIdle()).toBe(false);
     expect(activeCalls).toBeGreaterThan(0);
   });
 
   it('enters idle again after another timeout of inactivity', () => {
     detector = makeDetector();
-    vi.advanceTimersByTime(5100);        // idle
-    win._trigger('mousemove');           // active
+    vi.advanceTimersByTime(5100); // idle
+    win._trigger('mousemove'); // active
     expect(idleCalls).toBe(1);
 
-    vi.advanceTimersByTime(5100);        // idle again
+    vi.advanceTimersByTime(5100); // idle again
     expect(idleCalls).toBe(2);
   });
 });
@@ -184,22 +192,22 @@ describe('background tab throttling', () => {
     doc._trigger('visibilitychange');
 
     doc.hidden = false;
-    doc._trigger('visibilitychange');   // visible again → timer restarts
+    doc._trigger('visibilitychange'); // visible again → timer restarts
     expect(detector.isIdle()).toBe(false);
 
-    vi.advanceTimersByTime(5100);        // idle timer fires
+    vi.advanceTimersByTime(5100); // idle timer fires
     expect(detector.isIdle()).toBe(true);
   });
 
   it('cancels the idle timer when tab goes hidden', () => {
     detector = makeDetector();
-    vi.advanceTimersByTime(3000);        // 3 s in, 2 s remaining on timer
+    vi.advanceTimersByTime(3000); // 3 s in, 2 s remaining on timer
 
     doc.hidden = true;
-    doc._trigger('visibilitychange');    // immediately idle, timer cancelled
+    doc._trigger('visibilitychange'); // immediately idle, timer cancelled
 
     doc.hidden = false;
-    doc._trigger('visibilitychange');    // visible; fresh 5 s timer
+    doc._trigger('visibilitychange'); // visible; fresh 5 s timer
 
     // Only 2 s after becoming visible → NOT yet idle
     vi.advanceTimersByTime(2000);

@@ -1,20 +1,20 @@
-import { describe, it, expect } from 'vitest';
-import {
-  SECOND,
-  MINUTE,
-  HOUR,
-  DAY,
-  YEAR,
-  MILLION_YEARS,
-  BILLION_YEARS,
-  projectToScreen,
-  isVisible,
-  compareTimes,
-  addDuration,
-  calculateDuration,
-  validateDuration,
-} from '../../src/core/time.js';
+import { describe, expect, it } from 'vitest';
 import { RationalScale } from '../../src/core/scale.js';
+import {
+  addDuration,
+  BILLION_YEARS,
+  calculateDuration,
+  compareTimes,
+  DAY,
+  HOUR,
+  isVisible,
+  MILLION_YEARS,
+  MINUTE,
+  projectToScreen,
+  SECOND,
+  validateDuration,
+  YEAR,
+} from '../../src/core/time.js';
 
 describe('Time Unit Constants', () => {
   it('SECOND equals 1n', () => {
@@ -59,7 +59,7 @@ describe('BigInt Temporal Coordinates', () => {
   });
 
   it('handles 4.5 billion years without precision loss', () => {
-    const earthFormation = 4n * BILLION_YEARS + (BILLION_YEARS / 2n);
+    const earthFormation = 4n * BILLION_YEARS + BILLION_YEARS / 2n;
     const expected = (9n * BILLION_YEARS) / 2n;
     expect(earthFormation).toBe(expected);
     expect(earthFormation > 0n).toBe(true);
@@ -128,10 +128,10 @@ describe('Temporal Arithmetic', () => {
 
 describe('Boundary-value analysis: extreme deep time', () => {
   // Key cosmological anchors in seconds (negative = before present)
-  const BIG_BANG     = -13_800n * MILLION_YEARS;
-  const EARTH_FORMED =  -4_500n * MILLION_YEARS;
-  const DINO_EXTINCT =     -66n * MILLION_YEARS;
-  const FUTURE_30GA  =  30_000n * MILLION_YEARS;
+  const BIG_BANG = -13_800n * MILLION_YEARS;
+  const EARTH_FORMED = -4_500n * MILLION_YEARS;
+  const DINO_EXTINCT = -66n * MILLION_YEARS;
+  const FUTURE_30GA = 30_000n * MILLION_YEARS;
 
   describe('BigInt constant magnitudes', () => {
     it('BILLION_YEARS equals 1000 * MILLION_YEARS', () => {
@@ -151,7 +151,7 @@ describe('Boundary-value analysis: extreme deep time', () => {
 
   describe('precision at cosmological scale', () => {
     it('two events 1 second apart at Big Bang epoch are distinguishable', () => {
-      expect((BIG_BANG + 1n) - BIG_BANG).toBe(1n);
+      expect(BIG_BANG + 1n - BIG_BANG).toBe(1n);
     });
 
     it('Big Bang to Earth formation duration is exactly 9300 Ma', () => {
@@ -193,21 +193,21 @@ describe('Boundary-value analysis: extreme deep time', () => {
   describe('isVisible at extreme coordinates', () => {
     it('event at Big Bang is visible when viewport spans Big Bang era', () => {
       const viewStart = BIG_BANG - BILLION_YEARS;
-      const viewEnd   = BIG_BANG + BILLION_YEARS;
+      const viewEnd = BIG_BANG + BILLION_YEARS;
       expect(isVisible(BIG_BANG, 0n, viewStart, viewEnd)).toBe(true);
     });
 
     it('Earth formation is not visible in Big Bang-only viewport', () => {
       const viewStart = BIG_BANG - MILLION_YEARS;
-      const viewEnd   = BIG_BANG + MILLION_YEARS;
+      const viewEnd = BIG_BANG + MILLION_YEARS;
       expect(isVisible(EARTH_FORMED, 0n, viewStart, viewEnd)).toBe(false);
     });
 
     it('long event from Big Bang to Earth formation is visible mid-span', () => {
-      const duration  = EARTH_FORMED - BIG_BANG;
-      const midpoint  = BIG_BANG + duration / 2n;
+      const duration = EARTH_FORMED - BIG_BANG;
+      const midpoint = BIG_BANG + duration / 2n;
       const viewStart = midpoint - BILLION_YEARS;
-      const viewEnd   = midpoint + BILLION_YEARS;
+      const viewEnd = midpoint + BILLION_YEARS;
       expect(isVisible(BIG_BANG, duration, viewStart, viewEnd)).toBe(true);
     });
 

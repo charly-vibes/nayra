@@ -5,9 +5,9 @@ import { DAY, YEAR } from '../core/time.js';
  */
 
 // LOD levels
-export const LOD_MICRO = 'micro';  // days/hours - maximum detail
-export const LOD_MESO = 'meso';    // decades - medium detail
-export const LOD_MACRO = 'macro';  // centuries+ - minimal detail
+export const LOD_MICRO = 'micro'; // days/hours - maximum detail
+export const LOD_MESO = 'meso'; // decades - medium detail
+export const LOD_MACRO = 'macro'; // centuries+ - minimal detail
 
 // Event priority levels
 export const PRIORITY_LOW = 0;
@@ -16,10 +16,10 @@ export const PRIORITY_HIGH = 2;
 
 // LOD thresholds (seconds per pixel)
 // Add hysteresis to prevent flickering during zoom
-const MICRO_TO_MESO_THRESHOLD = Number(DAY) / 2;        // 12 hours/px
-const MESO_TO_MICRO_THRESHOLD = Number(DAY) / 3;        // 8 hours/px
-const MESO_TO_MACRO_THRESHOLD = Number(YEAR) * 50;      // 50 years/px
-const MACRO_TO_MESO_THRESHOLD = Number(YEAR) * 30;      // 30 years/px
+const MICRO_TO_MESO_THRESHOLD = Number(DAY) / 2; // 12 hours/px
+const MESO_TO_MICRO_THRESHOLD = Number(DAY) / 3; // 8 hours/px
+const MESO_TO_MACRO_THRESHOLD = Number(YEAR) * 50; // 50 years/px
+const MACRO_TO_MESO_THRESHOLD = Number(YEAR) * 30; // 30 years/px
 
 /**
  * Determine the appropriate LOD level based on zoom
@@ -98,12 +98,12 @@ export function filterEventsByLOD(events, lod) {
 
   if (lod === LOD_MESO) {
     // Show medium and high priority events
-    return events.filter(event => getEventPriority(event) >= PRIORITY_MEDIUM);
+    return events.filter((event) => getEventPriority(event) >= PRIORITY_MEDIUM);
   }
 
   if (lod === LOD_MACRO) {
     // Show only high priority events
-    return events.filter(event => getEventPriority(event) >= PRIORITY_HIGH);
+    return events.filter((event) => getEventPriority(event) >= PRIORITY_HIGH);
   }
 
   return events;

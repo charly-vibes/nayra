@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { assignLanes } from '../../src/layout/greedy-interval-coloring.js';
 
 describe('Layout Performance Benchmarks', () => {

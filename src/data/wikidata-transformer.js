@@ -27,7 +27,7 @@ function astronomicalToHistorical(dateStr) {
   const match = dateStr.match(/^(-?\d+)-(\d{2})-(\d{2})/);
   if (!match) return dateStr;
 
-  let year = parseInt(match[1], 10);
+  const year = parseInt(match[1], 10);
 
   if (year <= 0) {
     return formatBceYear(1 - year);
@@ -120,7 +120,5 @@ function transformBinding(binding) {
 export function transformWikidata(sparqlResult) {
   const bindings = sparqlResult?.results?.bindings || [];
 
-  return bindings
-    .map(transformBinding)
-    .filter(event => event !== null);
+  return bindings.map(transformBinding).filter((event) => event !== null);
 }

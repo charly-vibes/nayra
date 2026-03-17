@@ -5,11 +5,11 @@
  * They intentionally probe the boundaries of the 10% threshold.
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   compareBenchmarks,
-  hasRegression,
   formatMarkdownReport,
+  hasRegression,
   normalizeResults,
 } from '../../scripts/compare-benchmarks.js';
 
@@ -29,7 +29,7 @@ function makeData(p50) {
 describe('compareBenchmarks', () => {
   it('marks a benchmark as "ok" when within the threshold', () => {
     const baseline = makeData(100);
-    const current  = makeData(108); // +8% — within default 10%
+    const current = makeData(108); // +8% — within default 10%
     const [result] = compareBenchmarks(baseline, current);
     expect(result.status).toBe('ok');
     expect(result.change).toBeCloseTo(0.08, 5);
@@ -56,7 +56,7 @@ describe('compareBenchmarks', () => {
   it('detects an improvement (>10% faster)', () => {
     const [result] = compareBenchmarks(makeData(100), makeData(80)); // −20%
     expect(result.status).toBe('improvement');
-    expect(result.change).toBeCloseTo(-0.20, 5);
+    expect(result.change).toBeCloseTo(-0.2, 5);
   });
 
   it('marks a minor speedup as "ok"', () => {
@@ -66,7 +66,7 @@ describe('compareBenchmarks', () => {
 
   it('flags a missing benchmark', () => {
     const baseline = makeData(100);
-    const current  = { benchmarks: {} }; // benchmark absent from current run
+    const current = { benchmarks: {} }; // benchmark absent from current run
     const [result] = compareBenchmarks(baseline, current);
     expect(result.status).toBe('missing');
     expect(result.change).toBeNull();
@@ -74,7 +74,7 @@ describe('compareBenchmarks', () => {
 
   it('respects a custom threshold', () => {
     // With 20% threshold, +15% should be ok
-    const [result] = compareBenchmarks(makeData(100), makeData(115), 0.20);
+    const [result] = compareBenchmarks(makeData(100), makeData(115), 0.2);
     expect(result.status).toBe('ok');
   });
 
@@ -87,7 +87,7 @@ describe('compareBenchmarks', () => {
     };
     const current = {
       benchmarks: {
-        'suite/fast': { p50: 8, mean: 8 },   // -20% improvement
+        'suite/fast': { p50: 8, mean: 8 }, // -20% improvement
         'suite/slow': { p50: 120, mean: 120 }, // +20% regression
       },
     };

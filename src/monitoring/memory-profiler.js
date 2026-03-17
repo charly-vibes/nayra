@@ -72,7 +72,7 @@ export function measureGrowthMB(beforeBytes, afterBytes) {
  */
 export function createListenerTracker(target) {
   const live = new Map(); // type → Set of listeners
-  const origAdd    = target.addEventListener.bind(target);
+  const origAdd = target.addEventListener.bind(target);
   const origRemove = target.removeEventListener.bind(target);
 
   target.addEventListener = (type, listener, options) => {
@@ -95,7 +95,7 @@ export function createListenerTracker(target) {
     },
     /** Restore original methods. */
     restore() {
-      target.addEventListener    = origAdd;
+      target.addEventListener = origAdd;
       target.removeEventListener = origRemove;
     },
   };

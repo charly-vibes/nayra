@@ -1,35 +1,35 @@
-import { createStore } from './core/store.js';
-import { init as initRenderer, draw } from './rendering/renderer.js';
-import { initInput, fitToContent, resetZoom } from './interaction/input.js';
-import { createFocusManager } from './interaction/focus-manager.js';
-import { generateSampleEvents } from './data/samples.js';
-import { loadExample, loadFromFile } from './data/loader.js';
-import { DEFAULT_EXAMPLE } from './data/examples.js';
-import { createSearchBar } from './ui/searchbar.js';
-import { createHelpMenu } from './ui/help.js';
-import { createHelpButton } from './ui/help-button.js';
-import { createZoomControls } from './ui/zoom-controls.js';
-import { createTooltip } from './ui/tooltip.js';
-import { createEventPanel } from './ui/event-panel.js';
-import { createContextMenu, buildEventActions } from './ui/context-menu.js';
-import { createDropzone } from './ui/dropzone.js';
-import { parseTimeQuery } from './core/time-parser.js';
-import { RationalScale } from './core/scale.js';
-import { computePanToEvent } from './ui/search-navigation.js';
-import { createCategoryFilter } from './ui/category-filter.js';
-import { extractCategories } from './core/filter-engine.js';
-import { encodeAllState, decodeSearchState, decodeViewportState } from './core/url-state.js';
-import { createDebouncedSearch } from './core/search-engine.js';
+import { createAriaAnnouncer } from './accessibility/aria-announcer.js';
 import { createDomSync } from './accessibility/dom-sync.js';
 import { createLiveAnnouncer } from './accessibility/live-announcer.js';
-import { createAriaAnnouncer } from './accessibility/aria-announcer.js';
 import { createSkipLinks } from './accessibility/skip-links.js';
-import { detectFeatures, REQUIRED_FEATURES } from './utils/feature-detection.js';
+import { extractCategories } from './core/filter-engine.js';
+import { RationalScale } from './core/scale.js';
+import { createDebouncedSearch } from './core/search-engine.js';
+import { createStore } from './core/store.js';
+import { parseTimeQuery } from './core/time-parser.js';
+import { decodeSearchState, decodeViewportState, encodeAllState } from './core/url-state.js';
+import { DEFAULT_EXAMPLE } from './data/examples.js';
+import { loadExample, loadFromFile } from './data/loader.js';
+import { generateSampleEvents } from './data/samples.js';
+import { createFocusManager } from './interaction/focus-manager.js';
+import { fitToContent, initInput, resetZoom } from './interaction/input.js';
+import { draw, init as initRenderer } from './rendering/renderer.js';
 import { createBrowserError } from './ui/browser-error.js';
+import { createCategoryFilter } from './ui/category-filter.js';
+import { buildEventActions, createContextMenu } from './ui/context-menu.js';
+import { createDropzone } from './ui/dropzone.js';
+import { createEventPanel } from './ui/event-panel.js';
+import { createHelpMenu } from './ui/help.js';
+import { createHelpButton } from './ui/help-button.js';
+import { computePanToEvent } from './ui/search-navigation.js';
+import { createSearchBar } from './ui/searchbar.js';
+import { createTooltip } from './ui/tooltip.js';
+import { createZoomControls } from './ui/zoom-controls.js';
+import { detectFeatures, REQUIRED_FEATURES } from './utils/feature-detection.js';
 
 // Feature detection: show a graceful error UI if required APIs are missing
 const features = detectFeatures();
-const missing = REQUIRED_FEATURES.filter(key => !features[key].supported);
+const missing = REQUIRED_FEATURES.filter((key) => !features[key].supported);
 if (missing.length > 0) {
   createBrowserError(document.body, missing);
   throw new Error(`Nayra: missing required browser features: ${missing.join(', ')}`);
@@ -41,7 +41,12 @@ const store = createStore();
 // Skip navigation links: first focusable elements on the page (WCAG 2.4.1)
 createSkipLinks(document.body, [
   { label: 'Skip to timeline', targetId: 'timeline-canvas' },
-  { label: 'Skip to search', onClick: () => { searchBar.show(); } },
+  {
+    label: 'Skip to search',
+    onClick: () => {
+      searchBar.show();
+    },
+  },
   { label: 'Skip to help', targetId: 'help-button' },
 ]);
 
@@ -175,7 +180,7 @@ const zoomControls = createZoomControls(document.body, {
   onToggleFilter: toggleFilter,
 });
 
-const dropzone = createDropzone(canvas.parentElement, { onLoad: handleExampleLoad });
+const _dropzone = createDropzone(canvas.parentElement, { onLoad: handleExampleLoad });
 
 const categoryFilter = createCategoryFilter(document.body, {
   onToggle: (category) => store.dispatch({ type: 'TOGGLE_CATEGORY', category }),
@@ -206,18 +211,18 @@ let lastHoveredEventId = null;
 function handleHoverChange(hoveredEventId) {
   if (hoveredEventId !== lastHoveredEventId) {
     lastHoveredEventId = hoveredEventId;
-    
+
     if (hoverTimeout) {
       clearTimeout(hoverTimeout);
       hoverTimeout = null;
     }
-    
+
     if (hoveredEventId === null) {
       tooltip.hide();
     } else {
       hoverTimeout = setTimeout(() => {
         const state = store.getState();
-        const event = state.events.find(e => e.id === hoveredEventId);
+        const event = state.events.find((e) => e.id === hoveredEventId);
         if (event && state.hoveredEventId === hoveredEventId) {
           tooltip.update(event, mouseX, mouseY);
           tooltip.show();
@@ -266,8 +271,7 @@ store.subscribe((state) => {
 
   // Update search navigation UI
   const total = state.searchResultIds ? state.searchResultIds.length : 0;
-  const activeFilterCount =
-    (state.searchQuery ? 1 : 0) + state.selectedCategories.length;
+  const activeFilterCount = (state.searchQuery ? 1 : 0) + state.selectedCategories.length;
   searchBar.updateNavigation(state.currentResultIndex, total, activeFilterCount);
 
   // Pan to current search result when index or results change
@@ -349,47 +353,52 @@ window.addEventListener('hashchange', () => {
   }
 });
 
-initInput(canvas, store, {
-  onOpenSearch: () => {
-    if (!searchBar.isVisible()) {
-      searchBar.show();
-    }
-  },
-  onOpenSelectedEvent: (eventId) => {
-    const state = store.getState();
-    const event = state.events.find(e => e.id === eventId);
-    if (event) {
-      eventPanel.update([event]);
-      eventPanel.show();
-    }
-  },
-  onToggleHelp: toggleHelp,
-  onToggleFilter: toggleFilter,
-  onMousePosition: (x, y) => {
-    mouseX = x;
-    mouseY = y;
-    if (tooltip.isVisible()) {
-      const state = store.getState();
-      const event = state.events.find(e => e.id === state.hoveredEventId);
-      if (event) {
-        tooltip.update(event, x, y);
+initInput(
+  canvas,
+  store,
+  {
+    onOpenSearch: () => {
+      if (!searchBar.isVisible()) {
+        searchBar.show();
       }
-    }
+    },
+    onOpenSelectedEvent: (eventId) => {
+      const state = store.getState();
+      const event = state.events.find((e) => e.id === eventId);
+      if (event) {
+        eventPanel.update([event]);
+        eventPanel.show();
+      }
+    },
+    onToggleHelp: toggleHelp,
+    onToggleFilter: toggleFilter,
+    onMousePosition: (x, y) => {
+      mouseX = x;
+      mouseY = y;
+      if (tooltip.isVisible()) {
+        const state = store.getState();
+        const event = state.events.find((e) => e.id === state.hoveredEventId);
+        if (event) {
+          tooltip.update(event, x, y);
+        }
+      }
+    },
+    onContextMenu: ({ x, y, target, targetType }) => {
+      tooltip.hide();
+      if (targetType === 'event' && target) {
+        const actions = buildEventActions(target, store, {
+          onShowDetails: (ev) => {
+            eventPanel.update([ev]);
+            eventPanel.show();
+          },
+        });
+        contextMenu.show(x, y, actions);
+      }
+      // Background right-click: no menu for now (per spec: implementation choice)
+    },
   },
-  onContextMenu: ({ x, y, target, targetType }) => {
-    tooltip.hide();
-    if (targetType === 'event' && target) {
-      const actions = buildEventActions(target, store, {
-        onShowDetails: (ev) => {
-          eventPanel.update([ev]);
-          eventPanel.show();
-        },
-      });
-      contextMenu.show(x, y, actions);
-    }
-    // Background right-click: no menu for now (per spec: implementation choice)
-  },
-}, focusManager);
+  focusManager,
+);
 
 async function init() {
   const params = new URLSearchParams(window.location.search);

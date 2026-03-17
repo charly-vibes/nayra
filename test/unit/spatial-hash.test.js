@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { SpatialHash, createSpatialHash, DEFAULT_BUCKET_WIDTH } from '../../src/layout/spatial-hash.js';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { createSpatialHash, DEFAULT_BUCKET_WIDTH, SpatialHash } from '../../src/layout/spatial-hash.js';
 
 describe('SpatialHash', () => {
   let hash;
@@ -240,7 +240,7 @@ describe('SpatialHash', () => {
       ];
 
       const getBounds = (event) => {
-        const idx = parseInt(event.id.slice(1));
+        const idx = parseInt(event.id.slice(1), 10);
         return { x: idx * 100, y: 100, width: 50, height: 20 };
       };
 
@@ -259,7 +259,7 @@ describe('SpatialHash', () => {
       }
 
       const getBounds = (event) => {
-        const idx = parseInt(event.id.slice(1));
+        const idx = parseInt(event.id.slice(1), 10);
         return { x: idx * 10, y: 100, width: 50, height: 20 };
       };
 
@@ -291,9 +291,9 @@ describe('SpatialHash', () => {
       const event2 = { id: 'e2', label: 'Event 2' };
       const event3 = { id: 'e3', label: 'Event 3' };
 
-      hash.insert(event1, 10, 100, 30, 20);    // Bucket 0
-      hash.insert(event2, 60, 100, 30, 20);    // Bucket 1
-      hash.insert(event3, 15, 100, 30, 20);    // Bucket 0
+      hash.insert(event1, 10, 100, 30, 20); // Bucket 0
+      hash.insert(event2, 60, 100, 30, 20); // Bucket 1
+      hash.insert(event3, 15, 100, 30, 20); // Bucket 0
 
       const stats = hash.getStats();
 
@@ -311,7 +311,7 @@ describe('SpatialHash', () => {
         { id: 'e2', label: 'Event 2' },
       ];
 
-      const getBounds = (event) => ({ x: 10, y: 100, width: 30, height: 20 });
+      const getBounds = (_event) => ({ x: 10, y: 100, width: 30, height: 20 });
 
       const hash = createSpatialHash(events, getBounds);
 
@@ -358,7 +358,7 @@ describe('SpatialHash', () => {
       }
 
       const getBounds = (event) => {
-        const idx = parseInt(event.id.slice(1));
+        const idx = parseInt(event.id.slice(1), 10);
         return { x: idx * 100, y: 100, width: 50, height: 20 };
       };
 

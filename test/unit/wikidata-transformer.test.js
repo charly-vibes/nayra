@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { transformWikidata } from '../../src/data/wikidata-transformer.js';
 
 describe('Wikidata SPARQL Transformer', () => {
@@ -6,11 +6,13 @@ describe('Wikidata SPARQL Transformer', () => {
     it('transforms a minimal SPARQL result binding', () => {
       const sparqlResult = {
         results: {
-          bindings: [{
-            item: { value: 'http://www.wikidata.org/entity/Q11750' },
-            itemLabel: { value: 'Apollo 11' },
-            startTime: { value: '1969-07-16T00:00:00Z' },
-          }],
+          bindings: [
+            {
+              item: { value: 'http://www.wikidata.org/entity/Q11750' },
+              itemLabel: { value: 'Apollo 11' },
+              startTime: { value: '1969-07-16T00:00:00Z' },
+            },
+          ],
         },
       };
 
@@ -28,12 +30,14 @@ describe('Wikidata SPARQL Transformer', () => {
     it('transforms result with start and end times', () => {
       const sparqlResult = {
         results: {
-          bindings: [{
-            item: { value: 'http://www.wikidata.org/entity/Q11750' },
-            itemLabel: { value: 'Apollo 11' },
-            startTime: { value: '1969-07-16T00:00:00Z' },
-            endTime: { value: '1969-07-24T00:00:00Z' },
-          }],
+          bindings: [
+            {
+              item: { value: 'http://www.wikidata.org/entity/Q11750' },
+              itemLabel: { value: 'Apollo 11' },
+              startTime: { value: '1969-07-16T00:00:00Z' },
+              endTime: { value: '1969-07-24T00:00:00Z' },
+            },
+          ],
         },
       };
 
@@ -46,11 +50,13 @@ describe('Wikidata SPARQL Transformer', () => {
     it('extracts Q-number from Wikidata URI', () => {
       const sparqlResult = {
         results: {
-          bindings: [{
-            item: { value: 'http://www.wikidata.org/entity/Q12345' },
-            itemLabel: { value: 'Test' },
-            startTime: { value: '2020-01-01T00:00:00Z' },
-          }],
+          bindings: [
+            {
+              item: { value: 'http://www.wikidata.org/entity/Q12345' },
+              itemLabel: { value: 'Test' },
+              startTime: { value: '2020-01-01T00:00:00Z' },
+            },
+          ],
         },
       };
 
@@ -63,12 +69,14 @@ describe('Wikidata SPARQL Transformer', () => {
     it('includes description when present', () => {
       const sparqlResult = {
         results: {
-          bindings: [{
-            item: { value: 'http://www.wikidata.org/entity/Q11750' },
-            itemLabel: { value: 'Apollo 11' },
-            itemDescription: { value: 'First crewed Moon landing mission' },
-            startTime: { value: '1969-07-16T00:00:00Z' },
-          }],
+          bindings: [
+            {
+              item: { value: 'http://www.wikidata.org/entity/Q11750' },
+              itemLabel: { value: 'Apollo 11' },
+              itemDescription: { value: 'First crewed Moon landing mission' },
+              startTime: { value: '1969-07-16T00:00:00Z' },
+            },
+          ],
         },
       };
 
@@ -80,12 +88,14 @@ describe('Wikidata SPARQL Transformer', () => {
     it('includes category from instanceOf', () => {
       const sparqlResult = {
         results: {
-          bindings: [{
-            item: { value: 'http://www.wikidata.org/entity/Q11750' },
-            itemLabel: { value: 'Apollo 11' },
-            startTime: { value: '1969-07-16T00:00:00Z' },
-            instanceOf: { value: 'crewed spaceflight' },
-          }],
+          bindings: [
+            {
+              item: { value: 'http://www.wikidata.org/entity/Q11750' },
+              itemLabel: { value: 'Apollo 11' },
+              startTime: { value: '1969-07-16T00:00:00Z' },
+              instanceOf: { value: 'crewed spaceflight' },
+            },
+          ],
         },
       };
 
@@ -97,12 +107,14 @@ describe('Wikidata SPARQL Transformer', () => {
     it('includes url from article', () => {
       const sparqlResult = {
         results: {
-          bindings: [{
-            item: { value: 'http://www.wikidata.org/entity/Q11750' },
-            itemLabel: { value: 'Apollo 11' },
-            startTime: { value: '1969-07-16T00:00:00Z' },
-            article: { value: 'https://en.wikipedia.org/wiki/Apollo_11' },
-          }],
+          bindings: [
+            {
+              item: { value: 'http://www.wikidata.org/entity/Q11750' },
+              itemLabel: { value: 'Apollo 11' },
+              startTime: { value: '1969-07-16T00:00:00Z' },
+              article: { value: 'https://en.wikipedia.org/wiki/Apollo_11' },
+            },
+          ],
         },
       };
 
@@ -140,12 +152,14 @@ describe('Wikidata SPARQL Transformer', () => {
       it('converts Big Bang date to Ga notation', () => {
         const sparqlResult = {
           results: {
-            bindings: [{
-              item: { value: 'http://www.wikidata.org/entity/Q1' },
-              itemLabel: { value: 'Big Bang' },
-              startTime: { value: '-13799999999-01-01T00:00:00Z' },
-              startTimePrecision: { value: '0' },
-            }],
+            bindings: [
+              {
+                item: { value: 'http://www.wikidata.org/entity/Q1' },
+                itemLabel: { value: 'Big Bang' },
+                startTime: { value: '-13799999999-01-01T00:00:00Z' },
+                startTimePrecision: { value: '0' },
+              },
+            ],
           },
         };
 
@@ -157,12 +171,14 @@ describe('Wikidata SPARQL Transformer', () => {
       it('converts Earth formation to Ga notation', () => {
         const sparqlResult = {
           results: {
-            bindings: [{
-              item: { value: 'http://www.wikidata.org/entity/Q2' },
-              itemLabel: { value: 'Earth formation' },
-              startTime: { value: '-4499999999-01-01T00:00:00Z' },
-              startTimePrecision: { value: '0' },
-            }],
+            bindings: [
+              {
+                item: { value: 'http://www.wikidata.org/entity/Q2' },
+                itemLabel: { value: 'Earth formation' },
+                startTime: { value: '-4499999999-01-01T00:00:00Z' },
+                startTimePrecision: { value: '0' },
+              },
+            ],
           },
         };
 
@@ -174,12 +190,14 @@ describe('Wikidata SPARQL Transformer', () => {
       it('converts dinosaur extinction to Ma notation', () => {
         const sparqlResult = {
           results: {
-            bindings: [{
-              item: { value: 'http://www.wikidata.org/entity/Q3' },
-              itemLabel: { value: 'Cretaceous–Paleogene extinction event' },
-              startTime: { value: '-65999999-01-01T00:00:00Z' },
-              startTimePrecision: { value: '3' },
-            }],
+            bindings: [
+              {
+                item: { value: 'http://www.wikidata.org/entity/Q3' },
+                itemLabel: { value: 'Cretaceous–Paleogene extinction event' },
+                startTime: { value: '-65999999-01-01T00:00:00Z' },
+                startTimePrecision: { value: '3' },
+              },
+            ],
           },
         };
 
@@ -191,12 +209,14 @@ describe('Wikidata SPARQL Transformer', () => {
       it('converts million-year-scale date to Ma notation without Ga', () => {
         const sparqlResult = {
           results: {
-            bindings: [{
-              item: { value: 'http://www.wikidata.org/entity/Q4' },
-              itemLabel: { value: 'Cambrian explosion' },
-              startTime: { value: '-538000000-01-01T00:00:00Z' },
-              startTimePrecision: { value: '3' },
-            }],
+            bindings: [
+              {
+                item: { value: 'http://www.wikidata.org/entity/Q4' },
+                itemLabel: { value: 'Cambrian explosion' },
+                startTime: { value: '-538000000-01-01T00:00:00Z' },
+                startTimePrecision: { value: '3' },
+              },
+            ],
           },
         };
 
@@ -210,11 +230,13 @@ describe('Wikidata SPARQL Transformer', () => {
       it('adjusts astronomical year -43 to 44 BCE', () => {
         const sparqlResult = {
           results: {
-            bindings: [{
-              item: { value: 'http://www.wikidata.org/entity/Q1048' },
-              itemLabel: { value: 'Assassination of Julius Caesar' },
-              startTime: { value: '-0043-03-15T00:00:00Z' },
-            }],
+            bindings: [
+              {
+                item: { value: 'http://www.wikidata.org/entity/Q1048' },
+                itemLabel: { value: 'Assassination of Julius Caesar' },
+                startTime: { value: '-0043-03-15T00:00:00Z' },
+              },
+            ],
           },
         };
 
@@ -226,11 +248,13 @@ describe('Wikidata SPARQL Transformer', () => {
       it('adjusts astronomical year 0 to 1 BCE', () => {
         const sparqlResult = {
           results: {
-            bindings: [{
-              item: { value: 'http://www.wikidata.org/entity/Q1' },
-              itemLabel: { value: 'Year Zero Event' },
-              startTime: { value: '0000-01-01T00:00:00Z' },
-            }],
+            bindings: [
+              {
+                item: { value: 'http://www.wikidata.org/entity/Q1' },
+                itemLabel: { value: 'Year Zero Event' },
+                startTime: { value: '0000-01-01T00:00:00Z' },
+              },
+            ],
           },
         };
 
@@ -242,11 +266,13 @@ describe('Wikidata SPARQL Transformer', () => {
       it('adjusts astronomical year -0 to 1 BCE', () => {
         const sparqlResult = {
           results: {
-            bindings: [{
-              item: { value: 'http://www.wikidata.org/entity/Q1' },
-              itemLabel: { value: 'Year Zero Event' },
-              startTime: { value: '-0000-06-15T00:00:00Z' },
-            }],
+            bindings: [
+              {
+                item: { value: 'http://www.wikidata.org/entity/Q1' },
+                itemLabel: { value: 'Year Zero Event' },
+                startTime: { value: '-0000-06-15T00:00:00Z' },
+              },
+            ],
           },
         };
 
@@ -258,11 +284,13 @@ describe('Wikidata SPARQL Transformer', () => {
       it('handles deep time BCE dates', () => {
         const sparqlResult = {
           results: {
-            bindings: [{
-              item: { value: 'http://www.wikidata.org/entity/Q123' },
-              itemLabel: { value: 'Ancient Event' },
-              startTime: { value: '-2499-01-01T00:00:00Z' },
-            }],
+            bindings: [
+              {
+                item: { value: 'http://www.wikidata.org/entity/Q123' },
+                itemLabel: { value: 'Ancient Event' },
+                startTime: { value: '-2499-01-01T00:00:00Z' },
+              },
+            ],
           },
         };
 
@@ -276,12 +304,14 @@ describe('Wikidata SPARQL Transformer', () => {
       it('simplifies year-precision dates', () => {
         const sparqlResult = {
           results: {
-            bindings: [{
-              item: { value: 'http://www.wikidata.org/entity/Q11750' },
-              itemLabel: { value: 'Apollo 11' },
-              startTime: { value: '1969-01-01T00:00:00Z' },
-              startTimePrecision: { value: '9' },
-            }],
+            bindings: [
+              {
+                item: { value: 'http://www.wikidata.org/entity/Q11750' },
+                itemLabel: { value: 'Apollo 11' },
+                startTime: { value: '1969-01-01T00:00:00Z' },
+                startTimePrecision: { value: '9' },
+              },
+            ],
           },
         };
 
@@ -321,12 +351,14 @@ describe('Wikidata SPARQL Transformer', () => {
       it('handles instanceOfLabel variant', () => {
         const sparqlResult = {
           results: {
-            bindings: [{
-              item: { value: 'http://www.wikidata.org/entity/Q11750' },
-              itemLabel: { value: 'Apollo 11' },
-              startTime: { value: '1969-07-16T00:00:00Z' },
-              instanceOfLabel: { value: 'space mission' },
-            }],
+            bindings: [
+              {
+                item: { value: 'http://www.wikidata.org/entity/Q11750' },
+                itemLabel: { value: 'Apollo 11' },
+                startTime: { value: '1969-07-16T00:00:00Z' },
+                instanceOfLabel: { value: 'space mission' },
+              },
+            ],
           },
         };
 

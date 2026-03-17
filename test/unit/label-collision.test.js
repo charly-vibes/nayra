@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import {
   calculateLabelPriority,
-  measureLabel,
-  labelsOverlap,
   detectLabelCollisions,
+  labelsOverlap,
+  measureLabel,
   renderLabel,
 } from '../../src/layout/label-collision.js';
 
@@ -222,8 +222,12 @@ describe('Label Collision Detection', () => {
     it('should call save and restore', () => {
       let saveCalled = false;
       let restoreCalled = false;
-      mockCtx.save = () => { saveCalled = true; };
-      mockCtx.restore = () => { restoreCalled = true; };
+      mockCtx.save = () => {
+        saveCalled = true;
+      };
+      mockCtx.restore = () => {
+        restoreCalled = true;
+      };
 
       renderLabel(mockCtx, 'Test', 0, 0, 100, 20);
       expect(saveCalled).toBe(true);

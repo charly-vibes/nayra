@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { createLiveAnnouncer } from '../../src/accessibility/live-announcer.js';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createAriaAnnouncer } from '../../src/accessibility/aria-announcer.js';
+import { createLiveAnnouncer } from '../../src/accessibility/live-announcer.js';
 
 describe('createAriaAnnouncer', () => {
   let element;

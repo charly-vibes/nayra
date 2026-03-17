@@ -54,7 +54,7 @@ export function calculatePanToEvent(event, canvasWidth, scale, currentStart) {
  * @param {Object} focusManager - Focus manager (optional, for testing)
  * @returns {Function} Unsubscribe function
  */
-export function initAutoPan(store, focusManager = null) {
+export function initAutoPan(store, _focusManager = null) {
   let lastFocusedEventId = null;
 
   const unsubscribe = store.subscribe((state) => {

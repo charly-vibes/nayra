@@ -1,13 +1,13 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
-  SHAPE_TYPES,
-  SHAPE_LABELS,
-  getEventShape,
-  drawShape,
   drawEventShapeIndicator,
+  drawShape,
+  getEventShape,
   getShapeLegend,
   hashString,
+  SHAPE_LABELS,
+  SHAPE_TYPES,
 } from './event-shapes.js';
 
 describe('hashString', () => {
@@ -43,9 +43,7 @@ describe('getEventShape', () => {
 
   it('different categories can produce different shapes', () => {
     const shapes = new Set(
-      ['astronomy', 'history', 'science', 'politics', 'culture'].map(
-        (c) => getEventShape({ category: c })
-      )
+      ['astronomy', 'history', 'science', 'politics', 'culture'].map((c) => getEventShape({ category: c })),
     );
     // Should get at least 2 distinct shapes across 5 different categories
     expect(shapes.size).toBeGreaterThan(1);
@@ -53,8 +51,16 @@ describe('getEventShape', () => {
 
   it('covers all 5 shape types across varied categories', () => {
     const categories = [
-      'astronomy', 'history', 'science', 'politics', 'culture',
-      'technology', 'biology', 'geology', 'art', 'economics',
+      'astronomy',
+      'history',
+      'science',
+      'politics',
+      'culture',
+      'technology',
+      'biology',
+      'geology',
+      'art',
+      'economics',
     ];
     const usedShapes = new Set(categories.map((c) => getEventShape({ category: c })));
     // With 10 categories we should see most or all shape types

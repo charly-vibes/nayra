@@ -2,7 +2,7 @@ export const EXAMPLES = [
   {
     id: 'space-exploration',
     label: 'Space Exploration',
-    desc: 'Key milestones in humanity\'s journey to the stars, from Sputnik to JWST',
+    desc: "Key milestones in humanity's journey to the stars, from Sputnik to JWST",
   },
   {
     id: 'earth-history',

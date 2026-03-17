@@ -30,8 +30,8 @@ export function logSlowFrame(metrics, devMode = isDevMode()) {
 
   console.warn(
     `[perf] slow frame: ${metrics.frameTime.toFixed(2)}ms` +
-    ` (budget: 16.67ms)` +
-    ` | render: ${metrics.renderTime.toFixed(2)}ms` +
-    ` | layout: ${metrics.layoutTime.toFixed(2)}ms`,
+      ` (budget: 16.67ms)` +
+      ` | render: ${metrics.renderTime.toFixed(2)}ms` +
+      ` | layout: ${metrics.layoutTime.toFixed(2)}ms`,
   );
 }

@@ -122,12 +122,7 @@ export class SpatialHash {
    * @returns {boolean} - True if point is in bounds
    */
   pointInBounds(x, y, bounds) {
-    return (
-      x >= bounds.x &&
-      x <= bounds.x + bounds.width &&
-      y >= bounds.y &&
-      y <= bounds.y + bounds.height
-    );
+    return x >= bounds.x && x <= bounds.x + bounds.width && y >= bounds.y && y <= bounds.y + bounds.height;
   }
 
   /**
@@ -147,9 +142,7 @@ export class SpatialHash {
       maxBucketSize = Math.max(maxBucketSize, size);
     }
 
-    const avgBucketSize = bucketCounts.length > 0
-      ? totalEvents / bucketCounts.length
-      : 0;
+    const avgBucketSize = bucketCounts.length > 0 ? totalEvents / bucketCounts.length : 0;
 
     return {
       bucketCount: this.buckets.size,

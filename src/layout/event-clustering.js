@@ -56,9 +56,14 @@ export function clusterEvents(events, viewportStart, scale) {
         // Add to current cluster
         currentCluster.events.push(event);
         currentCluster.maxX = Math.max(currentCluster.maxX, eventX);
-        currentCluster.maxTime = event.end !== undefined ?
-          (event.end > currentCluster.maxTime ? event.end : currentCluster.maxTime) :
-          (event.start > currentCluster.maxTime ? event.start : currentCluster.maxTime);
+        currentCluster.maxTime =
+          event.end !== undefined
+            ? event.end > currentCluster.maxTime
+              ? event.end
+              : currentCluster.maxTime
+            : event.start > currentCluster.maxTime
+              ? event.start
+              : currentCluster.maxTime;
       } else {
         // Finalize current cluster and start a new one
         if (currentCluster.events.length >= MIN_CLUSTER_SIZE) {

@@ -1,10 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import {
-  encodeSearchState,
-  decodeSearchState,
-  buildHashString,
-  parseHashString,
-} from '../../src/core/url-state.js';
+import { describe, expect, it } from 'vitest';
+import { buildHashString, decodeSearchState, encodeSearchState, parseHashString } from '../../src/core/url-state.js';
 
 // ---------------------------------------------------------------------------
 // Hash encoding / decoding

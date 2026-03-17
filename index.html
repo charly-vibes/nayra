@@ -75,6 +75,108 @@
     <!-- ARIA live region for screen reader announcements -->
     <div id="aria-live" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
   </div>
-  <script type="module" src="src/main.js"></script>
+  <script id="nayra-app" type="module" src="src/main.js"></script>
+  <script>
+    // Early feature detection — runs as a classic (non-module) script BEFORE the
+    // ES-module graph is evaluated, so it can block loading when BigInt / Canvas /
+    // IndexedDB are absent.  The module script above is type="module" and therefore
+    // deferred; this classic script executes first.
+    (function () {
+      var missing = [];
+      if (typeof BigInt === 'undefined') missing.push('bigint');
+      try {
+        var c = document.createElement('canvas');
+        if (!c.getContext('2d')) missing.push('canvas');
+      } catch (_) { missing.push('canvas'); }
+      if (typeof indexedDB === 'undefined' || indexedDB === null) missing.push('indexeddb');
+
+      if (missing.length === 0) return; // all good — let the module load
+
+      // Prevent the module from executing (it would crash calling BigInt())
+      var appScript = document.getElementById('nayra-app');
+      if (appScript) appScript.remove();
+
+      // Feature labels for the error UI
+      var labels = { canvas: 'Canvas 2D API', bigint: 'BigInt', indexeddb: 'IndexedDB' };
+
+      // Build a self-contained error overlay (mirrors src/ui/browser-error.js)
+      var overlay = document.createElement('div');
+      overlay.setAttribute('role', 'alert');
+      overlay.setAttribute('aria-live', 'assertive');
+      overlay.setAttribute('aria-atomic', 'true');
+      overlay.setAttribute('tabindex', '-1');
+      var os = overlay.style;
+      os.position = 'fixed'; os.inset = '0'; os.display = 'flex';
+      os.alignItems = 'center'; os.justifyContent = 'center';
+      os.background = '#1a1a2e'; os.color = '#e0e0e0';
+      os.fontFamily = 'system-ui, -apple-system, sans-serif';
+      os.zIndex = '9999'; os.padding = '2rem';
+
+      var card = document.createElement('div');
+      var cs = card.style;
+      cs.maxWidth = '480px'; cs.width = '100%'; cs.background = '#2a2a3e';
+      cs.border = '1px solid #4a4a6a'; cs.borderRadius = '12px';
+      cs.padding = '2rem'; cs.textAlign = 'center';
+
+      var icon = document.createElement('div');
+      icon.textContent = '\u26A0\uFE0F';
+      icon.setAttribute('aria-hidden', 'true');
+      icon.style.fontSize = '3rem'; icon.style.marginBottom = '1rem';
+
+      var title = document.createElement('h2');
+      title.textContent = 'Browser Not Supported';
+      var ts = title.style;
+      ts.fontSize = '1.5rem'; ts.fontWeight = '700'; ts.color = '#ff6b6b';
+      ts.marginBottom = '0.75rem';
+
+      var message = document.createElement('p');
+      message.textContent = 'Nayra requires the following browser features that are not available:';
+      var ms = message.style;
+      ms.color = '#b0b0c8'; ms.marginBottom = '1.25rem'; ms.lineHeight = '1.5';
+
+      card.appendChild(icon);
+      card.appendChild(title);
+      card.appendChild(message);
+
+      var list = document.createElement('ul');
+      list.setAttribute('aria-label', 'Missing browser features');
+      var ls = list.style;
+      ls.listStyle = 'none'; ls.margin = '0 0 1.5rem'; ls.padding = '0'; ls.textAlign = 'left';
+
+      for (var i = 0; i < missing.length; i++) {
+        var item = document.createElement('li');
+        var is = item.style;
+        is.display = 'flex'; is.alignItems = 'center'; is.gap = '0.5rem';
+        is.padding = '0.4rem 0.75rem'; is.background = '#1a1a2e';
+        is.borderRadius = '6px'; is.marginBottom = '0.4rem';
+        is.fontFamily = 'monospace'; is.fontSize = '0.9rem'; is.color = '#ff6b6b';
+        var mark = document.createElement('span');
+        mark.textContent = '\u2717';
+        mark.setAttribute('aria-hidden', 'true');
+        var label = document.createElement('span');
+        label.textContent = labels[missing[i]] || missing[i];
+        item.appendChild(mark);
+        item.appendChild(label);
+        list.appendChild(item);
+      }
+      card.appendChild(list);
+
+      var suggestion = document.createElement('p');
+      suggestion.style.color = '#b0b0c8';
+      suggestion.style.fontSize = '0.9rem';
+      suggestion.style.lineHeight = '1.5';
+      suggestion.textContent = 'Please upgrade to a modern browser such as ';
+      var browsers = document.createElement('strong');
+      browsers.textContent = 'Chrome 90+, Firefox 90+, or Safari 14+';
+      browsers.style.color = '#00d9ff';
+      suggestion.appendChild(browsers);
+      suggestion.appendChild(document.createTextNode('.'));
+
+      card.appendChild(suggestion);
+      overlay.appendChild(card);
+      document.body.appendChild(overlay);
+      overlay.focus();
+    })();
+  </script>
 </body>
 </html>

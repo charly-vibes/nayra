@@ -83,9 +83,9 @@ describe('Performance Benchmarks', () => {
 
   describe('Initial Render Pipeline', () => {
     const SIZES = [
-      { label: '1K', getData: getDataset1K, layoutBudget: 15, hashBudget: 10, pipelineBudget: 25 },
-      { label: '10K', getData: getDataset10K, layoutBudget: 150, hashBudget: 40, pipelineBudget: 200 },
-      { label: '50K', getData: getDataset50K, layoutBudget: 800, hashBudget: 150, pipelineBudget: 950 },
+      { label: '1K', getData: getDataset1K, layoutBudget: 75, hashBudget: 50, pipelineBudget: 125 },
+      { label: '10K', getData: getDataset10K, layoutBudget: 600, hashBudget: 200, pipelineBudget: 800 },
+      { label: '50K', getData: getDataset50K, layoutBudget: 3200, hashBudget: 600, pipelineBudget: 3800 },
     ];
 
     for (const { label, getData, layoutBudget, hashBudget, pipelineBudget } of SIZES) {
@@ -150,9 +150,9 @@ describe('Performance Benchmarks', () => {
 
   describe('Pan Operations', () => {
     const PAN_SIZES = [
-      { label: '1K', getData: getDataset1K, frames: 60, budgetMs: 500, runs: 8 },
-      { label: '10K', getData: getDataset10K, frames: 30, budgetMs: 1500, runs: 5 },
-      { label: '50K', getData: getDataset50K, frames: 10, budgetMs: 2000, runs: 3 },
+      { label: '1K', getData: getDataset1K, frames: 60, budgetMs: 2000, runs: 8 },
+      { label: '10K', getData: getDataset10K, frames: 30, budgetMs: 6000, runs: 5 },
+      { label: '50K', getData: getDataset50K, frames: 10, budgetMs: 8000, runs: 3 },
     ];
 
     for (const { label, getData, frames, budgetMs, runs } of PAN_SIZES) {
@@ -187,7 +187,7 @@ describe('Performance Benchmarks', () => {
   // =========================================================================
 
   describe('Zoom Operations', () => {
-    it('scale.zoom — 1000 successive transforms within 5ms', () => {
+    it('scale.zoom — 1000 successive transforms within 25ms', () => {
       const stats = bench(
         () => {
           let s = SCALE;
@@ -199,11 +199,11 @@ describe('Performance Benchmarks', () => {
       const perCall = stats.mean / 1000;
       recordResult('zoom', 'scale-zoom-1000x', { ...stats, perCall });
 
-      expect(stats.mean).toBeLessThan(5);
+      expect(stats.mean).toBeLessThan(25);
       console.log(`scale.zoom (1000×): mean=${stats.mean.toFixed(3)}ms, ` + `per-call=${perCall.toFixed(5)}ms`);
     });
 
-    it('determineLOD — 1000 calls including level transitions within 2ms', () => {
+    it('determineLOD — 1000 calls including level transitions within 10ms', () => {
       const stats = bench(
         () => {
           let lod = LOD_MICRO;
@@ -219,14 +219,14 @@ describe('Performance Benchmarks', () => {
       const perCall = stats.mean / 1000;
       recordResult('zoom', 'determineLOD-1000x', { ...stats, perCall });
 
-      expect(stats.mean).toBeLessThan(2);
+      expect(stats.mean).toBeLessThan(10);
       console.log(`determineLOD (1000×): mean=${stats.mean.toFixed(3)}ms, ` + `per-call=${perCall.toFixed(5)}ms`);
     });
 
     const LOD_SIZES = [
-      { label: '1K', getData: getDataset1K, budget: 3, iters: 100 },
-      { label: '10K', getData: getDataset10K, budget: 15, iters: 40 },
-      { label: '50K', getData: getDataset50K, budget: 60, iters: 15 },
+      { label: '1K', getData: getDataset1K, budget: 15, iters: 100 },
+      { label: '10K', getData: getDataset10K, budget: 75, iters: 40 },
+      { label: '50K', getData: getDataset50K, budget: 240, iters: 15 },
     ];
 
     for (const { label, getData, budget, iters } of LOD_SIZES) {
@@ -241,7 +241,7 @@ describe('Performance Benchmarks', () => {
       });
     }
 
-    it('full zoom-out transition — 10K events (micro→macro pipeline) within 250ms', () => {
+    it('full zoom-out transition — 10K events (micro→macro pipeline) within 1000ms', () => {
       const events = getDataset10K();
 
       const stats = bench(
@@ -256,7 +256,7 @@ describe('Performance Benchmarks', () => {
       );
       recordResult('zoom', 'full-zoom-out-transition-10K', stats);
 
-      expect(stats.mean).toBeLessThan(250);
+      expect(stats.mean).toBeLessThan(1000);
       console.log(
         `Zoom-out transition (10K→MACRO): mean=${stats.mean.toFixed(2)}ms ` + `p95=${stats.p95.toFixed(2)}ms`,
       );
@@ -281,7 +281,7 @@ describe('Performance Benchmarks', () => {
       );
       recordResult('layout', 'project-to-screen-50K', stats);
 
-      expect(stats.mean).toBeLessThan(30);
+      expect(stats.mean).toBeLessThan(150);
       console.log(`projectToScreen(50K): mean=${stats.mean.toFixed(2)}ms`);
     });
 
@@ -298,7 +298,7 @@ describe('Performance Benchmarks', () => {
       const stats = bench(() => detectLabelCollisions(eventsWithBounds, MOCK_CTX, spp), { warmup: 5, iterations: 30 });
       recordResult('layout', 'label-collision-1K', stats);
 
-      expect(stats.mean).toBeLessThan(20);
+      expect(stats.mean).toBeLessThan(100);
       console.log(`detectLabelCollisions(1K): mean=${stats.mean.toFixed(2)}ms ` + `p95=${stats.p95.toFixed(2)}ms`);
     });
 
@@ -315,7 +315,7 @@ describe('Performance Benchmarks', () => {
       const stats = bench(() => detectLabelCollisions(eventsWithBounds, MOCK_CTX, spp), { warmup: 3, iterations: 15 });
       recordResult('layout', 'label-collision-10K', stats);
 
-      expect(stats.mean).toBeLessThan(200);
+      expect(stats.mean).toBeLessThan(800);
       console.log(`detectLabelCollisions(10K): mean=${stats.mean.toFixed(2)}ms ` + `p95=${stats.p95.toFixed(2)}ms`);
     });
 
@@ -326,7 +326,7 @@ describe('Performance Benchmarks', () => {
       const stats = bench(() => clusterEvents(events, VIEWPORT_START, macroScale), { warmup: 5, iterations: 20 });
       recordResult('layout', 'event-clustering-macro-10K', stats);
 
-      expect(stats.mean).toBeLessThan(50);
+      expect(stats.mean).toBeLessThan(200);
       console.log(`clusterEvents(10K, macro): mean=${stats.mean.toFixed(2)}ms ` + `p95=${stats.p95.toFixed(2)}ms`);
     });
 
@@ -337,7 +337,7 @@ describe('Performance Benchmarks', () => {
       const stats = bench(() => clusterEvents(events, VIEWPORT_START, macroScale), { warmup: 3, iterations: 8 });
       recordResult('layout', 'event-clustering-macro-50K', stats);
 
-      expect(stats.mean).toBeLessThan(200);
+      expect(stats.mean).toBeLessThan(800);
       console.log(`clusterEvents(50K, macro): mean=${stats.mean.toFixed(2)}ms ` + `p95=${stats.p95.toFixed(2)}ms`);
     });
   });

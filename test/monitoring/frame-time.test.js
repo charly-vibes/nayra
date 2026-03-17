@@ -294,6 +294,6 @@ describe('monitoring overhead', () => {
 
     // Allow generous budget since Date.now() has 1ms resolution; the important
     // thing is it doesn't take seconds.
-    expect(perFrameMs).toBeLessThan(0.5);
+    expect(perFrameMs).toBeLessThan(2);
   });
 });

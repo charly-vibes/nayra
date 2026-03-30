@@ -2,5 +2,6 @@
   "database": "dolt",
   "backend": "dolt",
   "dolt_mode": "server",
-  "dolt_database": "nayra"
+  "dolt_database": "nayra",
+  "project_id": "39ab67ee-b7ba-4529-9c74-b995d146a1c2"
 }

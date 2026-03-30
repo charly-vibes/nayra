@@ -32,6 +32,12 @@ const SHORTCUTS_CONTENT = `
         </td>
         <td style="padding: 8px 0;">Toggle help menu</td>
       </tr>
+      <tr style="border-bottom: 1px solid #3a3a4e;">
+        <td style="padding: 8px 16px 8px 0; font-family: monospace; color: #8a8aaa;">
+          <kbd style="background: #1a1a2e; padding: 2px 8px; border-radius: 4px; border: 1px solid #4a4a6a;">k</kbd>
+        </td>
+        <td style="padding: 8px 0;">Toggle Human Era (HE) calendar</td>
+      </tr>
       <tr>
         <td style="padding: 8px 16px 8px 0; font-family: monospace; color: #8a8aaa;">
           <kbd style="background: #1a1a2e; padding: 2px 8px; border-radius: 4px; border: 1px solid #4a4a6a;">Esc</kbd>

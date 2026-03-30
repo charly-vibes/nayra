@@ -10,6 +10,7 @@ import {
   terminateWorker,
 } from '../layout/layout-worker-manager.js';
 import { SpatialHash } from '../layout/spatial-hash.js';
+import { toDisplayYear } from '../ui/format.js';
 import { lightenColor } from './colors.js';
 import { applyDpiScaling, getLogicalSize } from './dpi-scaling.js';
 import { drawEventShapeIndicator, getShapeIndicatorLabelOffset } from './event-shapes.js';
@@ -588,7 +589,7 @@ function ordinalSuffix(n) {
   return `${abs}th`;
 }
 
-export function formatTime(timeValue, unit, interval) {
+export function formatTime(timeValue, unit, interval, calendar) {
   if (unit === 'Ga') {
     const gaAbs = timeValue < 0n ? -timeValue : timeValue;
     const gaWhole = gaAbs / BILLION_YEARS;
@@ -617,6 +618,11 @@ export function formatTime(timeValue, unit, interval) {
   }
 
   if (unit === 'ky') {
+    if (calendar === 'holocene') {
+      const yearsFromEpoch = Number(timeValue / YEAR);
+      const year = 1970 + yearsFromEpoch;
+      return toDisplayYear(year, 'holocene');
+    }
     const kyAbs = timeValue < 0n ? -timeValue : timeValue;
     const kyWhole = kyAbs / (YEAR * 1000n);
     const kyInt = Number(kyWhole);
@@ -641,6 +647,9 @@ export function formatTime(timeValue, unit, interval) {
 
   if (unit === 'y') {
     const yr = date.getUTCFullYear();
+    if (calendar === 'holocene') {
+      return toDisplayYear(yr, 'holocene');
+    }
     if (yr > 0) {
       if (interval !== undefined && interval >= YEAR * 100n) {
         const century = Math.ceil(yr / 100);
@@ -730,7 +739,7 @@ function drawGridAndLabels(state, width, height, axisY) {
   while (gridTime <= viewportEnd && gridCount < maxGridLines) {
     const x = projectToScreen(gridTime, state.viewportStart, state.scale);
     if (x >= -1 && x <= width + 1) {
-      const label = formatTime(gridTime, unit, interval);
+      const label = formatTime(gridTime, unit, interval, state.calendar);
       ticks.push({ x, gridTime, label });
     }
     gridTime = gridTime + interval;

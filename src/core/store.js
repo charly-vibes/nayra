@@ -16,6 +16,7 @@ export function createStore(initialState = {}) {
     filterMode: 'OR',
     categoryFilterIds: null,
     activeFilterIds: null,
+    calendar: 'gregorian',
     selectedEventIds: new Set(),
     hoveredEventId: null,
     focusedEventId: null,
@@ -150,7 +151,7 @@ function reduce(state, action) {
       };
 
     case 'RESTORE_FROM_URL': {
-      const { searchQuery = '', selectedCategories = [], filterMode = 'OR' } = action;
+      const { searchQuery = '', selectedCategories = [], filterMode = 'OR', calendar = 'gregorian' } = action;
       const searchResultIds = filterEvents(state.events, searchQuery);
       const categoryFilterIds =
         selectedCategories.length > 0 ? filterByCategories(state.events, selectedCategories, filterMode) : null;
@@ -161,6 +162,7 @@ function reduce(state, action) {
         currentResultIndex: 0,
         selectedCategories,
         filterMode,
+        calendar,
         categoryFilterIds,
         activeFilterIds: computeActiveFilter(searchResultIds, categoryFilterIds),
       };
@@ -183,6 +185,9 @@ function reduce(state, action) {
       const idx = Math.max(0, Math.min(action.index, state.searchResultIds.length - 1));
       return { ...state, currentResultIndex: idx };
     }
+
+    case 'SET_CALENDAR':
+      return { ...state, calendar: action.calendar };
 
     case 'SELECT_EVENT':
       return { ...state, selectedEventIds: new Set([action.eventId]) };

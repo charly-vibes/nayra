@@ -16,9 +16,9 @@ import { formatTimeRange } from '../ui/format.js';
  * @param {Object} event - Timeline event object
  * @returns {string}
  */
-export function buildEventAriaLabel(event) {
+export function buildEventAriaLabel(event, calendar) {
   const title = event.title || event.label || '';
-  const dateRange = formatTimeRange(event);
+  const dateRange = formatTimeRange(event, calendar);
   return `${title} on ${dateRange}`;
 }
 

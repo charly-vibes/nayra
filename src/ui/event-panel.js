@@ -128,13 +128,13 @@ export function createEventPanel(container, { onClose }) {
     return overlay.style.display !== 'none';
   }
 
-  function update(events) {
+  function update(events, calendar) {
     if (!events || events.length === 0) return;
 
     const event = events[0];
 
     titleEl.textContent = event.label || 'Untitled';
-    timeEl.textContent = formatTimeRange(event);
+    timeEl.textContent = formatTimeRange(event, calendar);
 
     if (event.description) {
       descEl.textContent = event.description;

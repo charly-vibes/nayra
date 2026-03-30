@@ -28,36 +28,42 @@ function formatMa(timeValue) {
   return String(Math.abs(ma));
 }
 
-function formatYear(timeValue, precision) {
+export function toDisplayYear(astronomicalYear, calendar) {
+  if (calendar === 'holocene') {
+    const heYear = astronomicalYear + 10000;
+    if (heYear >= 1) return `${heYear} HE`;
+    return `${1 - heYear} BHE`;
+  }
+  if (astronomicalYear < 1) return `${1 - astronomicalYear} BCE`;
+  return String(astronomicalYear);
+}
+
+function formatYear(timeValue, precision, calendar) {
   const secondsFromEpoch = Number(timeValue);
 
   if (!Number.isFinite(secondsFromEpoch) || Math.abs(secondsFromEpoch) > 8.64e15 / 1000) {
     const yearsFromEpoch = Number(timeValue / YEAR);
     const year = 1970 + yearsFromEpoch;
-    if (year < 1) {
-      return `${1 - year} BCE`;
-    }
-    return String(year);
+    return toDisplayYear(year, calendar);
   }
 
   const date = new Date(secondsFromEpoch * 1000);
   const year = date.getUTCFullYear();
 
-  if (precision === 'day') {
-    const month = MONTHS[date.getUTCMonth()];
-    const day = date.getUTCDate();
-    return `${month} ${day}, ${year}`;
+  if (calendar !== 'holocene') {
+    if (precision === 'day') {
+      const month = MONTHS[date.getUTCMonth()];
+      const day = date.getUTCDate();
+      return `${month} ${day}, ${year}`;
+    }
+
+    if (precision === 'month') {
+      const month = MONTHS[date.getUTCMonth()];
+      return `${month} ${year}`;
+    }
   }
 
-  if (precision === 'month') {
-    const month = MONTHS[date.getUTCMonth()];
-    return `${month} ${year}`;
-  }
-
-  if (year < 1) {
-    return `${1 - year} BCE`;
-  }
-  return String(year);
+  return toDisplayYear(year, calendar);
 }
 
 function needsCirca(precision) {
@@ -66,7 +72,7 @@ function needsCirca(precision) {
   );
 }
 
-export function formatTimeRange(event) {
+export function formatTimeRange(event, calendar) {
   const { start, end, precision } = event;
   const scale = getTimeScale(start);
   const prefix = needsCirca(precision) ? 'c. ' : '';
@@ -97,9 +103,14 @@ export function formatTimeRange(event) {
     const startYear = timeToYear(start);
     const endYear = timeToYear(end);
     if (startYear !== endYear) {
-      return `${prefix}${startYear} – ${endYear}`;
+      const startLabel = toDisplayYear(startYear, calendar);
+      const endLabel = toDisplayYear(endYear, calendar);
+      const suffix = calendar === 'holocene' ? ' HE' : '';
+      const startClean = startLabel.replace(/ (?:HE|BHE|BCE)$/, '');
+      const endClean = endLabel.replace(/ (?:HE|BHE|BCE)$/, '');
+      return `${prefix}${startClean} – ${endClean}${suffix}`;
     }
   }
 
-  return `${prefix}${formatYear(start, precision)}`;
+  return `${prefix}${formatYear(start, precision, calendar)}`;
 }

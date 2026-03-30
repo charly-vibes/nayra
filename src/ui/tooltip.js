@@ -46,9 +46,9 @@ export function createTooltip(container) {
     return element.style.display !== 'none';
   }
 
-  function update(event, x, y) {
+  function update(event, x, y, calendar) {
     labelEl.textContent = event.label || 'Untitled';
-    timeEl.textContent = formatTimeRange(event);
+    timeEl.textContent = formatTimeRange(event, calendar);
 
     let left = x + OFFSET_X;
     let top = y + OFFSET_Y;

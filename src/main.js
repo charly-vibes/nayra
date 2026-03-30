@@ -224,7 +224,7 @@ function handleHoverChange(hoveredEventId) {
         const state = store.getState();
         const event = state.events.find((e) => e.id === hoveredEventId);
         if (event && state.hoveredEventId === hoveredEventId) {
-          tooltip.update(event, mouseX, mouseY);
+          tooltip.update(event, mouseX, mouseY, state.calendar);
           tooltip.show();
         }
       }, 500);
@@ -330,6 +330,7 @@ const debouncedSyncUrl = createDebouncedSearch((state) => {
     filterMode: state.filterMode,
     viewportStart: state.viewportStart,
     spp: state.scale.getSecondsPerPixel(),
+    calendar: state.calendar,
   });
   const newHash = hash || (window.location.hash ? '' : undefined);
   if (newHash !== undefined && newHash !== window.location.hash) {
@@ -340,16 +341,19 @@ const debouncedSyncUrl = createDebouncedSearch((state) => {
 // Restore state from URL hash on browser back/forward
 window.addEventListener('hashchange', () => {
   const restored = decodeSearchState(window.location.hash);
-  if (restored.searchQuery || restored.selectedCategories.length > 0) {
+  if (restored.searchQuery || restored.selectedCategories.length > 0 || restored.calendar === 'holocene') {
     store.dispatch({ type: 'RESTORE_FROM_URL', ...restored });
   } else {
     store.dispatch({ type: 'CLEAR_ALL_FILTERS' });
   }
 
-  const { viewportStart, spp } = decodeViewportState(window.location.hash);
+  const { viewportStart, spp, calendar } = decodeViewportState(window.location.hash);
   if (viewportStart !== null && spp !== null) {
     const scale = RationalScale.fromSecondsPerPixel(spp);
     store.dispatch({ type: 'SET_VIEWPORT', viewportStart, scale });
+  }
+  if (calendar) {
+    store.dispatch({ type: 'SET_CALENDAR', calendar });
   }
 });
 
@@ -366,7 +370,7 @@ initInput(
       const state = store.getState();
       const event = state.events.find((e) => e.id === eventId);
       if (event) {
-        eventPanel.update([event]);
+        eventPanel.update([event], state.calendar);
         eventPanel.show();
       }
     },
@@ -379,7 +383,7 @@ initInput(
         const state = store.getState();
         const event = state.events.find((e) => e.id === state.hoveredEventId);
         if (event) {
-          tooltip.update(event, x, y);
+          tooltip.update(event, x, y, state.calendar);
         }
       }
     },
@@ -388,7 +392,7 @@ initInput(
       if (targetType === 'event' && target) {
         const actions = buildEventActions(target, store, {
           onShowDetails: (ev) => {
-            eventPanel.update([ev]);
+            eventPanel.update([ev], store.getState().calendar);
             eventPanel.show();
           },
         });
@@ -431,9 +435,9 @@ async function init() {
     store.dispatch({ type: 'SET_VIEWPORT', viewportStart, scale });
   }
 
-  // Restore search/filter state from URL hash (if present)
+  // Restore search/filter/calendar state from URL hash (if present)
   const urlState = decodeSearchState(window.location.hash);
-  if (urlState.searchQuery || urlState.selectedCategories.length > 0) {
+  if (urlState.searchQuery || urlState.selectedCategories.length > 0 || urlState.calendar === 'holocene') {
     store.dispatch({ type: 'RESTORE_FROM_URL', ...urlState });
   }
 

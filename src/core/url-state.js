@@ -64,7 +64,7 @@ export function parseHashString(hash) {
  * @param {{ searchQuery: string, selectedCategories: string[], filterMode: string }} state
  * @returns {string} Hash string (e.g. '#q=Moon&cats=Science,Military&mode=AND'), or ''
  */
-export function encodeSearchState({ searchQuery, selectedCategories, filterMode }) {
+export function encodeSearchState({ searchQuery, selectedCategories, filterMode, calendar }) {
   const params = {};
 
   if (searchQuery) {
@@ -80,6 +80,10 @@ export function encodeSearchState({ searchQuery, selectedCategories, filterMode 
     params.mode = filterMode;
   }
 
+  if (calendar === 'holocene') {
+    params.cal = 'he';
+  }
+
   return buildHashString(params);
 }
 
@@ -89,7 +93,7 @@ export function encodeSearchState({ searchQuery, selectedCategories, filterMode 
  * @param {{ searchQuery: string, selectedCategories: string[], filterMode: string, viewportStart: bigint, spp: number }} state
  * @returns {string} Hash string, or ''
  */
-export function encodeAllState({ searchQuery, selectedCategories, filterMode, viewportStart, spp }) {
+export function encodeAllState({ searchQuery, selectedCategories, filterMode, viewportStart, spp, calendar }) {
   const params = {};
 
   if (searchQuery) {
@@ -112,6 +116,10 @@ export function encodeAllState({ searchQuery, selectedCategories, filterMode, vi
     params.spp = String(spp);
   }
 
+  if (calendar === 'holocene') {
+    params.cal = 'he';
+  }
+
   return buildHashString(params);
 }
 
@@ -127,9 +135,10 @@ export function decodeViewportState(hash) {
     const params = parseHashString(hash);
     const viewportStart = params.vs != null ? BigInt(params.vs) : null;
     const spp = params.spp != null ? Number(params.spp) : null;
-    return { viewportStart, spp };
+    const calendar = params.cal === 'he' ? 'holocene' : 'gregorian';
+    return { viewportStart, spp, calendar };
   } catch {
-    return { viewportStart: null, spp: null };
+    return { viewportStart: null, spp: null, calendar: 'gregorian' };
   }
 }
 
@@ -141,7 +150,7 @@ export function decodeViewportState(hash) {
  * @returns {{ searchQuery: string, selectedCategories: string[], filterMode: string }}
  */
 export function decodeSearchState(hash) {
-  const defaults = { searchQuery: '', selectedCategories: [], filterMode: 'OR' };
+  const defaults = { searchQuery: '', selectedCategories: [], filterMode: 'OR', calendar: 'gregorian' };
 
   try {
     const params = parseHashString(hash);
@@ -152,7 +161,9 @@ export function decodeSearchState(hash) {
 
     const filterMode = params.mode === 'AND' ? 'AND' : 'OR';
 
-    return { searchQuery, selectedCategories, filterMode };
+    const calendar = params.cal === 'he' ? 'holocene' : 'gregorian';
+
+    return { searchQuery, selectedCategories, filterMode, calendar };
   } catch {
     return defaults;
   }

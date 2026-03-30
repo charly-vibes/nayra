@@ -27,6 +27,7 @@ export const KEYBOARD_SHORTCUTS = {
   H: 'jumpToFirst',
   L: 'jumpToLast',
   h: 'jumpToToday',
+  k: 'toggleCalendar',
   '/': 'openSearch',
   '?': 'toggleHelp',
   f: 'toggleFilter',
@@ -570,7 +571,11 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
     }
 
     const action = KEYBOARD_SHORTCUTS[e.key];
-    if (action === 'jumpToToday') {
+    if (action === 'toggleCalendar') {
+      const state = store.getState();
+      const next = state.calendar === 'holocene' ? 'gregorian' : 'holocene';
+      store.dispatch({ type: 'SET_CALENDAR', calendar: next });
+    } else if (action === 'jumpToToday') {
       const state = store.getState();
       const { viewportStart, scale } = jumpToToday(state.canvasWidth);
       store.dispatch({ type: 'SET_VIEWPORT', viewportStart, scale });

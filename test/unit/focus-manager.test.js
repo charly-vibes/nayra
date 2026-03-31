@@ -295,6 +295,68 @@ describe('FocusManager', () => {
     });
   });
 
+  describe('point events (no end)', () => {
+    it('handles focus on a point event without throwing', () => {
+      store.dispatch({
+        type: 'SET_EVENTS',
+        events: [
+          { id: 'point-1', start: 100n },
+          { id: 'event-2', start: 300n, end: 400n },
+        ],
+      });
+      expect(() => focusManager.setFocus('point-1')).not.toThrow();
+      expect(store.getState().focusedEventId).toBe('point-1');
+    });
+
+    it('findNearestEvent uses start as midpoint for point events', () => {
+      store.dispatch({
+        type: 'SET_EVENTS',
+        events: [
+          { id: 'point-1', start: 100n },
+          { id: 'event-2', start: 300n, end: 400n },
+        ],
+      });
+      // point-1 midpoint is 100n, event-2 midpoint is 350n
+      // 200n is 100n from point-1 and 150n from event-2
+      const nearest = focusManager.findNearestEvent(200n);
+      expect(nearest).toBe('point-1');
+    });
+
+    it('restores focus to nearest event when point event is filtered', () => {
+      store.dispatch({
+        type: 'SET_EVENTS',
+        events: [
+          { id: 'point-1', start: 300n },
+          { id: 'event-2', start: 500n, end: 600n },
+        ],
+      });
+      focusManager.setFocus('point-1');
+
+      // Remove point-1, focus should restore to event-2
+      store.dispatch({
+        type: 'SET_EVENTS',
+        events: [{ id: 'event-2', start: 500n, end: 600n }],
+      });
+      expect(store.getState().focusedEventId).toBe('event-2');
+    });
+
+    it('navigates between point events and range events', () => {
+      store.dispatch({
+        type: 'SET_EVENTS',
+        events: [
+          { id: 'point-1', start: 100n },
+          { id: 'event-2', start: 300n, end: 400n },
+          { id: 'point-3', start: 500n },
+        ],
+      });
+      focusManager.setFocus('point-1');
+      focusManager.focusNext();
+      expect(store.getState().focusedEventId).toBe('event-2');
+      focusManager.focusNext();
+      expect(store.getState().focusedEventId).toBe('point-3');
+    });
+  });
+
   describe('error handling', () => {
     it('handles focus on non-existent event ID', () => {
       focusManager.setFocus('non-existent');

@@ -24,7 +24,9 @@ export function createFocusManager(store, ariaLiveElement = null) {
       const focusedEvent = state.events.find((e) => e.id === state.focusedEventId);
       if (focusedEvent) {
         // Update last known position
-        lastKnownPosition = focusedEvent.start + (focusedEvent.end - focusedEvent.start) / 2n;
+        lastKnownPosition = focusedEvent.end != null
+          ? focusedEvent.start + (focusedEvent.end - focusedEvent.start) / 2n
+          : focusedEvent.start;
       } else {
         // Focused event no longer exists, restore focus
         if (lastKnownPosition !== null && state.events.length > 0) {
@@ -112,7 +114,9 @@ export function createFocusManager(store, ariaLiveElement = null) {
 
     for (const event of state.events) {
       // Calculate midpoint of event
-      const midpoint = event.start + (event.end - event.start) / 2n;
+      const midpoint = event.end != null
+        ? event.start + (event.end - event.start) / 2n
+        : event.start;
       const distance = midpoint > targetTime ? midpoint - targetTime : targetTime - midpoint;
 
       if (minDistance === null || distance < minDistance) {

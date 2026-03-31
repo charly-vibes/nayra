@@ -115,8 +115,7 @@ export function createFocusManager(store, ariaLiveElement = null) {
 
     for (const event of state.events) {
       // Calculate midpoint of event
-      const midpoint =
-        event.end != null ? event.start + (event.end - event.start) / 2n : event.start;
+      const midpoint = event.end != null ? event.start + (event.end - event.start) / 2n : event.start;
       const distance = midpoint > targetTime ? midpoint - targetTime : targetTime - midpoint;
 
       if (minDistance === null || distance < minDistance) {

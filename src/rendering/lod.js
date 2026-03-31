@@ -142,12 +142,12 @@ export function shouldShowFullLabels(lod) {
  */
 export function getMinEventWidth(lod) {
   if (lod === LOD_MICRO) {
-    return 4; // Show small durations
+    return 8;
   }
   if (lod === LOD_MESO) {
-    return 6; // Slightly larger minimum
+    return 10;
   }
-  return 8; // Macro: only show significant durations
+  return 12;
 }
 
 /**

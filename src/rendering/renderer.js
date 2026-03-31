@@ -298,6 +298,18 @@ export function draw(state) {
   ctx.lineTo(width, axisY);
   ctx.stroke();
 
+  // Draw lane baselines so events have a visual anchor
+  ctx.strokeStyle = 'rgba(100, 100, 140, 0.15)';
+  ctx.lineWidth = 1;
+  for (let lane = 0; lane < Math.max(1, laneCount); lane++) {
+    const laneY = getLaneY(lane, axisY, currentLaneConfig);
+    const centerY = Math.round(laneY + currentLaneConfig.laneHeight / 2) + 0.5;
+    ctx.beginPath();
+    ctx.moveTo(0, centerY);
+    ctx.lineTo(width, centerY);
+    ctx.stroke();
+  }
+
   // Build Set for O(1) lookups during rendering (uses combined active filter)
   const searchResultSet = state.activeFilterIds ? new Set(state.activeFilterIds) : null;
 

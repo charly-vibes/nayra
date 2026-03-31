@@ -138,33 +138,33 @@ describe('LOD System', () => {
   });
 
   describe('getMinEventWidth', () => {
-    it('should return 4px at MICRO level', () => {
-      expect(getMinEventWidth(LOD_MICRO)).toBe(4);
+    it('should return 8px at MICRO level', () => {
+      expect(getMinEventWidth(LOD_MICRO)).toBe(8);
     });
 
-    it('should return 6px at MESO level', () => {
-      expect(getMinEventWidth(LOD_MESO)).toBe(6);
+    it('should return 10px at MESO level', () => {
+      expect(getMinEventWidth(LOD_MESO)).toBe(10);
     });
 
-    it('should return 8px at MACRO level', () => {
-      expect(getMinEventWidth(LOD_MACRO)).toBe(8);
+    it('should return 12px at MACRO level', () => {
+      expect(getMinEventWidth(LOD_MACRO)).toBe(12);
     });
   });
 
   describe('shouldRenderAsPoint', () => {
     it('should render as point when width is below minimum at MICRO', () => {
-      expect(shouldRenderAsPoint(2, LOD_MICRO)).toBe(true);
-      expect(shouldRenderAsPoint(4, LOD_MICRO)).toBe(false);
+      expect(shouldRenderAsPoint(6, LOD_MICRO)).toBe(true);
+      expect(shouldRenderAsPoint(8, LOD_MICRO)).toBe(false);
     });
 
     it('should render as point when width is below minimum at MESO', () => {
-      expect(shouldRenderAsPoint(5, LOD_MESO)).toBe(true);
-      expect(shouldRenderAsPoint(6, LOD_MESO)).toBe(false);
+      expect(shouldRenderAsPoint(9, LOD_MESO)).toBe(true);
+      expect(shouldRenderAsPoint(10, LOD_MESO)).toBe(false);
     });
 
     it('should render as point when width is below minimum at MACRO', () => {
-      expect(shouldRenderAsPoint(7, LOD_MACRO)).toBe(true);
-      expect(shouldRenderAsPoint(8, LOD_MACRO)).toBe(false);
+      expect(shouldRenderAsPoint(11, LOD_MACRO)).toBe(true);
+      expect(shouldRenderAsPoint(12, LOD_MACRO)).toBe(false);
     });
   });
 });

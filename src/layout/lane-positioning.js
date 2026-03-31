@@ -56,7 +56,7 @@ export function getTotalHeight(laneCount, config = {}) {
 }
 
 const TOP_LANE_PADDING = 40; // pixels reserved above the topmost lane
-const MAX_LANE_HEIGHT = 120; // cap so events don't become absurdly tall
+const MAX_LANE_HEIGHT = 40; // cap so lanes don't balloon with sparse data
 const MIN_LANE_HEIGHT = 20; // floor so events stay readable
 
 /**

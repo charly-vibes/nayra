@@ -242,8 +242,8 @@ describe('lane-positioning', () => {
     it('fills available height for a single lane', () => {
       const axisY = 500;
       const config = getDynamicLaneConfig(axisY, 1);
-      // Single lane should be large (up to MAX_LANE_HEIGHT)
-      expect(config.laneHeight).toBe(120);
+      // Single lane should be capped at MAX_LANE_HEIGHT
+      expect(config.laneHeight).toBe(40);
     });
 
     it('scales down for many lanes', () => {
@@ -261,7 +261,7 @@ describe('lane-positioning', () => {
 
     it('never exceeds maximum lane height', () => {
       const config = getDynamicLaneConfig(400, 1);
-      expect(config.laneHeight).toBeLessThanOrEqual(120);
+      expect(config.laneHeight).toBeLessThanOrEqual(40);
     });
 
     it('all lanes fit within available canvas height', () => {

@@ -37,6 +37,7 @@ if (missing.length > 0) {
 
 const canvas = document.getElementById('timeline-canvas');
 const store = createStore();
+let currentExample = null;
 
 // Skip navigation links: first focusable elements on the page (WCAG 2.4.1)
 createSkipLinks(document.body, [
@@ -90,8 +91,10 @@ const searchBar = createSearchBar(document.body, {
 async function handleExampleLoad(exampleOrFile) {
   let result;
   if (typeof exampleOrFile === 'string') {
+    currentExample = exampleOrFile;
     result = await loadExample(exampleOrFile);
   } else {
+    currentExample = null;
     result = await loadFromFile(exampleOrFile);
   }
 
@@ -331,6 +334,7 @@ const debouncedSyncUrl = createDebouncedSearch((state) => {
     viewportStart: state.viewportStart,
     spp: state.scale.getSecondsPerPixel(),
     calendar: state.calendar,
+    example: currentExample,
   });
   const newHash = hash || (window.location.hash ? '' : undefined);
   if (newHash !== undefined && newHash !== window.location.hash) {
@@ -405,8 +409,10 @@ initInput(
 );
 
 async function init() {
+  const hashState = decodeViewportState(window.location.hash);
   const params = new URLSearchParams(window.location.search);
-  const exampleName = params.get('example') || DEFAULT_EXAMPLE;
+  const exampleName = hashState.example || params.get('example') || DEFAULT_EXAMPLE;
+  currentExample = exampleName;
 
   const result = await loadExample(exampleName);
 

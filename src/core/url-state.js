@@ -93,7 +93,7 @@ export function encodeSearchState({ searchQuery, selectedCategories, filterMode,
  * @param {{ searchQuery: string, selectedCategories: string[], filterMode: string, viewportStart: bigint, spp: number }} state
  * @returns {string} Hash string, or ''
  */
-export function encodeAllState({ searchQuery, selectedCategories, filterMode, viewportStart, spp, calendar }) {
+export function encodeAllState({ searchQuery, selectedCategories, filterMode, viewportStart, spp, calendar, example }) {
   const params = {};
 
   if (searchQuery) {
@@ -120,6 +120,10 @@ export function encodeAllState({ searchQuery, selectedCategories, filterMode, vi
     params.cal = 'he';
   }
 
+  if (example) {
+    params.ex = example;
+  }
+
   return buildHashString(params);
 }
 
@@ -136,9 +140,10 @@ export function decodeViewportState(hash) {
     const viewportStart = params.vs != null ? BigInt(params.vs) : null;
     const spp = params.spp != null ? Number(params.spp) : null;
     const calendar = params.cal === 'he' ? 'holocene' : 'gregorian';
-    return { viewportStart, spp, calendar };
+    const example = params.ex || null;
+    return { viewportStart, spp, calendar, example };
   } catch {
-    return { viewportStart: null, spp: null, calendar: 'gregorian' };
+    return { viewportStart: null, spp: null, calendar: 'gregorian', example: null };
   }
 }
 

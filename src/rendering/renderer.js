@@ -392,6 +392,10 @@ function drawCluster(cluster, state, axisY, canvasWidth, viewportEnd) {
   const x = cluster.centerX;
   if (x < 0 || x > canvasWidth) return;
 
+  // Position cluster at the centered lane band, not at the bottom axis
+  const laneY = getLaneY(0, axisY, currentLaneConfig);
+  const clusterY = laneY + currentLaneConfig.laneHeight / 2;
+
   // Cluster marker size based on count
   const baseRadius = 12;
   const maxRadius = 24;
@@ -403,7 +407,7 @@ function drawCluster(cluster, state, axisY, canvasWidth, viewportEnd) {
   ctx.lineWidth = 2;
 
   ctx.beginPath();
-  ctx.arc(x, axisY, radius, 0, Math.PI * 2);
+  ctx.arc(x, clusterY, radius, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
 
@@ -412,7 +416,7 @@ function drawCluster(cluster, state, axisY, canvasWidth, viewportEnd) {
   ctx.font = 'bold 12px sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(cluster.count.toString(), x, axisY);
+  ctx.fillText(cluster.count.toString(), x, clusterY);
 }
 
 function drawEvent(event, state, axisY, canvasWidth, lod, searchResultSet = null, laneConfig = null) {

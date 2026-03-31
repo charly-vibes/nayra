@@ -127,6 +127,14 @@ const SHORTCUTS_CONTENT = `
   </p>
 
   <h2 style="margin: 24px 0 16px 0; color: #ffffff; font-size: 20px; font-weight: 600;">
+    Event Shapes
+  </h2>
+  <ul style="margin: 0; padding: 0 0 0 20px; line-height: 1.8;">
+    <li><strong>&#x25C7; Diamond:</strong> Point event (a single moment in time)</li>
+    <li><strong>&#x25AC; Bar:</strong> Range event (a duration with start and end)</li>
+  </ul>
+
+  <h2 style="margin: 24px 0 16px 0; color: #ffffff; font-size: 20px; font-weight: 600;">
     Mouse & Keyboard Navigation
   </h2>
   <ul style="margin: 0; padding: 0 0 0 20px; line-height: 1.8;">

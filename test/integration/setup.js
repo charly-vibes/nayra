@@ -15,6 +15,7 @@ function createMockContext() {
     lineTo: vi.fn(),
     stroke: vi.fn(),
     fill: vi.fn(),
+    closePath: vi.fn(),
     fillText: vi.fn(),
     setTransform: vi.fn(),
     scale: vi.fn(),

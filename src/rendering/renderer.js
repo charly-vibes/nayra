@@ -443,17 +443,33 @@ function drawEvent(event, state, axisY, canvasWidth, lod, searchResultSet = null
   ctx.fillStyle = fillColor;
 
   if (renderAsPoint) {
-    // Render as a point (small square or circle)
+    // Render as a diamond — the standard milestone/instant symbol in Gantt charts.
+    // Diamond is maximally distinct from rectangular range bars and readable at 6-8px.
     const pointSize = minWidth;
-    ctx.fillRect(x - pointSize / 2, y + (eventHeight - pointSize) / 2, pointSize, pointSize);
+    const cx = x;
+    const cy = y + eventHeight / 2;
+    const half = pointSize / 2;
+
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - half); // top
+    ctx.lineTo(cx + half, cy); // right
+    ctx.lineTo(cx, cy + half); // bottom
+    ctx.lineTo(cx - half, cy); // left
+    ctx.closePath();
+    ctx.fill();
 
     ctx.strokeStyle = strokeStyle.color;
     ctx.lineWidth = strokeStyle.lineWidth;
     if (isSelected) {
-      ctx.strokeRect(x - pointSize / 2 - 1, y + (eventHeight - pointSize) / 2 - 1, pointSize + 2, pointSize + 2);
-    } else {
-      ctx.strokeRect(x - pointSize / 2, y + (eventHeight - pointSize) / 2, pointSize, pointSize);
+      const s = half + 1;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - s);
+      ctx.lineTo(cx + s, cy);
+      ctx.lineTo(cx, cy + s);
+      ctx.lineTo(cx - s, cy);
+      ctx.closePath();
     }
+    ctx.stroke();
   } else {
     // Render as a duration bar
     ctx.fillRect(x, y, displayWidth, eventHeight);

@@ -67,28 +67,36 @@ describe('LOD System', () => {
   });
 
   describe('getEventPriority', () => {
-    it('should return event priority if defined', () => {
-      const event = { id: 'test', priority: PRIORITY_HIGH };
+    it('should invert data priority (0=critical → PRIORITY_HIGH)', () => {
+      const event = { id: 'test', priority: 0 };
       expect(getEventPriority(event)).toBe(PRIORITY_HIGH);
     });
 
-    it('should return PRIORITY_MEDIUM as default', () => {
+    it('should return PRIORITY_MEDIUM as default when unset', () => {
       const event = { id: 'test' };
       expect(getEventPriority(event)).toBe(PRIORITY_MEDIUM);
     });
 
-    it('should handle priority 0 (low)', () => {
-      const event = { id: 'test', priority: PRIORITY_LOW };
+    it('should map data priority 1 to PRIORITY_MEDIUM', () => {
+      const event = { id: 'test', priority: 1 };
+      expect(getEventPriority(event)).toBe(PRIORITY_MEDIUM);
+    });
+
+    it('should map data priority 2+ to PRIORITY_LOW', () => {
+      const event = { id: 'test', priority: 2 };
       expect(getEventPriority(event)).toBe(PRIORITY_LOW);
+      const event3 = { id: 'test', priority: 5 };
+      expect(getEventPriority(event3)).toBe(PRIORITY_LOW);
     });
   });
 
   describe('filterEventsByLOD', () => {
+    // Data priorities: 0=critical, 1=medium, 2=low (P0/P1/P2 convention)
     const events = [
-      { id: '1', priority: PRIORITY_LOW },
-      { id: '2', priority: PRIORITY_MEDIUM },
-      { id: '3', priority: PRIORITY_HIGH },
-      { id: '4' }, // Default to medium
+      { id: '1', priority: 0 }, // critical → internal HIGH
+      { id: '2', priority: 1 }, // medium → internal MEDIUM
+      { id: '3', priority: 2 }, // low → internal LOW
+      { id: '4' }, // unset → internal MEDIUM
     ];
 
     it('should show all events at MICRO level', () => {
@@ -99,13 +107,13 @@ describe('LOD System', () => {
     it('should show medium and high priority events at MESO level', () => {
       const filtered = filterEventsByLOD(events, LOD_MESO);
       expect(filtered).toHaveLength(3);
-      expect(filtered.map((e) => e.id)).toEqual(['2', '3', '4']);
+      expect(filtered.map((e) => e.id)).toEqual(['1', '2', '4']);
     });
 
     it('should show only high priority events at MACRO level', () => {
       const filtered = filterEventsByLOD(events, LOD_MACRO);
       expect(filtered).toHaveLength(1);
-      expect(filtered[0].id).toBe('3');
+      expect(filtered[0].id).toBe('1');
     });
   });
 

@@ -71,14 +71,16 @@ export function determineLOD(secondsPerPixel, currentLOD = LOD_MICRO) {
 }
 
 /**
- * Get event priority, defaulting to medium if not specified
+ * Get event display priority, defaulting to medium if not specified.
+ * Data uses P0=critical convention (lower number = higher importance),
+ * so we invert: data 0 → PRIORITY_HIGH, data 2+ → PRIORITY_LOW.
  *
  * @param {Object} event - Event object
- * @returns {number} - Priority level (0-2)
+ * @returns {number} - Internal priority level (0=low, 2=high)
  */
 export function getEventPriority(event) {
   if (event.priority !== undefined && event.priority !== null) {
-    return event.priority;
+    return Math.max(0, PRIORITY_HIGH - event.priority);
   }
   return PRIORITY_MEDIUM;
 }

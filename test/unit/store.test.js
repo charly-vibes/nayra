@@ -219,6 +219,37 @@ describe('Store', () => {
     });
   });
 
+  describe('calendar', () => {
+    it('defaults to gregorian', () => {
+      const store = createStore();
+      expect(store.getState().calendar).toBe('gregorian');
+    });
+
+    it('SET_CALENDAR switches to holocene', () => {
+      const store = createStore();
+      store.dispatch({ type: 'SET_CALENDAR', calendar: 'holocene' });
+      expect(store.getState().calendar).toBe('holocene');
+    });
+
+    it('SET_CALENDAR switches back to gregorian', () => {
+      const store = createStore({ calendar: 'holocene' });
+      store.dispatch({ type: 'SET_CALENDAR', calendar: 'gregorian' });
+      expect(store.getState().calendar).toBe('gregorian');
+    });
+
+    it('RESTORE_FROM_URL restores calendar', () => {
+      const store = createStore();
+      store.dispatch({ type: 'RESTORE_FROM_URL', calendar: 'holocene' });
+      expect(store.getState().calendar).toBe('holocene');
+    });
+
+    it('RESTORE_FROM_URL defaults calendar to gregorian', () => {
+      const store = createStore({ calendar: 'holocene' });
+      store.dispatch({ type: 'RESTORE_FROM_URL' });
+      expect(store.getState().calendar).toBe('gregorian');
+    });
+  });
+
   describe('error handling', () => {
     it('ignores unknown action types', () => {
       const store = createStore();

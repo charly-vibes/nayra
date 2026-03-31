@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { buildHashString, decodeSearchState, encodeSearchState, parseHashString } from '../../src/core/url-state.js';
+import {
+  buildHashString,
+  decodeSearchState,
+  decodeViewportState,
+  encodeAllState,
+  encodeSearchState,
+  parseHashString,
+} from '../../src/core/url-state.js';
 
 // ---------------------------------------------------------------------------
 // Hash encoding / decoding
@@ -166,5 +173,67 @@ describe('decodeSearchState', () => {
   it('returns empty categories for missing cats param', () => {
     const state = decodeSearchState('#q=Moon');
     expect(state.selectedCategories).toEqual([]);
+  });
+});
+
+describe('Holocene calendar URL state', () => {
+  it('encodeSearchState emits cal=he for holocene', () => {
+    const hash = encodeSearchState({ searchQuery: '', selectedCategories: [], filterMode: 'OR', calendar: 'holocene' });
+    expect(hash).toContain('cal=he');
+  });
+
+  it('encodeSearchState omits cal for gregorian', () => {
+    const hash = encodeSearchState({
+      searchQuery: '',
+      selectedCategories: [],
+      filterMode: 'OR',
+      calendar: 'gregorian',
+    });
+    expect(hash).not.toContain('cal=');
+  });
+
+  it('encodeAllState emits cal=he for holocene', () => {
+    const hash = encodeAllState({
+      searchQuery: '',
+      selectedCategories: [],
+      filterMode: 'OR',
+      viewportStart: 0n,
+      spp: 1000,
+      calendar: 'holocene',
+    });
+    expect(hash).toContain('cal=he');
+  });
+
+  it('decodeSearchState reads cal=he as holocene', () => {
+    const state = decodeSearchState('#cal=he');
+    expect(state.calendar).toBe('holocene');
+  });
+
+  it('decodeSearchState defaults to gregorian without cal', () => {
+    const state = decodeSearchState('#q=test');
+    expect(state.calendar).toBe('gregorian');
+  });
+
+  it('decodeViewportState reads cal=he as holocene', () => {
+    const state = decodeViewportState('#vs=0&spp=1000&cal=he');
+    expect(state.calendar).toBe('holocene');
+  });
+
+  it('decodeViewportState defaults to gregorian without cal', () => {
+    const state = decodeViewportState('#vs=0&spp=1000');
+    expect(state.calendar).toBe('gregorian');
+  });
+
+  it('round-trips calendar through encodeAllState / decodeSearchState', () => {
+    const hash = encodeAllState({
+      searchQuery: 'test',
+      selectedCategories: [],
+      filterMode: 'OR',
+      viewportStart: 100n,
+      spp: 500,
+      calendar: 'holocene',
+    });
+    const decoded = decodeSearchState(hash);
+    expect(decoded.calendar).toBe('holocene');
   });
 });

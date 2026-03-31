@@ -546,19 +546,17 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
       return;
     }
 
-    // Handle Enter/Space to activate (select) focused event, or open already-selected event
+    // Handle Enter/Space to select and open focused event
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       const focusedEventId = focusManager ? focusManager.getFocus() : null;
       if (focusedEventId) {
-        const state = store.getState();
-        const alreadySelected = state.selectedEventIds.has(focusedEventId);
         store.dispatch({ type: 'SELECT_EVENT', eventId: focusedEventId });
-        if (alreadySelected && callbacks.onOpenSelectedEvent) {
+        if (callbacks.onOpenSelectedEvent) {
           callbacks.onOpenSelectedEvent(focusedEventId);
         }
       } else {
-        // Open the currently selected event's detail panel (nayra-1l2)
+        // No focused event — open the currently selected event's detail panel
         const state = store.getState();
         if (state.selectedEventIds.size > 0) {
           const [selectedId] = state.selectedEventIds;

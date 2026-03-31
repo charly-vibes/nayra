@@ -623,6 +623,17 @@ describe('Input', () => {
       expect(state.selectedEventIds.has('event-2')).toBe(true);
     });
 
+    it('Space key selects and opens focused event in one press', () => {
+      const onOpenSelectedEvent = vi.fn();
+      initInput(canvas, store, { onOpenSelectedEvent }, mockFocusManager);
+      mockFocusManager.getFocus = vi.fn(() => 'event-2');
+
+      triggerKeyDown(' ');
+
+      expect(store.getState().selectedEventIds.has('event-2')).toBe(true);
+      expect(onOpenSelectedEvent).toHaveBeenCalledWith('event-2');
+    });
+
     it('Enter does nothing when no event focused', () => {
       mockFocusManager.getFocus = vi.fn(() => null);
       store.dispatch({ type: 'SELECT_EVENT', eventId: 'event-1' });

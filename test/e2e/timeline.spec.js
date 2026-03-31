@@ -17,9 +17,7 @@ test.describe('Timeline Application', () => {
     await page.waitForTimeout(500);
 
     // Filter out known webkit-specific worker error that doesn't affect functionality
-    const meaningful = errors.filter(
-      (e) => e !== 'Layout worker error: Event',
-    );
+    const meaningful = errors.filter((e) => e !== 'Layout worker error: Event');
     expect(meaningful).toEqual([]);
   });
 
@@ -88,9 +86,9 @@ test.describe('Timeline Rendering', () => {
     expect(screenshot.length).toBeGreaterThan(0);
   });
 
-  test('requestAnimationFrame loop is running', async ({ page, browserName }) => {
+  test('on-demand rendering fires rAF on state change', async ({ page, browserName }) => {
     // Headless webkit does not reliably fire requestAnimationFrame callbacks
-    test.skip(browserName === 'webkit', 'RAF loop unreliable in headless webkit');
+    test.skip(browserName === 'webkit', 'RAF unreliable in headless webkit');
 
     const rafCount = await page.evaluate(() => {
       return new Promise((resolve) => {
@@ -100,10 +98,13 @@ test.describe('Timeline Rendering', () => {
           count++;
           return original(cb);
         };
+        // Trigger a state change to cause a render
+        window.dispatchEvent(new Event('resize'));
         setTimeout(() => resolve(count), 200);
       });
     });
 
-    expect(rafCount).toBeGreaterThan(5);
+    // On-demand renderer: at least 1 rAF for the triggered render
+    expect(rafCount).toBeGreaterThanOrEqual(1);
   });
 });

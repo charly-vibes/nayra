@@ -41,6 +41,8 @@ const spatialHash = new SpatialHash();
 let layoutRevision = -1; // Track when layout needs recalculation
 let currentLOD = LOD_MICRO; // Current level of detail
 let clusters = []; // Current event clusters (for macro zoom)
+let lodFilteredEventsCache = []; // Cached LOD-filtered events
+let drawRevision = -1; // Track when draw-phase caches need refresh
 let pendingLayoutRevision = -1; // Track pending async layout calculation
 let isLayoutPending = false; // Flag to prevent duplicate layout requests
 
@@ -88,8 +90,10 @@ export function destroy() {
   currentLaneConfig = { ...LANE_CONFIG };
   spatialHash.clear();
   layoutRevision = -1;
+  drawRevision = -1;
   currentLOD = LOD_MICRO;
   clusters = [];
+  lodFilteredEventsCache = [];
   pendingLayoutRevision = -1;
   isLayoutPending = false;
 }
@@ -269,22 +273,28 @@ export function draw(state) {
   const secondsPerPixel = state.scale.getSecondsPerPixel();
   currentLOD = determineLOD(secondsPerPixel, currentLOD);
 
-  // Filter events by LOD before layout
-  const lodFilteredEvents = filterEventsByLOD(state.events, currentLOD);
+  // Only recalculate filtering, clustering, and layout when state has changed
+  if (drawRevision !== state.revision) {
+    drawRevision = state.revision;
 
-  // Apply clustering at macro zoom level
-  if (currentLOD === LOD_MACRO) {
-    clusters = clusterEvents(lodFilteredEvents, state.viewportStart, state.scale);
-  } else {
-    clusters = [];
+    // Filter events by LOD before layout
+    lodFilteredEventsCache = filterEventsByLOD(state.events, currentLOD);
+
+    // Apply clustering at macro zoom level
+    if (currentLOD === LOD_MACRO) {
+      clusters = clusterEvents(lodFilteredEventsCache, state.viewportStart, state.scale);
+    } else {
+      clusters = [];
+    }
+
+    // Calculate layout (only if state changed)
+    calculateLayout({ ...state, events: lodFilteredEventsCache }, axisY, state.viewportStart, state.scale, width);
+
+    // Update dynamic lane config based on current lane count and canvas height
+    currentLaneConfig = getDynamicLaneConfig(axisY, laneCount);
   }
 
-  // Calculate layout (only if state changed)
-  // For macro zoom with clustering, we still need layout for individual events within clusters
-  calculateLayout({ ...state, events: lodFilteredEvents }, axisY, state.viewportStart, state.scale, width);
-
-  // Update dynamic lane config based on current lane count and canvas height
-  currentLaneConfig = getDynamicLaneConfig(axisY, laneCount);
+  const lodFilteredEvents = lodFilteredEventsCache;
 
   ctx.fillStyle = '#1a1a2e';
   ctx.fillRect(0, 0, width, height);

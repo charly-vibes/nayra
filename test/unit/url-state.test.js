@@ -236,4 +236,47 @@ describe('Holocene calendar URL state', () => {
     const decoded = decodeSearchState(hash);
     expect(decoded.calendar).toBe('holocene');
   });
+
+  it('encodeAllState includes example param', () => {
+    const hash = encodeAllState({
+      viewportStart: 0n,
+      spp: 1000,
+      calendar: 'gregorian',
+      example: 'earth-history',
+    });
+    expect(hash).toContain('ex=earth-history');
+  });
+
+  it('encodeAllState omits example when null', () => {
+    const hash = encodeAllState({
+      viewportStart: 0n,
+      spp: 1000,
+      calendar: 'gregorian',
+      example: null,
+    });
+    expect(hash).not.toContain('ex=');
+  });
+
+  it('decodeViewportState extracts example', () => {
+    const state = decodeViewportState('#vs=0&spp=1000&ex=kurzgesagt-history');
+    expect(state.example).toBe('kurzgesagt-history');
+  });
+
+  it('decodeViewportState returns null example when absent', () => {
+    const state = decodeViewportState('#vs=0&spp=1000');
+    expect(state.example).toBe(null);
+  });
+
+  it('round-trips example through encode / decodeViewportState', () => {
+    const hash = encodeAllState({
+      viewportStart: 500n,
+      spp: 2000,
+      calendar: 'gregorian',
+      example: 'space-exploration',
+    });
+    const decoded = decodeViewportState(hash);
+    expect(decoded.example).toBe('space-exploration');
+    expect(decoded.viewportStart).toBe(500n);
+    expect(decoded.spp).toBe(2000);
+  });
 });

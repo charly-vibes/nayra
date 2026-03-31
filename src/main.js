@@ -454,14 +454,25 @@ async function init() {
 init();
 
 let lastRenderedRevision = -1;
+let rafId = null;
 
 function loop() {
+  rafId = null;
   const state = store.getState();
   if (state.revision !== lastRenderedRevision) {
     draw(state);
     lastRenderedRevision = state.revision;
   }
-  requestAnimationFrame(loop);
 }
 
-requestAnimationFrame(loop);
+function scheduleRender() {
+  if (rafId === null) {
+    rafId = requestAnimationFrame(loop);
+  }
+}
+
+// Trigger render on state changes
+store.subscribe(() => scheduleRender());
+
+// Initial render
+scheduleRender();

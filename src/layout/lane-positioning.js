@@ -29,13 +29,13 @@ export const DEFAULT_CONFIG = {
 export function getLaneY(lane, axisY, config = {}) {
   const cfg = { ...DEFAULT_CONFIG, ...config };
 
-  // Lane 0 is centered on the axis
-  // Each subsequent lane is offset vertically
   const laneStride = cfg.laneHeight + cfg.laneSpacing;
-  const offset = lane * laneStride;
+  const laneOffset = lane * laneStride;
+  const verticalShift = cfg.verticalOffset || 0;
 
-  // Position lane 0 centered on axis, then offset up for additional lanes
-  return axisY - cfg.laneHeight / 2 - offset;
+  // Position lane 0 at axis, offset up for additional lanes, then shift
+  // the entire band toward the vertical center of available space.
+  return axisY - cfg.laneHeight / 2 - laneOffset - verticalShift;
 }
 
 /**
@@ -81,7 +81,12 @@ export function getDynamicLaneConfig(axisY, laneCount) {
     Math.min(MAX_LANE_HEIGHT, Math.floor((availableHeight - laneSpacing * (effectiveLanes - 1)) / effectiveLanes)),
   );
 
-  return { ...DEFAULT_CONFIG, laneHeight };
+  // Vertically center the lane band in the available space above the axis.
+  // Without this, lanes anchor to the axis leaving the top 90% empty.
+  const bandHeight = effectiveLanes * laneHeight + (effectiveLanes - 1) * laneSpacing;
+  const verticalOffset = Math.max(0, Math.floor((availableHeight - bandHeight) / 2));
+
+  return { ...DEFAULT_CONFIG, laneHeight, verticalOffset };
 }
 
 /**

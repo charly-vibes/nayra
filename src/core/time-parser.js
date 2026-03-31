@@ -92,9 +92,11 @@ export function parseTimeQuery(query) {
   }
 
   // Ga/BYA: billion years ago
+  // Clamp to ±100 Ga to avoid 100+ digit BigInts that hang Firefox's BigInt engine
+  const MAX_GA = 100;
   const gaMatch = trimmed.match(/^(-?\d+(?:\.\d+)?(?:e[+-]?\d+)?)\s*(ga|bya)$/);
   if (gaMatch) {
-    const value = parseFloat(gaMatch[1]);
+    const value = Math.max(-MAX_GA, Math.min(MAX_GA, parseFloat(gaMatch[1])));
     const seconds = BigInt(Math.round(value * Number(BILLION_YEARS)));
     return {
       success: true,
@@ -104,9 +106,10 @@ export function parseTimeQuery(query) {
   }
 
   // Ma/MYA: million years ago
+  const MAX_MA = MAX_GA * 1000;
   const maMatch = trimmed.match(/^(-?\d+(?:\.\d+)?(?:e[+-]?\d+)?)\s*(ma|mya)$/);
   if (maMatch) {
-    const value = parseFloat(maMatch[1]);
+    const value = Math.max(-MAX_MA, Math.min(MAX_MA, parseFloat(maMatch[1])));
     const seconds = BigInt(Math.round(value * Number(MILLION_YEARS)));
     return {
       success: true,

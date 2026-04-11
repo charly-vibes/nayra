@@ -19,7 +19,7 @@ export const PRIORITY_HIGH = 2;
 const MICRO_TO_MESO_THRESHOLD = Number(DAY) / 2; // 12 hours/px
 const MESO_TO_MICRO_THRESHOLD = Number(DAY) / 3; // 8 hours/px
 const MESO_TO_MACRO_THRESHOLD = Number(YEAR) * 50; // 50 years/px
-const MACRO_TO_MESO_THRESHOLD = Number(YEAR) * 30; // 30 years/px
+export const MACRO_TO_MESO_THRESHOLD = Number(YEAR) * 30; // 30 years/px
 
 /**
  * Determine the appropriate LOD level based on zoom

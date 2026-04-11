@@ -210,8 +210,15 @@ let mouseX = 0;
 let mouseY = 0;
 let hoverTimeout = null;
 let lastHoveredEventId = null;
+let clusterHoverTimeout = null;
+let hoveredCluster = null;
+let lastHoveredClusterKey = null;
 
 function handleHoverChange(hoveredEventId) {
+  if (hoveredCluster !== null) {
+    return;
+  }
+
   if (hoveredEventId !== lastHoveredEventId) {
     lastHoveredEventId = hoveredEventId;
 
@@ -233,6 +240,41 @@ function handleHoverChange(hoveredEventId) {
       }, 500);
     }
   }
+}
+
+function getClusterKey(cluster) {
+  if (!cluster) return null;
+  const eventIds = cluster.events?.map((event) => event.id).join(',') ?? '';
+  return `${cluster.minTime}:${cluster.maxTime}:${cluster.count}:${eventIds}`;
+}
+
+function handleClusterHoverChange(cluster) {
+  const clusterKey = getClusterKey(cluster);
+  if (clusterKey === lastHoveredClusterKey) {
+    return;
+  }
+
+  lastHoveredClusterKey = clusterKey;
+  hoveredCluster = cluster;
+
+  if (clusterHoverTimeout) {
+    clearTimeout(clusterHoverTimeout);
+    clusterHoverTimeout = null;
+  }
+
+  if (cluster === null) {
+    tooltip.hide();
+    handleHoverChange(store.getState().hoveredEventId);
+    return;
+  }
+
+  tooltip.hide();
+  clusterHoverTimeout = setTimeout(() => {
+    if (hoveredCluster === cluster) {
+      tooltip.update(cluster, mouseX, mouseY, store.getState().calendar);
+      tooltip.show();
+    }
+  }, 500);
 }
 
 function handleSelectionChange(_selectedEventIds) {
@@ -385,12 +427,17 @@ initInput(
       mouseY = y;
       if (tooltip.isVisible()) {
         const state = store.getState();
-        const event = state.events.find((e) => e.id === state.hoveredEventId);
-        if (event) {
-          tooltip.update(event, x, y, state.calendar);
+        if (hoveredCluster) {
+          tooltip.update(hoveredCluster, x, y, state.calendar);
+        } else {
+          const event = state.events.find((e) => e.id === state.hoveredEventId);
+          if (event) {
+            tooltip.update(event, x, y, state.calendar);
+          }
         }
       }
     },
+    onHoverClusterChange: handleClusterHoverChange,
     onContextMenu: ({ x, y, target, targetType }) => {
       tooltip.hide();
       if (targetType === 'event' && target) {

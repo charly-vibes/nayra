@@ -131,6 +131,56 @@ describe('|unit| event-clustering', () => {
       expect(clusters[0].events[1].id).toBe('e2');
       expect(clusters[0].events[2].id).toBe('e3');
     });
+
+    it('includes span events when their visible geometry intersects the cluster footprint', () => {
+      const events = [
+        { id: 'span', start: 0n, end: 200n },
+        { id: 'point', start: 220n },
+      ];
+
+      const clusters = clusterEvents(events, 0n, RationalScale.fromSecondsPerPixel(10), 100);
+
+      expect(clusters).toHaveLength(1);
+      expect(clusters[0].type).toBe('cluster');
+      expect(clusters[0].events.map((event) => event.id)).toEqual(['span', 'point']);
+    });
+
+    it('ignores events whose rendered geometry does not intersect the viewport', () => {
+      const events = [
+        { id: 'offscreen-left', start: -1000n, end: -900n },
+        { id: 'visible-a', start: 0n, end: 100n },
+        { id: 'visible-b', start: 120n, end: 180n },
+      ];
+
+      const clusters = clusterEvents(events, 0n, RationalScale.fromSecondsPerPixel(1), 300);
+
+      expect(clusters).toHaveLength(1);
+      expect(clusters[0].type).toBe('cluster');
+      expect(clusters[0].events.map((event) => event.id)).toEqual(['visible-a', 'visible-b']);
+    });
+
+    it('exposes shared screen footprint and hit geometry for clusters', () => {
+      const events = [
+        { id: 'e1', start: 0n },
+        { id: 'e2', start: 10n },
+      ];
+
+      const clusters = clusterEvents(events, 0n, RationalScale.fromSecondsPerPixel(1), 200);
+
+      expect(clusters[0]).toMatchObject({
+        type: 'cluster',
+        screenFootprint: {
+          minX: expect.any(Number),
+          maxX: expect.any(Number),
+          width: expect.any(Number),
+        },
+        hitGeometry: {
+          centerX: expect.any(Number),
+          radius: expect.any(Number),
+        },
+      });
+      expect(clusters[0].screenFootprint.width).toBeGreaterThan(0);
+    });
   });
 
   describe('getClusterExpansionFactor', () => {

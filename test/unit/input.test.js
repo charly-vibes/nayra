@@ -3,6 +3,8 @@ import { RationalScale } from '../../src/core/scale.js';
 import { createStore } from '../../src/core/store.js';
 import { YEAR } from '../../src/core/time.js';
 import { initInput } from '../../src/interaction/input.js';
+import { getLaneY } from '../../src/layout/lane-positioning.js';
+import * as renderer from '../../src/rendering/renderer.js';
 import { getAxisY } from '../../src/rendering/renderer.js';
 
 function createMockCanvas() {
@@ -390,6 +392,156 @@ describe('Input', () => {
 
       const newSpp = store.getState().scale.getSecondsPerPixel();
       expect(newSpp).toBeLessThan(initialSpp);
+    });
+
+    it('clicking a collapsed cluster expands it and centers it', () => {
+      const initialScale = RationalScale.fromSecondsPerPixel(10);
+      destroy();
+      store = createStore({
+        viewportStart: 0n,
+        scale: initialScale,
+        canvasWidth: 800,
+        canvasHeight: 400,
+        events: [],
+      });
+      destroy = initInput(canvas, store);
+
+      const cluster = {
+        type: 'cluster',
+        centerX: 120,
+        centerTime: 150n,
+        minTime: 100n,
+        maxTime: 200n,
+        count: 3,
+        events: [],
+        screenFootprint: {
+          minX: 96,
+          maxX: 144,
+          width: 48,
+        },
+        hitGeometry: {
+          centerX: 120,
+          radius: 16,
+        },
+      };
+      const clustersSpy = vi.spyOn(renderer, 'getClusters').mockReturnValue([cluster]);
+      try {
+        const axisY = getAxisY(400);
+        const laneConfig = renderer.getCurrentLaneConfig();
+        const clusterY = getLaneY(0, axisY, laneConfig) + laneConfig.laneHeight / 2;
+        canvas.dispatchEvent(
+          'pointerdown',
+          createMockPointerEvent(cluster.centerX, clusterY, { buttons: 1, timeStamp: 10 }),
+        );
+        canvas.dispatchEvent('pointerup', createMockPointerEvent(cluster.centerX, clusterY, { timeStamp: 20 }));
+
+        const state = store.getState();
+        const viewportMidpoint = state.viewportStart + state.scale.pxToTime(800 / 2);
+        const minimumExpandedSpan = BigInt(Math.ceil(initialScale.getSecondsPerPixel() * cluster.screenFootprint.width));
+        const representedWidth = state.scale.timeToPx(minimumExpandedSpan);
+
+        expect(viewportMidpoint).toBe(cluster.centerTime);
+        expect(representedWidth).toBeCloseTo(800 * 0.8, 5);
+      } finally {
+        clustersSpy.mockRestore();
+      }
+    });
+
+    it('hovering a cluster notifies the cluster tooltip callback', () => {
+      const onHoverClusterChange = vi.fn();
+      destroy();
+      store = createStore({
+        viewportStart: 0n,
+        scale: RationalScale.fromSecondsPerPixel(10),
+        canvasWidth: 800,
+        canvasHeight: 400,
+        events: [],
+      });
+      destroy = initInput(canvas, store, { onHoverClusterChange });
+
+      const cluster = {
+        type: 'cluster',
+        centerX: 120,
+        centerTime: 150n,
+        minTime: 100n,
+        maxTime: 200n,
+        count: 2,
+        events: [],
+        screenFootprint: { minX: 96, maxX: 144, width: 48 },
+        hitGeometry: { centerX: 120, radius: 16 },
+      };
+      const clustersSpy = vi.spyOn(renderer, 'getClusters').mockReturnValue([cluster]);
+      try {
+        const axisY = getAxisY(400);
+        const laneConfig = renderer.getCurrentLaneConfig();
+        const clusterY = getLaneY(0, axisY, laneConfig) + laneConfig.laneHeight / 2;
+        canvas.dispatchEvent('pointermove', createMockPointerEvent(cluster.centerX, clusterY, { timeStamp: 10 }));
+
+        expect(onHoverClusterChange).toHaveBeenCalledWith(
+          expect.objectContaining({
+            __cluster: true,
+            minTime: cluster.minTime,
+            maxTime: cluster.maxTime,
+          }),
+        );
+        expect(store.getState().hoveredEventId).toBe(null);
+      } finally {
+        clustersSpy.mockRestore();
+      }
+    });
+
+    it('notifies again when cluster membership changes with the same span and count', () => {
+      const onHoverClusterChange = vi.fn();
+      destroy();
+      store = createStore({
+        viewportStart: 0n,
+        scale: RationalScale.fromSecondsPerPixel(10),
+        canvasWidth: 800,
+        canvasHeight: 400,
+        events: [],
+      });
+      destroy = initInput(canvas, store, { onHoverClusterChange });
+
+      const clusterA = {
+        type: 'cluster',
+        centerX: 120,
+        centerTime: 150n,
+        minTime: 100n,
+        maxTime: 200n,
+        count: 2,
+        events: [{ id: 'a' }, { id: 'b' }],
+        screenFootprint: { minX: 96, maxX: 144, width: 48 },
+        hitGeometry: { centerX: 120, radius: 16 },
+      };
+      const clusterB = {
+        ...clusterA,
+        events: [{ id: 'c' }, { id: 'd' }],
+      };
+
+      const axisY = getAxisY(400);
+      const laneConfig = renderer.getCurrentLaneConfig();
+      const clusterY = getLaneY(0, axisY, laneConfig) + laneConfig.laneHeight / 2;
+
+      const clustersSpy = vi
+        .spyOn(renderer, 'getClusters')
+        .mockReturnValueOnce([clusterA])
+        .mockReturnValueOnce([clusterB]);
+
+      try {
+        canvas.dispatchEvent('pointermove', createMockPointerEvent(clusterA.centerX, clusterY, { timeStamp: 10 }));
+        canvas.dispatchEvent('pointermove', createMockPointerEvent(clusterA.centerX, clusterY, { timeStamp: 20 }));
+
+        expect(onHoverClusterChange).toHaveBeenNthCalledWith(
+          1,
+          expect.objectContaining({ events: clusterA.events, __cluster: true }),
+        );
+        expect(onHoverClusterChange).toHaveBeenNthCalledWith(
+          2,
+          expect.objectContaining({ events: clusterB.events, __cluster: true }),
+        );
+      } finally {
+        clustersSpy.mockRestore();
+      }
     });
 
     it('long press triggers callback and suppresses selection', () => {

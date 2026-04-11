@@ -1,6 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { RationalScale } from '../../src/core/scale.js';
 import { findEventAtPoint } from '../../src/interaction/hit-detection.js';
+import { getLaneY } from '../../src/layout/lane-positioning.js';
+import * as renderer from '../../src/rendering/renderer.js';
 import { getAxisY } from '../../src/rendering/renderer.js';
 
 const EVENT_HEIGHT = 20;
@@ -25,6 +27,38 @@ describe('findEventAtPoint', () => {
     it('returns null', () => {
       const result = findEventAtPoint(50, axisY, [], viewportStart, scale, canvasHeight);
       expect(result).toBe(null);
+    });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  describe('when clicking on a visible cluster marker', () => {
+    it('returns the cluster at the rendered lane center', () => {
+      const laneConfig = renderer.getCurrentLaneConfig();
+      const clusterY = getLaneY(0, axisY, laneConfig) + laneConfig.laneHeight / 2;
+      const cluster = {
+        type: 'cluster',
+        centerX: 120,
+        centerTime: 150n,
+        minTime: 100n,
+        maxTime: 200n,
+        count: 2,
+        events: [makeEvent('e1', 100), makeEvent('e2', 200)],
+      };
+
+      vi.spyOn(renderer, 'getClusters').mockReturnValue([cluster]);
+
+      const result = findEventAtPoint(cluster.centerX, clusterY, [], viewportStart, scale, canvasHeight);
+
+      expect(result).toMatchObject({
+        __cluster: true,
+        centerTime: cluster.centerTime,
+        minTime: cluster.minTime,
+        maxTime: cluster.maxTime,
+        count: cluster.count,
+      });
     });
   });
 

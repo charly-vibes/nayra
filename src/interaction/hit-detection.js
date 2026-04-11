@@ -8,6 +8,8 @@ import { getAxisY, getClusters, getCurrentLaneConfig } from '../rendering/render
 // Lane-aware hit detection
 export function findEventAtPoint(x, y, events, viewportStart, scale, canvasHeight) {
   const axisY = getAxisY(canvasHeight);
+  const laneConfig = getCurrentLaneConfig();
+  const clusterY = getLaneY(0, axisY, laneConfig) + laneConfig.laneHeight / 2;
 
   // First check for cluster hits (if in macro zoom mode)
   const clusters = getClusters();
@@ -15,14 +17,17 @@ export function findEventAtPoint(x, y, events, viewportStart, scale, canvasHeigh
     const CLUSTER_RADIUS = 24; // Match max radius from renderer
     for (const cluster of clusters) {
       if (cluster.type === 'cluster') {
-        if (isPointInCluster(x, y, cluster, axisY, CLUSTER_RADIUS)) {
+        if (isPointInCluster(x, y, cluster, clusterY, CLUSTER_RADIUS)) {
           // Return a special cluster object with __cluster flag
           return {
             __cluster: true,
             minTime: cluster.minTime,
             maxTime: cluster.maxTime,
+            centerTime: cluster.centerTime,
             count: cluster.count,
             events: cluster.events,
+            screenFootprint: cluster.screenFootprint,
+            hitGeometry: cluster.hitGeometry,
           };
         }
       }
@@ -31,7 +36,6 @@ export function findEventAtPoint(x, y, events, viewportStart, scale, canvasHeigh
 
   // Build lane assignments for multilane support
   const { layouts: laneAssignments } = assignLanes(events);
-  const laneConfig = getCurrentLaneConfig();
   const eventHeight = laneConfig.laneHeight;
 
   // Check events in reverse order (last rendered = top of stack)

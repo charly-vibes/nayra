@@ -7,8 +7,9 @@ import { projectToScreen } from '../core/time.js';
  * at macro zoom levels where events would be too dense to distinguish.
  */
 
-// Clustering threshold in pixels - events closer than this will be clustered
-const CLUSTER_THRESHOLD_PX = 20;
+const CLUSTER_THRESHOLD_PX = 24;
+const CLUSTER_BASE_RADIUS_PX = 12;
+const CLUSTER_MAX_RADIUS_PX = 24;
 
 // Minimum events to form a cluster (single events won't cluster)
 const MIN_CLUSTER_SIZE = 2;
@@ -21,86 +22,96 @@ const MIN_CLUSTER_SIZE = 2;
  * @param {Object} scale - Scale object for time projection
  * @returns {Array} - Array of cluster objects
  */
-export function clusterEvents(events, viewportStart, scale) {
+export function clusterEvents(events, viewportStart, scale, viewportWidth = Number.POSITIVE_INFINITY) {
   if (events.length === 0) {
     return [];
   }
 
-  // Sort events by start time
-  const sortedEvents = [...events].sort((a, b) => {
-    if (a.start < b.start) return -1;
-    if (a.start > b.start) return 1;
-    return 0;
-  });
+  const projectedEvents = events
+    .map((event) => projectEvent(event, viewportStart, scale))
+    .filter((event) => event.maxX >= 0 && event.minX <= viewportWidth)
+    .sort(compareProjectedEvents);
+
+  if (projectedEvents.length === 0) {
+    return [];
+  }
 
   const clusters = [];
   let currentCluster = null;
 
-  for (const event of sortedEvents) {
-    const eventX = projectToScreen(event.start, viewportStart, scale);
-
+  for (const event of projectedEvents) {
     if (!currentCluster) {
-      // Start a new cluster
-      currentCluster = {
-        events: [event],
-        minX: eventX,
-        maxX: eventX,
-        minTime: event.start,
-        maxTime: event.end !== undefined ? event.end : event.start,
-      };
+      currentCluster = createClusterCandidate(event);
     } else {
-      // Check if this event is close enough to the current cluster
-      const distanceFromCluster = eventX - currentCluster.maxX;
-
-      if (distanceFromCluster <= CLUSTER_THRESHOLD_PX) {
-        // Add to current cluster
-        currentCluster.events.push(event);
-        currentCluster.maxX = Math.max(currentCluster.maxX, eventX);
-        currentCluster.maxTime =
-          event.end !== undefined
-            ? event.end > currentCluster.maxTime
-              ? event.end
-              : currentCluster.maxTime
-            : event.start > currentCluster.maxTime
-              ? event.start
-              : currentCluster.maxTime;
+      if (event.minX <= currentCluster.footprintMaxX) {
+        addEventToClusterCandidate(currentCluster, event);
       } else {
-        // Finalize current cluster and start a new one
-        if (currentCluster.events.length >= MIN_CLUSTER_SIZE) {
-          clusters.push(finalizeCluster(currentCluster));
-        } else {
-          // Single event - don't cluster
-          clusters.push({
-            type: 'event',
-            event: currentCluster.events[0],
-          });
-        }
-
-        currentCluster = {
-          events: [event],
-          minX: eventX,
-          maxX: eventX,
-          minTime: event.start,
-          maxTime: event.end !== undefined ? event.end : event.start,
-        };
+        clusters.push(finalizeClusterCandidate(currentCluster));
+        currentCluster = createClusterCandidate(event);
       }
     }
   }
 
-  // Finalize the last cluster
   if (currentCluster) {
-    if (currentCluster.events.length >= MIN_CLUSTER_SIZE) {
-      clusters.push(finalizeCluster(currentCluster));
-    } else {
-      // Single event - don't cluster
-      clusters.push({
-        type: 'event',
-        event: currentCluster.events[0],
-      });
-    }
+    clusters.push(finalizeClusterCandidate(currentCluster));
   }
 
   return clusters;
+}
+
+function compareProjectedEvents(a, b) {
+  if (a.minX !== b.minX) return a.minX - b.minX;
+  if (a.maxX !== b.maxX) return a.maxX - b.maxX;
+  if (a.event.start < b.event.start) return -1;
+  if (a.event.start > b.event.start) return 1;
+  return a.event.id.localeCompare(b.event.id);
+}
+
+function compareEventsChronologically(a, b) {
+  if (a.start < b.start) return -1;
+  if (a.start > b.start) return 1;
+  const aEnd = a.end ?? a.start;
+  const bEnd = b.end ?? b.start;
+  if (aEnd < bEnd) return -1;
+  if (aEnd > bEnd) return 1;
+  return a.id.localeCompare(b.id);
+}
+
+function projectEvent(event, viewportStart, scale) {
+  const startX = projectToScreen(event.start, viewportStart, scale);
+  const endTime = event.end ?? event.start;
+  const endX = projectToScreen(endTime, viewportStart, scale);
+  return {
+    event,
+    minX: Math.min(startX, endX),
+    maxX: Math.max(startX, endX),
+  };
+}
+
+function createClusterCandidate(projectedEvent) {
+  return {
+    projectedEvents: [projectedEvent],
+    footprintMinX: projectedEvent.minX - CLUSTER_THRESHOLD_PX,
+    footprintMaxX: projectedEvent.maxX + CLUSTER_THRESHOLD_PX,
+  };
+}
+
+function addEventToClusterCandidate(cluster, projectedEvent) {
+  cluster.projectedEvents.push(projectedEvent);
+  cluster.footprintMinX = Math.min(cluster.footprintMinX, projectedEvent.minX - CLUSTER_THRESHOLD_PX);
+  cluster.footprintMaxX = Math.max(cluster.footprintMaxX, projectedEvent.maxX + CLUSTER_THRESHOLD_PX);
+}
+
+function finalizeClusterCandidate(clusterCandidate) {
+  const events = clusterCandidate.projectedEvents.map(({ event }) => event).sort(compareEventsChronologically);
+  if (events.length < MIN_CLUSTER_SIZE) {
+    return {
+      type: 'event',
+      event: events[0],
+    };
+  }
+
+  return finalizeCluster(clusterCandidate, events);
 }
 
 /**
@@ -109,12 +120,18 @@ export function clusterEvents(events, viewportStart, scale) {
  * @param {Object} clusterData - Raw cluster data
  * @returns {Object} - Finalized cluster object
  */
-function finalizeCluster(clusterData) {
-  const { events, minX, maxX, minTime, maxTime } = clusterData;
+function finalizeCluster(clusterData, events) {
+  let minTime = events[0].start;
+  let maxTime = events[0].end ?? events[0].start;
+  for (const event of events) {
+    if (event.start < minTime) minTime = event.start;
+    const eventEnd = event.end ?? event.start;
+    if (eventEnd > maxTime) maxTime = eventEnd;
+  }
 
-  // Calculate centroid (average position)
-  const centerX = (minX + maxX) / 2;
+  const centerX = (clusterData.footprintMinX + clusterData.footprintMaxX) / 2;
   const centerTime = minTime + (maxTime - minTime) / 2n;
+  const markerRadius = getClusterMarkerRadius(events.length);
 
   return {
     type: 'cluster',
@@ -124,9 +141,22 @@ function finalizeCluster(clusterData) {
     centerTime,
     minTime,
     maxTime,
-    minX,
-    maxX,
+    minX: clusterData.footprintMinX,
+    maxX: clusterData.footprintMaxX,
+    screenFootprint: {
+      minX: clusterData.footprintMinX,
+      maxX: clusterData.footprintMaxX,
+      width: clusterData.footprintMaxX - clusterData.footprintMinX,
+    },
+    hitGeometry: {
+      centerX,
+      radius: markerRadius,
+    },
   };
+}
+
+export function getClusterMarkerRadius(count) {
+  return Math.min(CLUSTER_BASE_RADIUS_PX + Math.log(count) * 2, CLUSTER_MAX_RADIUS_PX);
 }
 
 /**
@@ -165,8 +195,10 @@ export function getClusterExpansionFactor(secondsPerPixel, macroThreshold, mesoT
  * @returns {boolean} - Whether the point intersects the cluster
  */
 export function isPointInCluster(x, y, cluster, markerY, markerRadius) {
-  const dx = x - cluster.centerX;
+  const radius = cluster.hitGeometry?.radius ?? markerRadius;
+  const centerX = cluster.hitGeometry?.centerX ?? cluster.centerX;
+  const dx = x - centerX;
   const dy = y - markerY;
   const distanceSquared = dx * dx + dy * dy;
-  return distanceSquared <= markerRadius * markerRadius;
+  return distanceSquared <= radius * radius;
 }

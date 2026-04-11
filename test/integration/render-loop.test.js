@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { RationalScale } from '../../src/core/scale.js';
 import { createStore } from '../../src/core/store.js';
-import { destroy, draw, init } from '../../src/rendering/renderer.js';
+import { destroy, draw, getClusters, init } from '../../src/rendering/renderer.js';
+import { YEAR } from '../../src/core/time.js';
 
 describe('Render Loop Integration', () => {
   let canvas;
@@ -77,6 +78,28 @@ describe('Render Loop Integration', () => {
         ],
       });
       expect(() => draw(store.getState())).not.toThrow();
+    });
+
+    it('builds macro clusters from the active filtered event set', () => {
+      const scale = RationalScale.fromSecondsPerPixel(Number(YEAR) * 60);
+      store.dispatch({ type: 'SET_VIEWPORT', viewportStart: 0n, scale });
+      store.dispatch({
+        type: 'SET_EVENTS',
+        events: [
+          { id: 'science-1', start: 0n, end: 10n, category: 'Science', priority: 0 },
+          { id: 'history-1', start: 5n, end: 15n, category: 'History', priority: 0 },
+        ],
+      });
+      store.dispatch({ type: 'TOGGLE_CATEGORY', category: 'Science' });
+
+      draw(store.getState());
+
+      expect(getClusters()).toEqual([
+        {
+          type: 'event',
+          event: expect.objectContaining({ id: 'science-1' }),
+        },
+      ]);
     });
   });
 

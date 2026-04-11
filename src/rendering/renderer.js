@@ -18,8 +18,10 @@ import {
   determineLOD,
   filterEventsByLOD,
   getMinEventWidth,
+  getEventPriority,
   LOD_MACRO,
   LOD_MICRO,
+  PRIORITY_HIGH,
   shouldRenderAsPoint,
   shouldShowLabels,
 } from './lod.js';
@@ -42,9 +44,18 @@ let layoutRevision = -1; // Track when layout needs recalculation
 let currentLOD = LOD_MICRO; // Current level of detail
 let clusters = []; // Current event clusters (for macro zoom)
 let lodFilteredEventsCache = []; // Cached LOD-filtered events
+let macroVisibleEventIds = new Set(); // High-priority events still visible as single markers in macro mode
 let drawRevision = -1; // Track when draw-phase caches need refresh
 let pendingLayoutRevision = -1; // Track pending async layout calculation
 let isLayoutPending = false; // Flag to prevent duplicate layout requests
+
+function filterEventsByActiveIds(events, activeFilterIds) {
+  if (activeFilterIds === null) {
+    return events;
+  }
+  const activeIds = new Set(activeFilterIds);
+  return events.filter((event) => activeIds.has(event.id));
+}
 
 export const AXIS_BOTTOM_MARGIN = 60;
 export function getAxisY(height) {
@@ -94,6 +105,7 @@ export function destroy() {
   currentLOD = LOD_MICRO;
   clusters = [];
   lodFilteredEventsCache = [];
+  macroVisibleEventIds.clear();
   pendingLayoutRevision = -1;
   isLayoutPending = false;
 }
@@ -276,13 +288,15 @@ export function draw(state) {
   // Only recalculate filtering, clustering, and layout when state has changed
   if (drawRevision !== state.revision) {
     drawRevision = state.revision;
+    const activeEvents = filterEventsByActiveIds(state.events, state.activeFilterIds);
 
     // Filter events by LOD before layout
     lodFilteredEventsCache = filterEventsByLOD(state.events, currentLOD);
+    macroVisibleEventIds = new Set(filterEventsByLOD(activeEvents, currentLOD).map((event) => event.id));
 
     // Apply clustering at macro zoom level
     if (currentLOD === LOD_MACRO) {
-      clusters = clusterEvents(lodFilteredEventsCache, state.viewportStart, state.scale);
+      clusters = clusterEvents(activeEvents, state.viewportStart, state.scale, width);
     } else {
       clusters = [];
     }
@@ -332,6 +346,9 @@ export function draw(state) {
       } else if (cluster.type === 'event') {
         // Single unclustered event
         const event = cluster.event;
+        if (!macroVisibleEventIds.has(event.id) && getEventPriority(event) < PRIORITY_HIGH) {
+          continue;
+        }
         const duration = event.end !== undefined ? event.end - event.start : 0n;
         if (isVisible(event.start, duration, state.viewportStart, viewportEnd)) {
           drawEvent(event, state, axisY, width, currentLOD, searchResultSet, currentLaneConfig);
@@ -399,7 +416,7 @@ function drawCluster(cluster, state, axisY, canvasWidth, viewportEnd) {
     return;
   }
 
-  const x = cluster.centerX;
+  const x = cluster.hitGeometry?.centerX ?? cluster.centerX;
   if (x < 0 || x > canvasWidth) return;
 
   // Position cluster at the centered lane band, not at the bottom axis
@@ -407,9 +424,7 @@ function drawCluster(cluster, state, axisY, canvasWidth, viewportEnd) {
   const clusterY = laneY + currentLaneConfig.laneHeight / 2;
 
   // Cluster marker size based on count
-  const baseRadius = 12;
-  const maxRadius = 24;
-  const radius = Math.min(baseRadius + Math.log(cluster.count) * 2, maxRadius);
+  const radius = cluster.hitGeometry?.radius ?? 12;
 
   // Draw cluster marker (circle)
   ctx.fillStyle = '#4ecdc4';

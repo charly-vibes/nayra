@@ -1,4 +1,4 @@
-import { zoomToEvent } from '../core/navigation.js';
+import { zoomToEvent, zoomToRange } from '../core/navigation.js';
 import { RationalScale } from '../core/scale.js';
 import { YEAR } from '../core/time.js';
 import { initAutoPan } from '../viewport/pan.js';
@@ -18,8 +18,15 @@ const MOMENTUM_THRESHOLD = 5;
 const MOMENTUM_FRICTION = 0.95;
 const MOMENTUM_MAX_SAMPLES = 5;
 const ZOOM_FACTOR = 1.15;
+const CLUSTER_VISIBLE_FRACTION = 0.8;
 
 export const DEFAULT_SCALE = RationalScale.fromSecondsPerPixel(Number(YEAR));
+
+function getHoverClusterKey(cluster) {
+  if (!cluster) return null;
+  const eventIds = cluster.events?.map((event) => event.id).join(',') ?? '';
+  return `${cluster.minTime}:${cluster.maxTime}:${cluster.count}:${eventIds}`;
+}
 
 export const KEYBOARD_SHORTCUTS = {
   Home: 'jumpToFirst',
@@ -100,6 +107,16 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
   let momentumRaf = null;
   let hasActiveTouch = false;
   let isLongPressActive = false;
+  let hoveredClusterKey = null;
+
+  function updateHoveredCluster(cluster) {
+    const nextKey = getHoverClusterKey(cluster);
+    if (nextKey === hoveredClusterKey) {
+      return;
+    }
+    hoveredClusterKey = nextKey;
+    callbacks.onHoverClusterChange?.(cluster);
+  }
 
   function cancelMomentum() {
     if (momentumRaf !== null && typeof cancelAnimationFrame === 'function') {
@@ -133,6 +150,7 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
     if (state.hoveredEventId !== null) {
       store.dispatch({ type: 'SET_HOVER', eventId: null });
     }
+    updateHoveredCluster(null);
     canvas.style.cursor = 'grab';
   }
 
@@ -318,6 +336,7 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
 
     if (!isDragging && e.buttons !== 1 && !hasActiveTouch) {
       const event = findEventAtPoint(x, y, state.events, state.viewportStart, state.scale, rect.height);
+      updateHoveredCluster(event && event.__cluster ? event : null);
       // Don't hover on clusters, only on regular events
       const eventId = event && !event.__cluster ? event.id : null;
       if (eventId !== state.hoveredEventId) {
@@ -399,19 +418,12 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
       if (event) {
         // Check if this is a cluster click
         if (event.__cluster) {
-          // Zoom to show the cluster's events
-          const clusterTimeRange = event.maxTime - event.minTime;
-          const padding = clusterTimeRange / 4n; // Add 25% padding on each side
-          const targetStart = event.minTime - padding;
-          const targetEnd = event.maxTime + padding;
-          const targetRange = targetEnd - targetStart;
-
-          // Calculate new scale to fit the cluster in view
-          const newSpp = Number(targetRange) / rect.width;
-          const newScale = RationalScale.fromSecondsPerPixel(newSpp);
-
-          // Center the cluster in view
-          store.dispatch({ type: 'SET_VIEWPORT', viewportStart: targetStart, scale: newScale });
+          const minSpan = BigInt(Math.ceil(state.scale.getSecondsPerPixel() * event.screenFootprint.width));
+          const { viewportStart, scale } = zoomToRange(event.minTime, event.maxTime, rect.width, {
+            minSpan,
+            targetVisibleFraction: CLUSTER_VISIBLE_FRACTION,
+          });
+          store.dispatch({ type: 'SET_VIEWPORT', viewportStart, scale });
         } else {
           // Regular event click
           if (e.ctrlKey || e.metaKey) {
@@ -461,6 +473,7 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
       isDragging = false;
     }
     clearLongPress();
+    updateHoveredCluster(null);
     if (!hasActiveTouch) {
       const state = store.getState();
       if (state.hoveredEventId !== null) {
@@ -477,6 +490,7 @@ export function initInput(canvas, store, callbacks = {}, focusManager = null) {
     gestures.removePointer(e.pointerId);
     pointerSamples.delete(e.pointerId);
     clearLongPress();
+    updateHoveredCluster(null);
     if (gestures.pointerCount < 2) {
       pinchStartDistance = null;
       pinchStartSpp = null;

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { zoomToEvent } from '../../src/core/navigation.js';
+import { zoomToEvent, zoomToRange } from '../../src/core/navigation.js';
 import { RationalScale } from '../../src/core/scale.js';
+import { MACRO_TO_MESO_THRESHOLD } from '../../src/rendering/lod.js';
 
 describe('zoomToEvent', () => {
   const CANVAS_WIDTH = 800;
@@ -49,5 +50,39 @@ describe('zoomToEvent', () => {
     // Event span in seconds
     const eventSpan = Number(event.end - event.start);
     expect(visibleSeconds).toBeGreaterThan(eventSpan);
+  });
+});
+
+describe('zoomToRange', () => {
+  const CANVAS_WIDTH = 800;
+
+  it('centers the target range in the viewport', () => {
+    const start = 1000n;
+    const end = 5000n;
+    const result = zoomToRange(start, end, CANVAS_WIDTH);
+    const viewportMidpoint = result.viewportStart + result.scale.pxToTime(CANVAS_WIDTH / 2);
+    const rangeMidpoint = start + (end - start) / 2n;
+
+    expect(viewportMidpoint).toBe(rangeMidpoint);
+  });
+
+  it('respects a max seconds-per-pixel cap', () => {
+    const start = 0n;
+    const end = BigInt(Math.round(MACRO_TO_MESO_THRESHOLD * CANVAS_WIDTH * 4));
+    const result = zoomToRange(start, end, CANVAS_WIDTH, {
+      maxSecondsPerPixel: MACRO_TO_MESO_THRESHOLD * 0.95,
+    });
+
+    expect(result.scale).toBeInstanceOf(RationalScale);
+    expect(result.scale.getSecondsPerPixel()).toBeLessThan(MACRO_TO_MESO_THRESHOLD);
+  });
+
+  it('expands a range to occupy the requested visible fraction', () => {
+    const start = 1000n;
+    const end = 5000n;
+    const result = zoomToRange(start, end, CANVAS_WIDTH, { targetVisibleFraction: 0.8 });
+    const representedWidth = result.scale.timeToPx(end - start);
+
+    expect(representedWidth).toBeCloseTo(CANVAS_WIDTH * 0.8, 5);
   });
 });

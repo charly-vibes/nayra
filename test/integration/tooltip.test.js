@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createTooltip } from '../../src/ui/tooltip.js';
 
 describe('createTooltip', () => {
@@ -98,6 +98,49 @@ describe('createTooltip', () => {
       expect(el.style.left).toBe('160px');
       expect(el.style.top).toBe('260px');
     });
+
+    it('renders cluster tooltip content with count, span, and represented events', () => {
+      tooltip = createTooltip(container);
+      tooltip.update(
+        {
+          __cluster: true,
+          count: 2,
+          minTime: 0n,
+          maxTime: 10n,
+          events: [
+            { id: 'b', label: 'Second', start: 10n },
+            { id: 'a', label: 'First', start: 0n },
+          ],
+        },
+        100,
+        200,
+      );
+      const el = container.querySelector('.tooltip');
+      expect(el.textContent).toContain('2 events');
+      expect(el.textContent).toContain('First');
+      expect(el.textContent).toContain('Second');
+    });
+
+    it('shows a truncation summary for large clusters', () => {
+      tooltip = createTooltip(container);
+      tooltip.update(
+        {
+          __cluster: true,
+          count: 8,
+          minTime: 0n,
+          maxTime: 10n,
+          events: Array.from({ length: 8 }, (_, index) => ({
+            id: `e${index}`,
+            label: `Event ${index}`,
+            start: BigInt(index),
+          })),
+        },
+        100,
+        200,
+      );
+      const el = container.querySelector('.tooltip');
+      expect(el.textContent).toContain('+2 more');
+    });
   });
 
   describe('viewport clamping', () => {
@@ -117,6 +160,34 @@ describe('createTooltip', () => {
       const el = container.querySelector('.tooltip');
       const top = parseInt(el.style.top, 10);
       expect(top).toBeLessThanOrEqual(window.innerHeight - 30);
+    });
+
+    it('clamps large cluster tooltips using measured rendered size', () => {
+      tooltip = createTooltip(container);
+      vi.spyOn(tooltip.element, 'offsetWidth', 'get').mockReturnValue(280);
+      vi.spyOn(tooltip.element, 'offsetHeight', 'get').mockReturnValue(180);
+
+      tooltip.update(
+        {
+          __cluster: true,
+          count: 8,
+          minTime: 0n,
+          maxTime: 10n,
+          events: Array.from({ length: 8 }, (_, index) => ({
+            id: `e${index}`,
+            label: `Event ${index}`,
+            start: BigInt(index),
+          })),
+        },
+        window.innerWidth - 5,
+        window.innerHeight - 5,
+      );
+      const el = container.querySelector('.tooltip');
+      const left = parseInt(el.style.left, 10);
+      const top = parseInt(el.style.top, 10);
+
+      expect(left).toBe(window.innerWidth - 280 - 10);
+      expect(top).toBe(window.innerHeight - 180 - 10);
     });
   });
 

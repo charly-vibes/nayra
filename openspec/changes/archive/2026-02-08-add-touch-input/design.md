@@ -2,7 +2,7 @@
 
 ## Context
 
-Nayra requires touch support for tablet and touchscreen users. The existing [`src/interaction/input.js`](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/interaction/input.js) uses mouse-only events (`mousedown`, `mousemove`, `mouseup`, `wheel`). Touch devices require gesture recognition for pinch-zoom and momentum scrolling—patterns not available via simple event mapping.
+Nayra requires touch support for tablet and touchscreen users. The existing [`src/interaction/input.js`](../../../../src/interaction/input.js) uses mouse-only events (`mousedown`, `mousemove`, `mouseup`, `wheel`). Touch devices require gesture recognition for pinch-zoom and momentum scrolling—patterns not available via simple event mapping.
 
 **Stakeholders**: End users on tablets/touchscreens, accessibility (touch targets minimum 44×44px per WCAG 2.1 Level AAA, 24×24px for Level AA).
 

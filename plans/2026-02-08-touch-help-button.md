@@ -8,8 +8,8 @@ Add a floating "?" button to the bottom-right corner of the viewport so touch-on
 
 ## Current State
 
-- **Help menu** exists at [`src/ui/help.js`](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/ui/help.js) with `show()`, `hide()`, `isVisible()` API
-- **Toggle logic** wired in [`src/main.js:120-126`](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/main.js#L120-L126) via `onToggleHelp` callback
+- **Help menu** exists at [`src/ui/help.js`](../src/ui/help.js) with `show()`, `hide()`, `isVisible()` API
+- **Toggle logic** wired in [`src/main.js:120-126`](../src/main.js#L120-L126) via `onToggleHelp` callback
 - **UI component pattern** established: factory function returns `{ element, destroy }`, appended to container
 - **No existing button UI** — all overlays are keyboard/mouse triggered
 

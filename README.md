@@ -50,7 +50,7 @@ Nayra implements a hybrid rendering architecture:
 
 ```bash
 # Clone the repository
-git clone https://github.com/charly/nayra.git
+git clone https://github.com/charly-vibes/nayra.git
 cd nayra
 
 # Setup development environment

@@ -642,7 +642,7 @@ Phases are semi-independent:
 
 ## References
 
-- Existing validator: [src/data/validator.js](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/data/validator.js)
-- Time parser: [src/core/time-parser.js](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/core/time-parser.js)
-- JSON-LD transformer: [src/data/jsonld-transformer.js](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/data/jsonld-transformer.js)
-- Example format: [examples/space-exploration.json](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/examples/space-exploration.json)
+- Existing validator: [src/data/validator.js](../src/data/validator.js)
+- Time parser: [src/core/time-parser.js](../src/core/time-parser.js)
+- JSON-LD transformer: [src/data/jsonld-transformer.js](../src/data/jsonld-transformer.js)
+- Example format: [examples/space-exploration.json](../examples/space-exploration.json)

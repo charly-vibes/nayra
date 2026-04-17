@@ -8,7 +8,7 @@ This document analyzes the Nayra codebase to understand how to implement event i
 
 ### Component 1: Event Data Model
 
-**Location:** [`src/data/event.schema.json:8-66`](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/data/event.schema.json#L8-L66)
+**Location:** [`src/data/event.schema.json:8-66`](../src/data/event.schema.json#L8-L66)
 
 **Purpose:** Defines the event schema with displayable properties.
 
@@ -30,7 +30,7 @@ This document analyzes the Nayra codebase to understand how to implement event i
 
 ### Component 2: State Management (Selection & Hover)
 
-**Location:** [`src/core/store.js:10-11`](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/core/store.js#L10-L11) (initial state), [`src/core/store.js:69-87`](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/core/store.js#L69-L87) (reducers)
+**Location:** [`src/core/store.js:10-11`](../src/core/store.js#L10-L11) (initial state), [`src/core/store.js:69-87`](../src/core/store.js#L69-L87) (reducers)
 
 **Purpose:** Manages UI interaction state.
 
@@ -59,7 +59,7 @@ store.subscribe((state) => {
 
 ### Component 3: Hit Detection
 
-**Location:** [`src/interaction/hit-detection.js:4-28`](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/interaction/hit-detection.js#L4-L28)
+**Location:** [`src/interaction/hit-detection.js:4-28`](../src/interaction/hit-detection.js#L4-L28)
 
 **Purpose:** Determines which event is at a given screen coordinate.
 
@@ -78,7 +78,7 @@ findEventAtPoint(x, y, events, viewportStart, scale, canvasHeight) → Event | n
 
 ### Component 4: Input Handling (Hover & Click Events)
 
-**Location:** [`src/interaction/input.js:40-118`](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/interaction/input.js#L40-L118)
+**Location:** [`src/interaction/input.js:40-118`](../src/interaction/input.js#L40-L118)
 
 **Purpose:** Listens to mouse events and updates store.
 
@@ -109,7 +109,7 @@ if (event) {
 
 ### Component 5: Visual Feedback (Rendering)
 
-**Location:** [`src/rendering/renderer.js:102-119`](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/rendering/renderer.js#L102-L119)
+**Location:** [`src/rendering/renderer.js:102-119`](../src/rendering/renderer.js#L102-L119)
 
 **Purpose:** Draws events with hover/selection visual states.
 
@@ -128,7 +128,7 @@ const strokeStyle = getEventStrokeStyle(isSelected);
 
 ### Component 6: UI Component Pattern (DOM Overlay)
 
-**Location:** [`src/ui/searchbar.js:1-74`](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/ui/searchbar.js#L1-L74) and [`src/ui/help.js:224-486`](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/ui/help.js#L224-L486)
+**Location:** [`src/ui/searchbar.js:1-74`](../src/ui/searchbar.js#L1-L74) and [`src/ui/help.js:224-486`](../src/ui/help.js#L224-L486)
 
 **Purpose:** Provides the pattern for DOM-based UI overlays.
 
@@ -172,7 +172,7 @@ export function createComponent(container, options = {}) {
 
 ### Component 7: Application Bootstrap
 
-**Location:** [`src/main.js:1-96`](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/main.js#L1-L96)
+**Location:** [`src/main.js:1-96`](../src/main.js#L1-L96)
 
 **Purpose:** Shows how UI components are wired into the application.
 
@@ -223,7 +223,7 @@ Show tooltip with event.label, event.description, etc.
 
 ## Requirements (from spec)
 
-**Location:** [`openspec/specs/user-interaction/spec.md:112-137`](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/openspec/specs/user-interaction/spec.md#L112-L137)
+**Location:** [`openspec/specs/user-interaction/spec.md:112-137`](../openspec/specs/user-interaction/spec.md#L112-L137)
 
 **Tooltip Requirements:**
 - Show after 500ms hover delay
@@ -489,7 +489,7 @@ function buildMultiEventContent(events) {
 }
 ```
 
-**Accessibility Notes (per [`openspec/specs/accessibility/spec.md:106-111`](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/openspec/specs/accessibility/spec.md#L106-L111)):**
+**Accessibility Notes (per [`openspec/specs/accessibility/spec.md:106-111`](../openspec/specs/accessibility/spec.md#L106-L111)):**
 - Panel uses `role="dialog"` and `aria-modal="true"`
 - Escape key closes the panel
 - Focus moves to panel on open
@@ -531,9 +531,9 @@ src/ui/
 
 ## References
 
-- Event schema: [`src/data/event.schema.json`](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/data/event.schema.json)
-- Store: [`src/core/store.js`](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/core/store.js)
-- Hit detection: [`src/interaction/hit-detection.js`](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/interaction/hit-detection.js)
-- Input handling: [`src/interaction/input.js`](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/interaction/input.js)
-- UI patterns: [`src/ui/searchbar.js`](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/ui/searchbar.js), [`src/ui/help.js`](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/ui/help.js)
-- Spec requirements: [`openspec/specs/user-interaction/spec.md`](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/openspec/specs/user-interaction/spec.md#L112-L137)
+- Event schema: [`src/data/event.schema.json`](../src/data/event.schema.json)
+- Store: [`src/core/store.js`](../src/core/store.js)
+- Hit detection: [`src/interaction/hit-detection.js`](../src/interaction/hit-detection.js)
+- Input handling: [`src/interaction/input.js`](../src/interaction/input.js)
+- UI patterns: [`src/ui/searchbar.js`](../src/ui/searchbar.js), [`src/ui/help.js`](../src/ui/help.js)
+- Spec requirements: [`openspec/specs/user-interaction/spec.md`](../openspec/specs/user-interaction/spec.md#L112-L137)

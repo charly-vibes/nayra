@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/charly/nayra/event.schema.json",
+  "$id": "https://github.com/charly-vibes/nayra/event.schema.json",
   "title": "Nayra Event",
   "description": "Schema for timeline event data in Nayra",
   "type": "object",

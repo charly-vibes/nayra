@@ -8,10 +8,10 @@ Implement event information visualization: tooltips on hover (500ms delay) and d
 
 ## Current State
 
-- **Event data model** has all displayable fields: `label`, `description`, `start/end`, `category`, `tags`, `priority`, `precision`, `url`, `source`, `metadata` ([event.schema.json](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/data/event.schema.json))
-- **State management** tracks `hoveredEventId` and `selectedEventIds` ([store.js:10-11](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/core/store.js#L10-L11))
-- **Hit detection** finds events at coordinates ([hit-detection.js](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/interaction/hit-detection.js))
-- **Input handling** dispatches hover/selection actions ([input.js:46-58](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/interaction/input.js#L46-L58))
+- **Event data model** has all displayable fields: `label`, `description`, `start/end`, `category`, `tags`, `priority`, `precision`, `url`, `source`, `metadata` ([event.schema.json](../src/data/event.schema.json))
+- **State management** tracks `hoveredEventId` and `selectedEventIds` ([store.js:10-11](../src/core/store.js#L10-L11))
+- **Hit detection** finds events at coordinates ([hit-detection.js](../src/interaction/hit-detection.js))
+- **Input handling** dispatches hover/selection actions ([input.js:46-58](../src/interaction/input.js#L46-L58))
 - **UI component pattern** established by searchbar.js and help.js
 
 **Missing:**
@@ -216,6 +216,6 @@ src/ui/
 
 ## References
 
-- Research: [research/2026-02-05-event-information-visualization.md](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/research/2026-02-05-event-information-visualization.md)
-- Spec requirements: [openspec/specs/user-interaction/spec.md#L112-L137](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/openspec/specs/user-interaction/spec.md#L112-L137)
-- UI pattern: [src/ui/searchbar.js](file:///var/home/sasha/para/areas/dev/gh/charly/nayra/src/ui/searchbar.js)
+- Research: [research/2026-02-05-event-information-visualization.md](../research/2026-02-05-event-information-visualization.md)
+- Spec requirements: [openspec/specs/user-interaction/spec.md#L112-L137](../openspec/specs/user-interaction/spec.md#L112-L137)
+- UI pattern: [src/ui/searchbar.js](../src/ui/searchbar.js)

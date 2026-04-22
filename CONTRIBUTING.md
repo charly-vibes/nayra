@@ -60,13 +60,10 @@ bd dep add <issue> <depends-on>   # issue blocks depends-on
 bd blocked                        # Show all blocked issues
 ```
 
-### Sync
+### Beads follow-up
 
-Beads state lives on `main`. On ephemeral branches, pull updates before committing:
-
-```bash
-bd sync --from-main
-```
+If beads needs follow-up on your branch, run `bd` and use the commands your
+installed version offers. Do not assume a hard-coded sync subcommand.
 
 ---
 

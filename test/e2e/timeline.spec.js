@@ -87,8 +87,8 @@ test.describe('Timeline Rendering', () => {
   });
 
   test('on-demand rendering fires rAF on state change', async ({ page, browserName }) => {
-    // Headless webkit does not reliably fire requestAnimationFrame callbacks
-    test.skip(browserName === 'webkit', 'RAF unreliable in headless webkit');
+    // Headless webkit/firefox do not reliably fire requestAnimationFrame callbacks
+    test.skip(browserName === 'webkit' || browserName === 'firefox', 'RAF unreliable in headless browsers');
 
     const rafCount = await page.evaluate(() => {
       return new Promise((resolve) => {

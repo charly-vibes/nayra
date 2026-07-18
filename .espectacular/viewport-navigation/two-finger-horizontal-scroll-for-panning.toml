@@ -1,0 +1,6 @@
+id = "two-finger-horizontal-scroll-for-panning"
+description = ""
+archetype = "PF"
+status = "active"
+superseded_by = ""
+authored_with = "0.1.0"

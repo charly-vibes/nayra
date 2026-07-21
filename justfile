@@ -24,6 +24,10 @@ dev-live:
 test:
     @command -v npm >/dev/null 2>&1 && npm test || echo "⚠️  No test framework configured yet"
 
+# Validate spec-test correspondence (requires ah)
+validate:
+    ah check
+
 # Run tests with coverage
 test-cover:
     @command -v npm >/dev/null 2>&1 && npm run test:coverage || echo "⚠️  No test framework configured yet"

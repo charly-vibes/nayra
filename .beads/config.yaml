@@ -1,2 +1,3 @@
-sync:
-    mode: dolt-native
+
+
+no-db: true
